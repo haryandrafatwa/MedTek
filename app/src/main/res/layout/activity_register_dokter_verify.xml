@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:theme="@style/ToolbarThemePrimary">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dokter"
+            android:textSize="18sp"
+            android:textColor="@color/colorPrimary"
+            android:textStyle="bold"
+            android:layout_gravity="center"/>
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/verifikasiakunanda"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="32dp"/>
+
+            <TextView
+                android:id="@+id/subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/silahkanupload"
+                android:textColor="@color/textColorGray"
+                android:fontFamily="@font/roboto_medium"
+                android:textSize="12sp"
+                android:layout_marginTop="4dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="32dp"
+                android:layout_below="@id/title"/>
+
+            <ImageView
+                android:id="@+id/upload_ilustrasi"
+                android:layout_width="270dp"
+                android:layout_height="180dp"
+                android:background="@drawable/ic_upload_image"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@+id/subtitle"
+                android:contentDescription="@string/verifikasiakunanda"
+                android:layout_marginTop="24dp"/>
+            
+            <com.makeramen.roundedimageview.RoundedImageView
+                android:id="@+id/riv_upload_image"
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:scaleType="centerCrop"
+                android:layout_marginHorizontal="32dp"
+                android:layout_below="@+id/upload_ilustrasi"
+                android:layout_marginTop="24dp"
+                app:riv_border_width="2dip"
+                app:riv_border_color="@color/colorPrimary"
+                app:riv_corner_radius="8dip"
+                android:visibility="gone"/>
+
+            <RelativeLayout
+                android:id="@+id/upload_image"
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:background="@drawable/bg_button_stroke_red"
+                android:layout_below="@+id/riv_upload_image"
+                android:layout_marginTop="24dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="32dp"
+                android:minHeight="144dp"
+                android:gravity="center"
+                >
+
+                <ImageButton
+                    android:id="@+id/image_cloud"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ic_upload_cloud"
+                    android:contentDescription="@string/unggahfoto"
+                    android:layout_centerHorizontal="true"/>
+
+                <TextView
+                    android:id="@+id/tv_upload_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/unggahfoto"
+                    android:textColor="@color/colorPrimary"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textSize="18sp"
+                    android:layout_below="@+id/image_cloud"
+                    android:layout_centerHorizontal="true"/>
+
+            </RelativeLayout>
+
+            <Button
+                android:id="@+id/btn_daftar_verify"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:background="@drawable/bg_button_red"
+                android:layout_below="@id/upload_image"
+                android:layout_marginHorizontal="32dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:fontFamily="@font/roboto_medium"
+                android:textSize="18sp"
+                android:text="@string/daftar"/>
+
+        </RelativeLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</RelativeLayout>

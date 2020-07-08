@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:layout_centerInParent="true"
+    android:gravity="center"
+    android:padding="16dp"
+    android:id="@+id/bottomSheetContainer"
+    android:background="@drawable/bg_bottom_sheet">
+
+    <TextView
+        android:id="@+id/select_method"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/ambilgambardari"
+        android:textSize="18sp"
+        android:textColor="@color/colorPrimary"
+        android:textStyle="bold"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/select_method"
+        android:gravity="center"
+        android:layout_marginTop="16dp">
+
+        <RelativeLayout
+            android:id="@+id/layout_camera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_home_all_rounded"
+            android:padding="16dp">
+
+            <ImageView
+                android:id="@+id/imageCamera"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/ic_camera"
+                android:contentDescription="@string/darikamera"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/darikamera"
+                android:layout_toEndOf="@id/imageCamera"
+                android:fontFamily="@font/roboto_bold"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
+                android:textSize="14sp"
+                android:textColor="@android:color/white"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/layout_gallery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_home_all_rounded"
+            android:layout_toEndOf="@id/layout_camera"
+            android:layout_marginStart="8dp"
+            android:padding="16dp">
+
+            <ImageView
+                android:id="@+id/imageGallery"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/ic_gallery"
+                android:contentDescription="@string/darigaleri"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/darigaleri"
+                android:layout_toEndOf="@id/imageGallery"
+                android:fontFamily="@font/roboto_bold"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
+                android:textSize="14sp"
+                android:textColor="@android:color/white"/>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

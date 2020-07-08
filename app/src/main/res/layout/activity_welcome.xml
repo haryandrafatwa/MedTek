@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="180dp"
+        android:layout_height="90dp"
+        android:background="@drawable/logo"
+        android:layout_centerHorizontal="true"
+        android:contentDescription="@string/app_name"
+        android:layout_marginTop="8dp"/>
+
+    <ImageView
+        android:id="@+id/welcome_ilustrasi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_welcome"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/logo"
+        android:contentDescription="@string/welcome"
+        android:layout_marginTop="48dp"/>
+
+    <TextView
+        android:id="@+id/selamat_datang"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/hai"
+        android:textColor="@color/colorPrimary"
+        android:textStyle="bold"
+        android:textSize="14sp"
+        android:layout_below="@id/welcome_ilustrasi"
+        android:layout_marginTop="48dp"
+        android:layout_marginStart="16dp"/>
+
+    <TextView
+        android:id="@+id/desc_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/jasakami"
+        android:textColor="@color/textColorGray"
+        android:textSize="12sp"
+        android:layout_below="@id/selamat_datang"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"/>
+
+    <Button
+        android:id="@+id/btn_dokter"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:background="@drawable/bg_button_stroke_red"
+        android:layout_below="@id/desc_text"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:textAllCaps="false"
+        android:textColor="@color/colorPrimary"
+        android:fontFamily="@font/roboto_medium"
+        android:text="@string/sebdokter"/>
+
+    <Button
+        android:id="@+id/btn_pasien"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:background="@drawable/bg_button_red"
+        android:layout_below="@id/btn_dokter"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:fontFamily="@font/roboto_medium"
+        android:text="@string/sebpasien"/>
+
+</RelativeLayout>

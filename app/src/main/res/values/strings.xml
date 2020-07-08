@@ -1,0 +1,76 @@
+<resources>
+    <string name="app_name">MedTek</string>
+    <string name="hai">Hai, selamat datang</string>
+    <string name="welcome">Welcome</string>
+    <string name="sebdokter">Sebagai Dokter</string>
+    <string name="dafsebdokter">Daftar sebagai Dokter</string>
+    <string name="dokter">Dokter</string>
+    <string name="sebpasien">Sebagai Pasien</string>
+    <string name="dafsebpasien">Daftar sebagai Pasien</string>
+    <string name="daftar">Daftar</string>
+    <string name="masuk">Masuk</string>
+    <string name="pasien">Pasien</string>
+    <string name="selamatdatang">Selamat datang</string>
+    <string name="lupapassword">Lupa password?</string>
+    <string name="silahkanmasuk">Silahkan masuk untuk melanjutkan</string>
+    <string name="silahkandaftar">Silahkan daftar untuk melanjutkan</string>
+    <string name="jasakami">Silahkan masuk terlebih dahulu untuk menggunakan jasa kami</string>
+    <string name="belumpunya">Belum punya akun?</string>
+    <string name="sudahpunya">Sudah punya akun?</string>
+    <string name="hint_nama_lngkap"><font size="12"><b>Nama Lengkap</b></font></string>
+    <string name="hint_email"><font size="12"><b>Email</b></font></string>
+    <string name="hint_password"><font size="12"><b>Password</b></font></string>
+    <string name="hint_repassword"><font size="12"><b>Re-Password</b></font></string>
+    <string name="welcomeback">Selamat datang kembali,</string>
+    <string name="user_name">Jhon Doe!</string>
+    <string name="search">Search doctor here...</string>
+    <string name="saldo">Saldo</string>
+    <string name="saldo_value">Rp100.000</string>
+    <string name="topup">Top Up</string>
+    <string name="withdraw">Withdraw</string>
+    <string name="history">History</string>
+    <string name="detail">Detail</string>
+    <string name="separator">Separator</string>
+    <string name="rsrekomendasi">Rekomendasi Rumah Sakit</string>
+    <string name="drpopuler">Dokter Populer</string>
+    <string name="lihatsemua">Lihat semua</string>
+    <string name="nama_rs">RSUPN Cipto Mangunkusumo</string>
+    <string name="tipe_rs">Rumah Sakit Umum</string>
+    <string name="lokasi_rs">Senen, Jakarta Pusat</string>
+    <string name="nama_dr">dr. Natya Anna Pradibta</string>
+    <string name="spes_dr">Pediatric Cardiology</string>
+    <string name="kantor_dr">Siloam Hospital TB Simatupang</string>
+    <string name="lokasi_dr">Cilandak, Jakarta Selatan</string>
+    <string name="buatjanji">Buat Janji</string>
+    <string name="artikelkesehatan">Artikel Kesehatan</string>
+    <string name="titleartikel">Cara Mudah Menjaga Kesehatan Jantung</string>
+    <string name="nama_user">Jhon Doe</string>
+    <string name="email_user">jhondoe@gmail.com</string>
+    <string name="notifikasi">Notifikasi</string>
+    <string name="tarik">Tarik</string>
+    <string name="isiulang">Isi Ulang</string>
+    <string name="riwayat">Riwayat</string>
+    <string name="wallet">Wallet</string>
+    <string name="invitefriend">Undang Teman</string>
+    <string name="translate">Ubah Bahasa</string>
+    <string name="bantuan">Bantuan</string>
+    <string name="nilaikami">Nilai Kami</string>
+    <string name="keluar">Keluar</string>
+    <string name="selanjutnya">Selanjutnya</string>
+    <string name="formattidakvalid">*Format tidak valid</string>
+    <string name="verifikasiakunanda">Verifikasi akun anda</string>
+    <string name="silahkanupload">Silahkan upload SIP (Surat Izin Praktik) anda untuk memverifikasi kebenaran akun ini</string>
+    <string name="unggahfoto">Unggah Foto</string>
+    <string name="passwordsama">Password harus sama</string>
+    <string name="passwordmin">Password minimal harus 8 karakter</string>
+    <string name="isidatadiri">Silahkan isi data diri terlebih dahulu</string>
+    <string name="formatemail">Format email anda tidak valid</string>
+    <string name="ambilgambardari">Ambil gambar dari</string>
+    <string name="darikamera">Dari kamera</string>
+    <string name="darigaleri">Dari galeri</string>
+    <string name="daftarberhasil">Daftar Berhasil</string>
+    <string name="oke">Oke</string>
+    <string name="silahkanunggahfoto">Silahkan unggah foto terlebih dahulu</string>
+    <string name="pendaftaranakan">Pendaftaran akan diproses 1-3 hari kerja, mohon untuk menunggu konfirmasi kebenaran akun anda oleh Admin kami</string>
+    <string name="emailsudahdigunakan">Email sudah digunakan oleh pengguna lain.</string>
+</resources>
