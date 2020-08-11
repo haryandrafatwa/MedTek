@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@android:color/white">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:theme="@style/ToolbarThemePrimary"
+        android:background="@android:color/white">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/undangteman"
+            android:textSize="18sp"
+            android:textColor="@color/textColorDark"
+            android:textStyle="bold"
+            android:layout_gravity="start"/>
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/marikita"
+        android:layout_below="@id/toolbar"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:textSize="28sp"
+        android:textColor="@color/textColorDark"
+        android:fontFamily="@font/roboto_bold"
+        android:layout_marginTop="16dp"/>
+
+    <com.codesgood.views.JustifiedTextView
+        android:id="@+id/sub_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/jadimereka"
+        android:layout_below="@id/title"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:textSize="14sp"
+        android:textColor="@color/textColorDark"
+        android:fontFamily="@font/roboto_light"
+        android:justificationMode="inter_word"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/sub_title"
+        android:layout_above="@id/iv_invite_friend">
+
+        <RelativeLayout
+            android:id="@+id/btn_masuk_clone"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:background="@drawable/bg_button_red"
+            android:layout_marginHorizontal="16dp"
+            android:layout_centerVertical="true"
+            android:gravity="center">
+
+            <ImageButton
+                android:id="@+id/ib_invite_friend"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:background="@drawable/ic_plus_solid"
+                android:layout_centerVertical="true"
+                android:contentDescription="@string/undangteman"/>
+
+
+            <TextView
+                android:id="@+id/mohontunggu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/undangteman"
+                android:textSize="18sp"
+                android:layout_toEndOf="@id/ib_invite_friend"
+                android:textColor="@android:color/white"
+                android:fontFamily="@font/roboto_medium"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"/>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/iv_invite_friend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_invite_friend"
+        android:layout_alignParentBottom="true"
+        android:contentDescription="@string/invitefriend"/>
+
+</RelativeLayout>

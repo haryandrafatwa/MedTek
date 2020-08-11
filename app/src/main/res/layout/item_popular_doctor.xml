@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rl_artikel">
+
+    <RelativeLayout
+        android:layout_width="246dp"
+        android:layout_height="140dp"
+        android:background="@drawable/bg_recycler_item"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="16dp"
+        android:elevation="4dp">
+
+        <RelativeLayout
+            android:id="@+id/layout_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginTop="12dp">
+            
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/civ_dokter"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:src="@drawable/ellipse"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/civ_dokter"
+                android:orientation="vertical"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp">
+
+                <TextView
+                    android:id="@+id/tv_dr_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/drname"
+                    android:textColor="@color/textColorDark"
+                    android:fontFamily="@font/roboto_medium"
+                    android:ellipsize="end"
+                    android:maxLines="1"/>
+
+                <TextView
+                    android:id="@+id/tv_dr_special"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/drspe"
+                    android:textColor="@android:color/darker_gray"
+                    android:fontFamily="@font/roboto_regular"
+                    android:textSize="12sp"
+                    android:ellipsize="end"
+                    android:maxLines="1"/>
+
+                <TextView
+                    android:id="@+id/tv_dr_rs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/drrs"
+                    android:textColor="@color/textColorGray"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textSize="12sp"
+                    android:ellipsize="end"
+                    android:maxLines="1"/>
+
+                <TextView
+                    android:id="@+id/tv_dr_rs_loc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/drrsloc"
+                    android:textColor="@android:color/darker_gray"
+                    android:fontFamily="@font/roboto_regular"
+                    android:textSize="12sp"
+                    android:ellipsize="end"
+                    android:maxLines="1"/>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+        
+        <ImageView
+            android:id="@+id/separator"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/textColorLightGray"
+            android:layout_below="@id/layout_content"
+            android:layout_marginTop="8dp"
+            android:contentDescription="@string/separator"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/separator">
+
+            <LinearLayout
+                android:id="@+id/layout_rating"
+                android:layout_width="20dp"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_marginStart="12dp">
+
+                <RatingBar
+                    android:id="@+id/rb_dokter"
+                    style="?android:attr/ratingBarStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:isIndicator="true"
+                    android:backgroundTint="@color/colorAccent"
+                    android:numStars="1"
+                    android:stepSize="0.05"/>
+
+                <TextView
+                    android:id="@+id/tv_dr_rat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/rating"
+                    android:textColor="@color/colorAccent"
+                    android:fontFamily="@font/roboto_medium"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_dr_harga"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/harga"
+                android:textColor="@color/colorAccent"
+                android:fontFamily="@font/roboto_medium"
+                android:layout_toEndOf="@id/layout_rating"
+                android:layout_toStartOf="@id/btnDetail"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:layout_marginHorizontal="4dp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textStyle="italic"/>
+
+            <Button
+                android:id="@+id/btnDetail"
+                android:layout_width="100dp"
+                android:layout_height="30dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:text="@string/detail"
+                android:textAllCaps="false"
+                android:background="@drawable/bg_button_red"
+                android:layout_marginEnd="12dp"
+                android:textColor="@android:color/white"
+                android:fontFamily="@font/roboto_regular"/>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

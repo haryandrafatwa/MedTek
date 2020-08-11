@@ -6,6 +6,9 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <application
         android:allowBackup="true"
@@ -14,7 +17,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:networkSecurityConfig="@xml/network_security_config"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:largeHeap="true"
+        android:requestLegacyExternalStorage="true">
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -36,12 +41,12 @@
         <activity android:name=".MainActivity"/>
         <activity android:name=".WelcomePageActivity"/>
 
-        <activity android:name=".Dokter.LoginDokterActivity"/>
-        <activity android:name=".Dokter.RegisterDokterActivity"/>
-        <activity android:name=".Dokter.VerifyRegisterDokterActivity"/>
+        <activity android:name=".Dokter.Auth.LoginDokterActivity"/>
+        <activity android:name=".Dokter.Auth.RegisterDokterActivity"/>
+        <activity android:name=".Dokter.Auth.VerifyRegisterDokterActivity"/>
 
-        <activity android:name=".Pasien.LoginPasienActivity"/>
-        <activity android:name=".Pasien.RegisterPasienActivity"/>
+        <activity android:name=".Pasien.Auth.LoginPasienActivity"/>
+        <activity android:name=".Pasien.Auth.RegisterPasienActivity"/>
     </application>
 
 </manifest>

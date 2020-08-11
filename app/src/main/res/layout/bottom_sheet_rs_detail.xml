@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:layout_centerInParent="true"
+    android:gravity="center"
+    android:padding="16dp"
+    android:id="@+id/bottomSheetRSDetail"
+    android:background="@drawable/bg_bottom_sheet">
+
+    <TextView
+        android:id="@+id/tv_dr_rs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/drrs"
+        android:textSize="18sp"
+        android:textColor="@color/colorAccent"
+        android:fontFamily="@font/roboto_medium"/>
+
+    <TextView
+        android:id="@+id/address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/address"
+        android:layout_below="@id/tv_dr_rs"
+        android:textSize="14sp"
+        android:textColor="@color/textColorDark"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/roboto_bold"/>
+
+    <com.codesgood.views.JustifiedTextView
+        android:id="@+id/tv_dr_rs_loc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/drrsloc"
+        android:layout_below="@id/address"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/textColorGray"/>
+
+    <TextView
+        android:id="@+id/tv_direct_me"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/directme"
+        android:layout_below="@id/tv_dr_rs_loc"
+        android:textSize="16sp"
+        android:textColor="@color/colorPrimary"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/roboto_bold"
+        android:gravity="end"/>
+
+</RelativeLayout>

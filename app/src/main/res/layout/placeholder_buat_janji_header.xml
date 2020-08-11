@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:background="@drawable/bg_home_bottom_rounded"
+    android:backgroundTint="@color/shimmer_color">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_16"
+        android:layout_marginBottom="@dimen/margin_16"
+        android:padding="@dimen/margin_16"
+        android:orientation="horizontal">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:src="@color/shimmer_color"
+            android:layout_gravity="center"
+            android:gravity="center"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="@dimen/margin_16">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/shimmer_color"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                android:fontFamily="@font/roboto_bold"
+                android:ellipsize="end"
+                android:maxLines="1"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/shimmer_color"
+                android:layout_marginTop="2dp"
+                android:textColor="@android:color/white"
+                android:fontFamily="@font/roboto_regular"
+                android:textSize="12sp"
+                android:ellipsize="end"
+                android:maxLines="1"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/shimmer_color"
+                android:layout_marginTop="2dp"
+                android:textColor="@color/colorAccent"
+                android:fontFamily="@font/roboto_medium"
+                android:textSize="14sp"
+                android:ellipsize="end"
+                android:maxLines="1"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/shimmer_color"
+                android:layout_marginTop="2dp"
+                android:textColor="@android:color/white"
+                android:fontFamily="@font/roboto_regular"
+                android:textSize="12sp"
+                android:ellipsize="end"
+                android:maxLines="1"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

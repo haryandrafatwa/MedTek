@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/shimmer_color"
+        android:layout_marginEnd="@dimen/margin_160"
+        android:layout_marginTop="16dp"
+        android:textSize="18sp"
+        android:fontFamily="@font/roboto_medium"
+        android:textColor="@color/colorAccent"
+        android:layout_marginStart="@dimen/margin_16"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="11"
+        android:baselineAligned="false">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="3"
+            android:orientation="vertical"
+            android:background="@drawable/bg_recycler_item"
+            android:backgroundTint="@color/shimmer_color"
+            android:gravity="center_vertical"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="@dimen/margin_16"
+            android:paddingHorizontal="@dimen/margin_16">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:gravity="center"
+                android:background="@color/shimmer_color"
+                android:textColor="@color/colorAccent"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:gravity="center"
+                android:background="@color/shimmer_color"
+                android:layout_marginTop="@dimen/margin_4"
+                android:textColor="@color/colorAccent"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="3"
+            android:orientation="vertical"
+            android:background="@drawable/bg_recycler_item"
+            android:backgroundTint="@color/shimmer_color"
+            android:gravity="center_vertical"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="@dimen/margin_16"
+            android:paddingHorizontal="@dimen/margin_16">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:gravity="center"
+                android:background="@color/shimmer_color"
+                android:textColor="@color/colorAccent"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:gravity="center"
+                android:background="@color/shimmer_color"
+                android:layout_marginTop="@dimen/margin_4"
+                android:textColor="@color/colorAccent"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="3"
+            android:orientation="vertical"
+            android:background="@drawable/bg_recycler_item"
+            android:backgroundTint="@color/shimmer_color"
+            android:gravity="center_vertical"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="@dimen/margin_16"
+            android:paddingHorizontal="@dimen/margin_16">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:gravity="center"
+                android:background="@color/shimmer_color"
+                android:textColor="@color/colorAccent"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:gravity="center"
+                android:background="@color/shimmer_color"
+                android:layout_marginTop="@dimen/margin_4"
+                android:textColor="@color/colorAccent"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="2"
+            android:orientation="vertical"
+            android:background="@drawable/bg_recycler_item"
+            android:backgroundTint="@color/shimmer_color"
+            android:layout_marginStart="@dimen/margin_8"
+            android:layout_marginEnd="@dimen/margin_16"
+            android:layout_marginVertical="@dimen/margin_8"
+            android:paddingHorizontal="@dimen/margin_16"
+            android:gravity="center_vertical">
+
+            <ImageButton
+                android:layout_width="@dimen/margin_16"
+                android:layout_height="@dimen/margin_16"
+                android:background="@color/shimmer_color"
+                android:contentDescription="@string/kosong"
+                android:layout_gravity="center"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:background="@color/shimmer_color"
+                android:layout_marginTop="@dimen/margin_4"
+                android:textColor="@color/colorPrimary"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/shimmer_color"
+        android:layout_marginEnd="@dimen/margin_160"
+        android:layout_marginTop="16dp"
+        android:textSize="18sp"
+        android:fontFamily="@font/roboto_medium"
+        android:textColor="@color/colorAccent"
+        android:layout_marginStart="@dimen/margin_16"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_recycler_item"
+        android:backgroundTint="@color/shimmer_color"
+        android:layout_marginTop="@dimen/margin_8"
+        android:layout_marginHorizontal="@dimen/margin_16"
+        android:orientation="horizontal"
+        android:paddingVertical="@dimen/margin_8"
+        android:paddingHorizontal="12dp">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:src="@color/shimmer_color"
+            android:layout_marginStart="@dimen/margin_16"/>
+
+        <TextView
+            android:layout_width="210dp"
+            android:layout_height="wrap_content"
+            android:background="@color/shimmer_color"
+            android:layout_gravity="center"
+            android:textSize="18sp"
+            android:fontFamily="@font/roboto_medium"
+            android:textColor="@color/colorAccent"
+            android:layout_marginStart="32dp"/>
+
+        <ImageButton
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="@color/shimmer_color"
+            android:layout_gravity="center"
+            android:layout_marginStart="@dimen/margin_16"
+            android:layout_marginEnd="@dimen/margin_16"
+            android:contentDescription="@string/pagi"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_recycler_item"
+        android:backgroundTint="@color/shimmer_color"
+        android:layout_marginTop="@dimen/margin_8"
+        android:layout_marginHorizontal="@dimen/margin_16"
+        android:orientation="horizontal"
+        android:paddingVertical="@dimen/margin_8"
+        android:paddingHorizontal="12dp">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:src="@color/shimmer_color"
+            android:layout_marginStart="@dimen/margin_16"/>
+
+        <TextView
+            android:layout_width="210dp"
+            android:layout_height="wrap_content"
+            android:background="@color/shimmer_color"
+            android:layout_gravity="center"
+            android:textSize="18sp"
+            android:fontFamily="@font/roboto_medium"
+            android:textColor="@color/colorAccent"
+            android:layout_marginStart="32dp"/>
+
+        <ImageButton
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="@color/shimmer_color"
+            android:layout_gravity="center"
+            android:layout_marginStart="@dimen/margin_16"
+            android:layout_marginEnd="@dimen/margin_16"
+            android:contentDescription="@string/pagi"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_recycler_item"
+        android:backgroundTint="@color/shimmer_color"
+        android:layout_marginTop="@dimen/margin_8"
+        android:layout_marginHorizontal="@dimen/margin_16"
+        android:orientation="horizontal"
+        android:paddingVertical="@dimen/margin_8"
+        android:paddingHorizontal="12dp">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:src="@color/shimmer_color"
+            android:layout_marginStart="@dimen/margin_16"/>
+
+        <TextView
+            android:layout_width="210dp"
+            android:layout_height="wrap_content"
+            android:background="@color/shimmer_color"
+            android:layout_gravity="center"
+            android:textSize="18sp"
+            android:fontFamily="@font/roboto_medium"
+            android:textColor="@color/colorAccent"
+            android:layout_marginStart="32dp"/>
+
+        <ImageButton
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="@color/shimmer_color"
+            android:layout_gravity="center"
+            android:layout_marginStart="@dimen/margin_16"
+            android:layout_marginEnd="@dimen/margin_16"
+            android:contentDescription="@string/pagi"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_recycler_item"
+        android:backgroundTint="@color/shimmer_color"
+        android:layout_marginTop="@dimen/margin_8"
+        android:layout_marginHorizontal="@dimen/margin_16"
+        android:orientation="horizontal"
+        android:paddingVertical="@dimen/margin_8"
+        android:paddingHorizontal="12dp">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:src="@color/shimmer_color"
+            android:layout_marginStart="@dimen/margin_16"/>
+
+        <TextView
+            android:layout_width="210dp"
+            android:layout_height="wrap_content"
+            android:background="@color/shimmer_color"
+            android:layout_gravity="center"
+            android:textSize="18sp"
+            android:fontFamily="@font/roboto_medium"
+            android:textColor="@color/colorAccent"
+            android:layout_marginStart="32dp"/>
+
+        <ImageButton
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="@color/shimmer_color"
+            android:layout_gravity="center"
+            android:layout_marginStart="@dimen/margin_16"
+            android:layout_marginEnd="@dimen/margin_16"
+            android:contentDescription="@string/pagi"/>
+
+    </LinearLayout>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:background="@drawable/bg_button_selector"
+        android:backgroundTint="@color/shimmer_color"
+        android:layout_below="@id/layout_Evening"
+        android:layout_margin="16dp"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:fontFamily="@font/roboto_medium"
+        android:textSize="18sp"
+        android:enabled="false"/>
+
+</LinearLayout>

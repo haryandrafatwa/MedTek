@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:theme="@style/ToolbarThemePrimary"
+        android:background="@color/colorPrimary">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/transfer"
+            android:textSize="18sp"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:layout_gravity="start"/>
+
+    </androidx.appcompat.widget.Toolbar>
+    
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar">
+        
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/ll_bank"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="12"
+                android:layout_marginHorizontal="@dimen/margin_16"
+                android:layout_marginTop="@dimen/margin_16">
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_weight="4"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ic_jenius_logo"
+                    android:contentDescription="@string/banklogo"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="4"
+                    android:layout_height="wrap_content"
+                    android:text="@string/BTPN"
+                    android:textSize="18sp"
+                    android:textColor="@color/colorAccent"
+                    android:fontFamily="@font/roboto_medium"
+                    android:layout_gravity="center"
+                    android:layout_marginHorizontal="@dimen/margin_8"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="4"
+                    android:layout_height="wrap_content"
+                    android:text="@string/kodeBank"
+                    android:textSize="18sp"
+                    android:textColor="@color/colorAccent"
+                    android:fontFamily="@font/roboto_medium"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="@dimen/margin_8"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_amount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginHorizontal="@dimen/margin_16"
+                android:layout_marginTop="@dimen/margin_16"
+                android:layout_below="@id/ll_bank">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/amount"
+                    android:textSize="14sp"
+                    android:textColor="@color/textColorGray"
+                    android:fontFamily="@font/roboto_medium"/>
+
+                <me.abhinay.input.CurrencyEditText
+                    android:id="@+id/cet_nominal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="24sp"
+                    android:textColor="@color/colorAccent"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_search"
+                    android:backgroundTint="@color/textColorLightGray"
+                    android:padding="8dp"
+                    android:fontFamily="@font/roboto_medium"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_recipient"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginHorizontal="@dimen/margin_16"
+                android:layout_marginTop="@dimen/margin_8"
+                android:layout_below="@id/ll_amount">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/recipient"
+                    android:textSize="14sp"
+                    android:textColor="@color/textColorGray"
+                    android:fontFamily="@font/roboto_medium"/>
+
+                <EditText
+                    android:id="@+id/et_penerima"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:textColor="@color/textColorDark"
+                    android:inputType="text"
+                    android:enabled="false"
+                    android:hint="@string/kosong"
+                    android:autofillHints="@string/kosong"
+                    android:fontFamily="@font/roboto_medium"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_search"
+                    android:backgroundTint="@color/textColorLightGray"
+                    android:padding="8dp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_ba_number"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginHorizontal="@dimen/margin_16"
+                android:layout_marginTop="@dimen/margin_8"
+                android:layout_below="@id/ll_recipient">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/baNumber"
+                    android:textSize="14sp"
+                    android:textColor="@color/textColorGray"
+                    android:fontFamily="@font/roboto_medium"/>
+
+                <EditText
+                    android:id="@+id/et_nomorrekening"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:textColor="@color/textColorDark"
+                    android:inputType="text"
+                    android:enabled="false"
+                    android:hint="@string/kosong"
+                    android:autofillHints="@string/kosong"
+                    android:fontFamily="@font/roboto_medium"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_search"
+                    android:backgroundTint="@color/textColorLightGray"
+                    android:padding="8dp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_sender"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginHorizontal="@dimen/margin_16"
+                android:layout_marginTop="@dimen/margin_8"
+                android:layout_below="@id/ll_ba_number">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/recipient"
+                    android:textSize="14sp"
+                    android:textColor="@color/textColorGray"
+                    android:fontFamily="@font/roboto_medium"/>
+
+                <EditText
+                    android:id="@+id/et_pengirim"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:textColor="@color/textColorDark"
+                    android:inputType="text"
+                    android:hint="@string/kosong"
+                    android:autofillHints="@string/kosong"
+                    android:fontFamily="@font/roboto_medium"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_search"
+                    android:backgroundTint="@color/textColorLightGray"
+                    android:padding="8dp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_ba_number_sender"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginHorizontal="@dimen/margin_16"
+                android:layout_marginTop="@dimen/margin_8"
+                android:layout_below="@id/ll_sender">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/baNumber"
+                    android:textSize="14sp"
+                    android:textColor="@color/textColorGray"
+                    android:fontFamily="@font/roboto_medium"/>
+
+                <EditText
+                    android:id="@+id/et_nomorrekening_sender"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:textColor="@color/textColorDark"
+                    android:inputType="text"
+                    android:hint="@string/kosong"
+                    android:autofillHints="@string/kosong"
+                    android:fontFamily="@font/roboto_medium"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_search"
+                    android:backgroundTint="@color/textColorLightGray"
+                    android:padding="8dp"/>
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnNext"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_below="@id/ll_ba_number_sender"
+                android:background="@drawable/bg_button_selector"
+                android:layout_margin="@dimen/margin_16"
+                android:text="@string/selanjutnya"
+                android:textColor="@android:color/white"
+                android:textAllCaps="false"
+                android:textSize="18sp"
+                android:enabled="false"/>
+
+        </RelativeLayout>
+        
+    </androidx.core.widget.NestedScrollView>
+
+</RelativeLayout>

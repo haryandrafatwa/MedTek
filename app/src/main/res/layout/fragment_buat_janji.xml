@@ -1,0 +1,546 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:theme="@style/ToolbarThemePrimary"
+        android:background="@color/colorPrimary">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pilihjadwal"
+            android:textSize="18sp"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:layout_gravity="start"/>
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmerLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/layout_loader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <include layout="@layout/placeholder_buat_janji_header"/>
+                    <include layout="@layout/placeholder_buat_janji_content"/>
+
+                </LinearLayout>
+
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
+            <RelativeLayout
+                android:id="@+id/layout_visible"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+
+                <RelativeLayout
+                    android:id="@+id/header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_home_bottom_rounded">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/margin_16"
+                        android:layout_marginBottom="@dimen/margin_16"
+                        android:padding="@dimen/margin_16"
+                        android:background="@drawable/bg_header_appointment">
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/civ_dokter"
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
+                            android:src="@drawable/ellipse"/>
+
+                        <LinearLayout
+                            android:layout_width="200dp"
+                            android:layout_height="wrap_content"
+                            android:layout_toEndOf="@id/civ_dokter"
+                            android:orientation="vertical"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp">
+
+                            <TextView
+                                android:id="@+id/tv_dr_name"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/drname"
+                                android:textColor="@android:color/white"
+                                android:textSize="18sp"
+                                android:fontFamily="@font/roboto_bold"
+                                android:ellipsize="end"
+                                android:maxLines="1"/>
+
+                            <TextView
+                                android:id="@+id/tv_dr_special"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/drspe"
+                                android:textColor="@android:color/white"
+                                android:fontFamily="@font/roboto_regular"
+                                android:textSize="12sp"
+                                android:ellipsize="end"
+                                android:maxLines="1"/>
+
+                            <TextView
+                                android:id="@+id/tv_dr_rs"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/drrs"
+                                android:textColor="@color/colorAccent"
+                                android:fontFamily="@font/roboto_medium"
+                                android:textSize="14sp"
+                                android:ellipsize="end"
+                                android:maxLines="1"/>
+
+                            <TextView
+                                android:id="@+id/tv_dr_rs_loc"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/drrsloc"
+                                android:textColor="@android:color/white"
+                                android:fontFamily="@font/roboto_regular"
+                                android:textSize="12sp"
+                                android:ellipsize="end"
+                                android:maxLines="1"/>
+
+                        </LinearLayout>
+
+                    </RelativeLayout>
+
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/chooseDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/pilihtanggalkonsultasi"
+                    android:layout_marginTop="16dp"
+                    android:layout_below="@id/header"
+                    android:textSize="18sp"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="@color/colorAccent"
+                    android:layout_marginStart="@dimen/margin_16"/>
+
+                <LinearLayout
+                    android:id="@+id/layout_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_below="@id/chooseDate"
+                    android:weightSum="11"
+                    android:baselineAligned="false">
+
+                    <LinearLayout
+                        android:id="@+id/layout_jadwal_left"
+                        android:layout_width="0dp"
+                        android:layout_height="60dp"
+                        android:layout_weight="3"
+                        android:orientation="vertical"
+                        android:background="@drawable/bg_recycler_item"
+                        android:gravity="center_vertical"
+                        android:elevation="4dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginStart="@dimen/margin_16">
+
+                        <TextView
+                            android:id="@+id/tv_jadwal_day_left"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:textColor="@color/colorAccent"/>
+
+                        <TextView
+                            android:id="@+id/tv_jadwal_date_left"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:textColor="@color/colorAccent"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layout_jadwal_center"
+                        android:layout_width="0dp"
+                        android:layout_height="60dp"
+                        android:layout_weight="3"
+                        android:orientation="vertical"
+                        android:background="@drawable/bg_recycler_item"
+                        android:gravity="center_vertical"
+                        android:layout_margin="@dimen/margin_8"
+                        android:elevation="4dp">
+
+                        <TextView
+                            android:id="@+id/tv_jadwal_day_center"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:textColor="@color/colorAccent"/>
+
+                        <TextView
+                            android:id="@+id/tv_jadwal_date_center"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:textColor="@color/colorAccent"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layout_jadwal_right"
+                        android:layout_width="0dp"
+                        android:layout_height="60dp"
+                        android:layout_weight="3"
+                        android:orientation="vertical"
+                        android:background="@drawable/bg_recycler_item"
+                        android:gravity="center_vertical"
+                        android:elevation="4dp"
+                        android:layout_marginVertical="@dimen/margin_8">
+
+                        <TextView
+                            android:id="@+id/tv_jadwal_day_right"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:textColor="@color/colorAccent"/>
+
+                        <TextView
+                            android:id="@+id/tv_jadwal_date_right"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:textColor="@color/colorAccent"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layout_jadwal_pcik"
+                        android:layout_width="0dp"
+                        android:layout_height="60dp"
+                        android:layout_weight="2"
+                        android:orientation="vertical"
+                        android:background="@drawable/bg_recycler_item"
+                        android:layout_marginStart="@dimen/margin_8"
+                        android:layout_marginEnd="@dimen/margin_16"
+                        android:layout_marginVertical="@dimen/margin_8"
+                        android:gravity="center_vertical"
+                        android:elevation="4dp">
+
+                        <ImageButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/ic_calendar_pick"
+                            android:contentDescription="@string/kosong"
+                            android:layout_gravity="center"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="@string/pick"
+                            android:textColor="@color/colorPrimary"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/chooseTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/pilihwaktu"
+                    android:layout_below="@id/layout_date"
+                    android:layout_marginTop="16dp"
+                    android:textSize="18sp"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="@color/colorAccent"
+                    android:layout_marginStart="@dimen/margin_16"/>
+
+                <LinearLayout
+                    android:id="@+id/layout_Morning"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/chooseTime"
+                    android:background="@drawable/bg_recycler_item"
+                    android:layout_marginTop="@dimen/margin_8"
+                    android:layout_marginHorizontal="@dimen/margin_16"
+                    android:orientation="vertical"
+                    android:elevation="4dp">
+
+                    <RelativeLayout
+                        android:id="@+id/header_Morning"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="@dimen/margin_8">
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/civ_Morning"
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            android:background="@drawable/ic_morning"
+                            android:layout_marginStart="@dimen/margin_16"/>
+
+                        <TextView
+                            android:id="@+id/tv_Morning"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/pagi"
+                            android:textSize="18sp"
+                            android:layout_toEndOf="@id/civ_Morning"
+                            android:layout_toStartOf="@id/ib_Morning"
+                            android:fontFamily="@font/roboto_medium"
+                            android:layout_centerVertical="true"
+                            android:textColor="@color/colorAccent"
+                            android:layout_marginStart="32dp"/>
+
+                        <ImageButton
+                            android:id="@+id/ib_Morning"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/ic_expand_more"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:backgroundTint="@color/colorAccent"
+                            android:layout_marginEnd="@dimen/margin_16"
+                            android:contentDescription="@string/pagi"/>
+
+                    </RelativeLayout>
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="0.4dp"
+                        android:background="@color/textColorLightGray"
+                        android:contentDescription="@string/separator"
+                        android:visibility="gone"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_Noon"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/layout_Morning"
+                    android:background="@drawable/bg_recycler_item"
+                    android:layout_marginTop="@dimen/margin_16"
+                    android:layout_marginHorizontal="@dimen/margin_16"
+                    android:orientation="vertical"
+                    android:elevation="4dp">
+
+                    <RelativeLayout
+                        android:id="@+id/header_Noon"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="@dimen/margin_8">
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/civ_Noon"
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            android:background="@drawable/ic_noon"
+                            android:layout_marginStart="@dimen/margin_16"/>
+
+                        <TextView
+                            android:id="@+id/tv_Noon"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/siang"
+                            android:textSize="18sp"
+                            android:layout_toEndOf="@id/civ_Noon"
+                            android:layout_toStartOf="@id/ib_Noon"
+                            android:fontFamily="@font/roboto_medium"
+                            android:layout_centerVertical="true"
+                            android:textColor="@color/colorAccent"
+                            android:layout_marginStart="32dp"/>
+
+                        <ImageButton
+                            android:id="@+id/ib_Noon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/ic_expand_more"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:backgroundTint="@color/colorAccent"
+                            android:layout_marginEnd="@dimen/margin_16"
+                            android:contentDescription="@string/siang"/>
+
+                    </RelativeLayout>
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="0.4dp"
+                        android:background="@color/textColorLightGray"
+                        android:contentDescription="@string/separator"
+                        android:visibility="gone"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_Afternoon"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/layout_Noon"
+                    android:background="@drawable/bg_recycler_item"
+                    android:layout_marginTop="@dimen/margin_16"
+                    android:layout_marginHorizontal="@dimen/margin_16"
+                    android:orientation="vertical"
+                    android:elevation="4dp">
+
+                    <RelativeLayout
+                        android:id="@+id/header_Afternoon"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="@dimen/margin_8">
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/civ_Afternoon"
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            android:background="@drawable/ic_afternoon"
+                            android:layout_marginStart="@dimen/margin_16"/>
+
+                        <TextView
+                            android:id="@+id/tv_Afternoon"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/sore"
+                            android:textSize="18sp"
+                            android:layout_toEndOf="@id/civ_Afternoon"
+                            android:layout_toStartOf="@id/ib_Afternoon"
+                            android:fontFamily="@font/roboto_medium"
+                            android:layout_centerVertical="true"
+                            android:textColor="@color/colorAccent"
+                            android:layout_marginStart="32dp"/>
+
+                        <ImageButton
+                            android:id="@+id/ib_Afternoon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/ic_expand_more"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:backgroundTint="@color/colorAccent"
+                            android:layout_marginEnd="@dimen/margin_16"
+                            android:contentDescription="@string/sore"/>
+
+                    </RelativeLayout>
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="0.4dp"
+                        android:background="@color/textColorLightGray"
+                        android:contentDescription="@string/separator"
+                        android:visibility="gone"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_Evening"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/layout_Afternoon"
+                    android:background="@drawable/bg_recycler_item"
+                    android:layout_marginTop="@dimen/margin_16"
+                    android:layout_marginBottom="@dimen/margin_16"
+                    android:layout_marginHorizontal="@dimen/margin_16"
+                    android:orientation="vertical"
+                    android:elevation="4dp">
+
+                    <RelativeLayout
+                        android:id="@+id/header_Evening"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="@dimen/margin_8">
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/civ_Evening"
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            android:background="@drawable/ic_evening"
+                            android:layout_marginStart="@dimen/margin_16"/>
+
+                        <TextView
+                            android:id="@+id/tv_Evening"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/malam"
+                            android:textSize="18sp"
+                            android:layout_toEndOf="@id/civ_Evening"
+                            android:layout_toStartOf="@id/ib_Evening"
+                            android:fontFamily="@font/roboto_medium"
+                            android:layout_centerVertical="true"
+                            android:textColor="@color/colorAccent"
+                            android:layout_marginStart="32dp"/>
+
+                        <ImageButton
+                            android:id="@+id/ib_Evening"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/ic_expand_more"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:backgroundTint="@color/colorAccent"
+                            android:layout_marginEnd="@dimen/margin_16"
+                            android:contentDescription="@string/malam"/>
+
+                    </RelativeLayout>
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="0.4dp"
+                        android:background="@color/textColorLightGray"
+                        android:contentDescription="@string/separator"
+                        android:visibility="gone"/>
+
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btnNext"
+                    android:layout_width="match_parent"
+                    android:layout_height="42dp"
+                    android:background="@drawable/bg_button_selector"
+                    android:layout_below="@id/layout_Evening"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textSize="18sp"
+                    android:text="@string/selanjutnya"
+                    android:enabled="false"/>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</RelativeLayout>

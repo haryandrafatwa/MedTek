@@ -1,0 +1,452 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:theme="@style/ToolbarThemePrimary"
+        android:background="@color/colorPrimary">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/payment"
+            android:textSize="18sp"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:layout_gravity="start"/>
+
+        <LinearLayout
+            android:id="@+id/layout_edit_jadwal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:orientation="horizontal"
+            android:layout_marginEnd="@dimen/margin_32"
+            android:layout_centerVertical="true">
+
+            <ImageButton
+                android:id="@+id/ib_editjadwal"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="@drawable/ic_calendar_pick"
+                android:backgroundTint="@android:color/white"
+                android:contentDescription="@string/kosong"
+                android:layout_gravity="center"/>
+
+            <TextView
+                android:id="@+id/tv_edit_jadwal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_gravity="center_vertical"
+                android:text="@string/editjadwal"
+                android:textSize="12sp"
+                android:layout_marginStart="@dimen/margin_8"
+                android:textColor="@android:color/white"/>
+
+        </LinearLayout>
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:id="@+id/header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_home_bottom_rounded">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/margin_16"
+                    android:layout_marginBottom="@dimen/margin_16"
+                    android:padding="@dimen/margin_16"
+                    android:background="@drawable/bg_header_appointment">
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/civ_dokter"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:src="@drawable/ellipse"/>
+
+                    <LinearLayout
+                        android:id="@+id/layout_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/civ_dokter"
+                        android:orientation="vertical"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="8dp">
+
+                        <TextView
+                            android:id="@+id/tv_dr_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/drname"
+                            android:textColor="@android:color/white"
+                            android:fontFamily="@font/roboto_bold"
+                            android:textSize="18sp"
+                            android:ellipsize="end"
+                            android:maxLines="1"/>
+
+                        <TextView
+                            android:id="@+id/tv_dr_special"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/drspe"
+                            android:textColor="@android:color/white"
+                            android:fontFamily="@font/roboto_regular"
+                            android:textSize="12sp"
+                            android:ellipsize="end"
+                            android:maxLines="1"/>
+
+                        <TextView
+                            android:id="@+id/tv_dr_rs"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/drrs"
+                            android:textColor="@color/colorAccent"
+                            android:fontFamily="@font/roboto_medium"
+                            android:ellipsize="end"
+                            android:maxLines="1"/>
+
+                        <TextView
+                            android:id="@+id/tv_dr_rs_loc"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/drrsloc"
+                            android:textColor="@android:color/white"
+                            android:fontFamily="@font/roboto_regular"
+                            android:textSize="12sp"
+                            android:ellipsize="end"
+                            android:maxLines="1"/>
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/ringkasanbuatjanji"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ringkasanbuatjanji"
+                android:layout_marginTop="16dp"
+                android:layout_below="@id/header"
+                android:textSize="18sp"
+                android:fontFamily="@font/roboto_medium"
+                android:textColor="@color/colorAccent"
+                android:layout_marginStart="@dimen/margin_16"/>
+
+            <LinearLayout
+                android:id="@+id/layout_ringkasan_konsultasi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_below="@id/ringkasanbuatjanji"
+                android:layout_marginHorizontal="@dimen/margin_16"
+                android:layout_marginTop="@dimen/margin_8"
+                android:background="@drawable/bg_form_input"
+                android:elevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="12"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginHorizontal="@dimen/margin_16">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="6"
+                        android:text="@string/namadokter"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="@color/colorAccent"/>
+
+                    <TextView
+                        android:id="@+id/tv_nama_dokter"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="6"
+                        android:text="@string/ringkasanbuatjanji"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:fontFamily="@font/roboto_regular"
+                        android:textColor="@color/colorAccent"
+                        android:gravity="end"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="12"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginHorizontal="@dimen/margin_16">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="6"
+                        android:text="@string/tanggalbuatjanji"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="@color/colorAccent"/>
+
+                    <TextView
+                        android:id="@+id/tv_tanggal_buatjanji"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="6"
+                        android:text="@string/ringkasanbuatjanji"
+                        android:fontFamily="@font/roboto_regular"
+                        android:textColor="@color/colorAccent"
+                        android:gravity="end"
+                        android:ellipsize="end"
+                        android:maxLines="1"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="12"
+                    android:layout_margin="@dimen/margin_16">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="6"
+                        android:text="@string/jambuatjanji"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="@color/colorAccent"/>
+
+                    <TextView
+                        android:id="@+id/tv_jam_buatjanji"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="6"
+                        android:text="@string/ringkasanbuatjanji"
+                        android:fontFamily="@font/roboto_regular"
+                        android:textColor="@color/colorAccent"
+                        android:gravity="end"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <TextView
+            android:id="@+id/ringkasanpembayaran"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ringkasanpembayaran"
+            android:layout_marginTop="16dp"
+            android:layout_below="@id/layout_ringkasan_konsultasi"
+            android:textSize="18sp"
+            android:fontFamily="@font/roboto_medium"
+            android:textColor="@color/colorAccent"
+            android:layout_marginStart="@dimen/margin_16"/>
+
+            <LinearLayout
+                android:id="@+id/layout_ringkasan_pembayaran"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_below="@id/ringkasanpembayaran"
+                android:layout_marginHorizontal="@dimen/margin_16"
+                android:layout_marginTop="@dimen/margin_8"
+                android:background="@drawable/bg_form_input"
+                android:elevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="12"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginHorizontal="@dimen/margin_16">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="6"
+                        android:text="@string/biayalayanan"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="@color/colorAccent"/>
+
+                    <TextView
+                        android:id="@+id/tv_biaya_layanan"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="6"
+                        android:text="@string/ringkasanbuatjanji"
+                        android:fontFamily="@font/roboto_regular"
+                        android:textColor="#B3944F"
+                        android:gravity="end"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="12"
+                    android:layout_margin="@dimen/margin_16">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="6"
+                        android:text="@string/totalpembayaran"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="@color/colorAccent"/>
+
+                    <TextView
+                        android:id="@+id/tv_total_pembayaran"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="6"
+                        android:text="@string/ringkasanbuatjanji"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="@color/colorAccent"
+                        android:gravity="end"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/dompetsaya"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/walletsaya"
+                android:layout_marginTop="16dp"
+                android:layout_below="@id/layout_ringkasan_pembayaran"
+                android:textSize="18sp"
+                android:fontFamily="@font/roboto_medium"
+                android:textColor="@color/colorAccent"
+                android:layout_marginStart="@dimen/margin_16"/>
+
+            <LinearLayout
+                android:id="@+id/layout_dompet_saya"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_below="@id/dompetsaya"
+                android:layout_marginHorizontal="@dimen/margin_16"
+                android:layout_marginTop="@dimen/margin_8"
+                android:background="@drawable/bg_form_input"
+                android:elevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="12"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginHorizontal="@dimen/margin_16">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="6"
+                        android:text="@string/saldo"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="@color/colorAccent"/>
+
+                    <TextView
+                        android:id="@+id/tv_saldo"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="6"
+                        android:text="@string/ringkasanbuatjanji"
+                        android:fontFamily="@font/roboto_regular"
+                        android:textColor="#B3944F"
+                        android:gravity="end"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="12"
+                    android:layout_marginTop="@dimen/margin_16"
+                    android:layout_marginHorizontal="@dimen/margin_16">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="6"
+                        android:text="@string/totalpembayaran"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="@color/colorAccent"/>
+
+                    <TextView
+                        android:id="@+id/tv_total_pembayaran_2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="6"
+                        android:text="@string/ringkasanbuatjanji"
+                        android:fontFamily="@font/roboto_regular"
+                        android:textColor="@color/colorAccent"
+                        android:gravity="end"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="12"
+                    android:layout_margin="@dimen/margin_16">
+
+                    <TextView
+                        android:id="@+id/tv_sisa_saldo"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="12"
+                        android:text="@string/ringkasanbuatjanji"
+                        android:fontFamily="@font/roboto_bold"
+                        android:textColor="@color/colorAccent"
+                        android:gravity="end"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnNext"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:background="@drawable/bg_button_selector"
+                android:layout_below="@id/layout_dompet_saya"
+                android:layout_margin="16dp"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:fontFamily="@font/roboto_medium"
+                android:textSize="18sp"
+                android:text="@string/paynow"/>
+
+        </RelativeLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</RelativeLayout>

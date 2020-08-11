@@ -1,0 +1,322 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:theme="@style/ToolbarThemePrimary"
+        android:background="@color/colorPrimary">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/detailpasien"
+            android:textSize="18sp"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:layout_gravity="start"/>
+
+        <LinearLayout
+            android:id="@+id/layout_edit_jadwal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:orientation="horizontal"
+            android:layout_marginEnd="@dimen/margin_32"
+            android:layout_centerVertical="true">
+
+            <ImageButton
+                android:id="@+id/ib_editjadwal"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="@drawable/ic_calendar_pick"
+                android:backgroundTint="@android:color/white"
+                android:contentDescription="@string/kosong"
+                android:layout_gravity="center"/>
+
+            <TextView
+                android:id="@+id/tv_edit_jadwal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_gravity="center_vertical"
+                android:text="@string/editjadwal"
+                android:textSize="12sp"
+                android:layout_marginStart="@dimen/margin_8"
+                android:textColor="@android:color/white"/>
+
+        </LinearLayout>
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:id="@+id/header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_home_bottom_rounded">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/margin_16"
+                    android:layout_marginBottom="@dimen/margin_16"
+                    android:padding="@dimen/margin_16"
+                    android:background="@drawable/bg_header_appointment">
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/civ_dokter"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:src="@drawable/ellipse"/>
+
+                    <LinearLayout
+                        android:id="@+id/layout_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/civ_dokter"
+                        android:orientation="vertical"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="8dp">
+
+                        <TextView
+                            android:id="@+id/tv_dr_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/drname"
+                            android:textColor="@android:color/white"
+                            android:fontFamily="@font/roboto_bold"
+                            android:textSize="18sp"
+                            android:ellipsize="end"
+                            android:maxLines="1"/>
+
+                        <TextView
+                            android:id="@+id/tv_dr_special"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/drspe"
+                            android:textColor="@android:color/white"
+                            android:fontFamily="@font/roboto_regular"
+                            android:textSize="12sp"
+                            android:ellipsize="end"
+                            android:maxLines="1"/>
+
+                        <TextView
+                            android:id="@+id/tv_dr_rs"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/drrs"
+                            android:textColor="@color/colorAccent"
+                            android:fontFamily="@font/roboto_medium"
+                            android:ellipsize="end"
+                            android:maxLines="1"/>
+
+                        <TextView
+                            android:id="@+id/tv_dr_rs_loc"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/drrsloc"
+                            android:textColor="@android:color/white"
+                            android:fontFamily="@font/roboto_regular"
+                            android:textSize="12sp"
+                            android:ellipsize="end"
+                            android:maxLines="1"/>
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/inputdetails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/inputdetailspasien"
+                android:layout_marginTop="16dp"
+                android:layout_below="@id/header"
+                android:textSize="18sp"
+                android:fontFamily="@font/roboto_medium"
+                android:textColor="@color/colorAccent"
+                android:layout_marginStart="@dimen/margin_16"/>
+
+            <LinearLayout
+                android:id="@+id/form_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_below="@id/inputdetails"
+                android:layout_marginHorizontal="@dimen/margin_16"
+                android:layout_marginTop="@dimen/margin_8"
+                android:background="@drawable/bg_form_input">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="@dimen/margin_32"
+                    android:paddingVertical="@dimen/margin_8"
+                    android:background="@drawable/bg_input_info_top_rounded">
+
+                    <ImageButton
+                        android:id="@+id/ib_rs_loc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ic_info"
+                        android:backgroundTint="#B3944F"
+                        android:layout_gravity="center"
+                        android:contentDescription="@string/drrsloc"/>
+
+                    <TextView
+                        android:id="@+id/inputinfo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/inputinfo"
+                        android:fontFamily="@font/roboto_regular"
+                        android:textColor="#80000000"
+                        android:textSize="12sp"
+                        android:ellipsize="end"
+                        android:maxLines="2"
+                        android:layout_marginStart="@dimen/margin_16"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/namalengkap"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="@color/textColorGray"
+                    android:textSize="12sp"
+                    android:layout_marginHorizontal="@dimen/margin_32"
+                    android:layout_marginTop="@dimen/margin_16"
+                    android:labelFor="@id/et_fullname"/>
+
+                <EditText
+                    android:id="@+id/et_fullname"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_edit_text"
+                    android:layout_marginHorizontal="@dimen/margin_32"
+                    android:inputType="text"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp"
+                    android:fontFamily="@font/roboto_medium"
+                    android:autofillHints="@string/hint_nama_lngkap"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/tgl"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="@color/textColorGray"
+                    android:textSize="12sp"
+                    android:layout_marginHorizontal="@dimen/margin_32"
+                    android:layout_marginTop="@dimen/margin_16"
+                    android:labelFor="@id/et_dob"/>
+
+                <EditText
+                    android:id="@+id/et_dob"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_edit_text"
+                    android:layout_marginHorizontal="@dimen/margin_32"
+                    android:layout_marginBottom="@dimen/margin_32"
+                    android:inputType="text"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp"
+                    android:fontFamily="@font/roboto_medium"
+                    android:autofillHints="@string/hint_nama_lngkap"
+                    android:drawableEnd="@drawable/ic_expand_more"
+                    android:drawableTint="@color/textColorGray"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/uploadidcard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/uploadidcard"
+                android:layout_marginTop="16dp"
+                android:layout_below="@id/form_input"
+                android:textSize="18sp"
+                android:fontFamily="@font/roboto_medium"
+                android:textColor="@color/colorAccent"
+                android:layout_marginStart="@dimen/margin_16"/>
+
+            <com.makeramen.roundedimageview.RoundedImageView
+                android:id="@+id/riv_upload_image"
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:scaleType="centerCrop"
+                android:layout_below="@+id/uploadidcard"
+                android:layout_marginTop="@dimen/margin_16"
+                android:layout_marginHorizontal="@dimen/margin_16"
+                app:riv_border_width="0.5dip"
+                app:riv_border_color="#80000000"
+                app:riv_corner_radius="12dip"
+                android:visibility="gone"/>
+
+            <RelativeLayout
+                android:id="@+id/upload_image"
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:background="@drawable/bg_upload_id_card"
+                android:layout_below="@+id/riv_upload_image"
+                android:layout_marginTop="@dimen/margin_16"
+                android:layout_marginHorizontal="@dimen/margin_16"
+                android:minHeight="144dp"
+                android:gravity="center">
+
+                <ImageButton
+                    android:id="@+id/image_cloud"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ic_upload_cloud"
+                    android:backgroundTint="#80000000"
+                    android:contentDescription="@string/unggahfoto"
+                    android:layout_centerHorizontal="true"/>
+
+                <TextView
+                    android:id="@+id/tv_upload_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/unggahfoto"
+                    android:textColor="#80000000"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textSize="18sp"
+                    android:layout_below="@+id/image_cloud"
+                    android:layout_centerHorizontal="true"/>
+
+            </RelativeLayout>
+
+            <Button
+                android:id="@+id/btnNext"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:background="@drawable/bg_button_selector"
+                android:layout_below="@id/upload_image"
+                android:layout_margin="16dp"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:fontFamily="@font/roboto_medium"
+                android:textSize="18sp"
+                android:text="@string/selanjutnya"
+                android:enabled="false"/>
+
+        </RelativeLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</RelativeLayout>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:id="@+id/rl_artikel">
+
+    <RelativeLayout
+        android:id="@+id/rl_item_artikel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginHorizontal="16dp"
+        android:visibility="visible">
+
+        <ImageView
+            android:id="@+id/riv_image_artikel"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:scaleType="centerCrop"
+            android:contentDescription="@string/titleartikel"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/riv_image_artikel"
+            android:layout_marginStart="16dp"
+            android:orientation="vertical"
+            android:layout_centerVertical="true">
+
+            <TextView
+                android:id="@+id/tv_judul_artikel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="@color/textColorDark"
+                android:fontFamily="@font/roboto_medium"/>
+
+            <TextView
+                android:id="@+id/tv_desc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="@color/textColorGray"
+                android:fontFamily="@font/roboto_regular"
+                android:layout_marginTop="8dp"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_not_found"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:layout_centerInParent="true">
+
+        <ImageView
+            android:id="@+id/iv_user_not_verified"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginHorizontal="72dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/ic_not_found"
+            android:contentDescription="@string/blmverified"/>
+
+
+        <TextView
+            android:id="@+id/tv_user_not_verified"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/iv_user_not_verified"
+            android:text="@string/notfound"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:fontFamily="@font/roboto_medium"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="8dp"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>

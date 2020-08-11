@@ -4,18 +4,18 @@
     <item
         android:id="@+id/chat"
         android:icon="@drawable/ic_chat"
-        android:title="Chat"
+        android:title="@string/chat"
         app:cnb_iconColor="@color/colorPrimary"/>
 
     <item
         android:id="@+id/homee"
         android:icon="@drawable/ic_home"
-        android:title="Home"
+        android:title="@string/home"
         app:cnb_iconColor="@color/colorPrimary"/>
 
     <item
         android:id="@+id/others"
         android:icon="@drawable/ic_others"
-        android:title="Others"
+        android:title="@string/others"
         app:cnb_iconColor="@color/colorPrimary"/>
 </menu>

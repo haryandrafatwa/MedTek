@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:theme="@style/ToolbarThemePrimary"
+        android:background="@color/colorPrimary">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/isiulang"
+            android:textSize="18sp"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:layout_gravity="start"/>
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:id="@+id/layout_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/margin_16"
+                android:layout_marginTop="@dimen/margin_16"
+                android:background="@drawable/bg_dialog"
+                android:elevation="4dp">
+
+                <me.abhinay.input.CurrencyEditText
+                    android:id="@+id/et_nominal_topup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:background="@android:color/transparent"
+                    android:fontFamily="@font/roboto_bold"
+                    android:gravity="center"
+                    android:inputType="number"
+                    android:hint="@string/hint_nominal"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="24sp"
+                    android:digits="0123456789."
+                    android:maxLength="12"/>
+
+                <com.jem.rubberpicker.RubberSeekBar
+                    android:id="@+id/rsb_nominal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/et_nominal_topup"
+                    android:layout_marginVertical="32dp"
+                    app:minValue="@integer/minSeekBar"
+                    app:maxValue="@integer/maxSeekBar"
+                    app:elasticBehavior="cubic"
+                    app:dampingRatio="0.3"
+                    app:stiffness="200"
+                    app:stretchRange="32dp"
+                    app:defaultThumbRadius="12dp"
+                    app:normalTrackWidth="4dp"
+                    app:highlightTrackWidth="6dp"
+                    app:normalTrackColor="#EEEEEE"
+                    app:highlightTrackColor="@color/colorPrimary"
+                    app:defaultThumbInsideColor="@color/colorPrimary"
+                    app:highlightDefaultThumbOnTouchColor="@color/colorPrimary"
+                    android:layout_marginHorizontal="@dimen/margin_16"/>
+
+                <LinearLayout
+                    android:id="@+id/layout_separator"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:weightSum="12"
+                    android:orientation="horizontal"
+                    android:layout_below="@id/rsb_nominal"
+                    android:layout_marginHorizontal="16dp"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="0.8dp"
+                        android:layout_weight="3"
+                        android:background="@color/textColorLightGray"
+                        android:contentDescription="@string/separator"/>
+
+                    <TextView
+                        android:id="@+id/atau"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="6"
+                        android:fontFamily="@font/roboto_medium"
+                        android:text="@string/ataupilih"
+                        android:textColor="@color/textColorLightGray"
+                        android:gravity="center"/>
+
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="0.8dp"
+                        android:layout_weight="3"
+                        android:background="@color/textColorLightGray"
+                        android:contentDescription="@string/separator"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_pilihan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:weightSum="12"
+                    android:orientation="horizontal"
+                    android:layout_below="@id/layout_separator"
+                    android:layout_marginVertical="@dimen/margin_16">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="6"
+                        android:orientation="vertical"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginStart="@dimen/margin_16">
+
+                        <LinearLayout
+                            android:id="@+id/ll_20rb"
+                            android:layout_width="match_parent"
+                            android:layout_height="80dp"
+                            android:background="@drawable/bg_default"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:id="@+id/tv_20rb"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_medium"
+                                android:text="Rp20.000"
+                                android:textColor="@color/colorAccent"
+                                android:textSize="18sp"
+                                android:layout_marginStart="@dimen/margin_8"/>
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_medium"
+                                android:text="Harga Rp20.000"
+                                android:textColor="@color/colorPrimary"
+                                android:textSize="12sp"
+                                android:layout_marginTop="4dp"
+                                android:layout_marginStart="@dimen/margin_8"/>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/ll_100rb"
+                            android:layout_width="match_parent"
+                            android:layout_height="80dp"
+                            android:background="@drawable/bg_default"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:layout_marginTop="@dimen/margin_8">
+
+                            <TextView
+                                android:id="@+id/tv_100rb"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_medium"
+                                android:text="Rp100.000"
+                                android:textColor="@color/colorAccent"
+                                android:textSize="18sp"
+                                android:layout_marginStart="@dimen/margin_8"/>
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_medium"
+                                android:text="Harga Rp100.000"
+                                android:textColor="@color/colorPrimary"
+                                android:textSize="12sp"
+                                android:layout_marginTop="4dp"
+                                android:layout_marginStart="@dimen/margin_8"/>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/ll_500rb"
+                            android:layout_width="match_parent"
+                            android:layout_height="80dp"
+                            android:background="@drawable/bg_default"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:layout_marginTop="@dimen/margin_8">
+
+                            <TextView
+                                android:id="@+id/tv_500rb"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_medium"
+                                android:text="Rp500.000"
+                                android:textColor="@color/colorAccent"
+                                android:textSize="18sp"
+                                android:layout_marginStart="@dimen/margin_8"/>
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_medium"
+                                android:text="Harga Rp500.000"
+                                android:textColor="@color/colorPrimary"
+                                android:textSize="12sp"
+                                android:layout_marginTop="4dp"
+                                android:layout_marginStart="@dimen/margin_8"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="6"
+                        android:orientation="vertical"
+                        android:layout_marginEnd="@dimen/margin_16"
+                        android:layout_marginStart="4dp">
+
+                        <LinearLayout
+                            android:id="@+id/ll_50rb"
+                            android:layout_width="match_parent"
+                            android:layout_height="80dp"
+                            android:background="@drawable/bg_default"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:id="@+id/tv_50rb"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_medium"
+                                android:text="Rp50.000"
+                                android:textColor="@color/colorAccent"
+                                android:textSize="18sp"
+                                android:layout_marginStart="@dimen/margin_8"/>
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_medium"
+                                android:text="Harga Rp50.000"
+                                android:textColor="@color/colorPrimary"
+                                android:textSize="12sp"
+                                android:layout_marginTop="4dp"
+                                android:layout_marginStart="@dimen/margin_8"/>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/ll_200rb"
+                            android:layout_width="match_parent"
+                            android:layout_height="80dp"
+                            android:background="@drawable/bg_default"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:layout_marginTop="@dimen/margin_8">
+
+                            <TextView
+                                android:id="@+id/tv_200rb"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_medium"
+                                android:text="Rp200.000"
+                                android:textColor="@color/colorAccent"
+                                android:textSize="18sp"
+                                android:layout_marginStart="@dimen/margin_8"/>
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_medium"
+                                android:text="Harga Rp200.000"
+                                android:textColor="@color/colorPrimary"
+                                android:textSize="12sp"
+                                android:layout_marginTop="4dp"
+                                android:layout_marginStart="@dimen/margin_8"/>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/ll_1000rb"
+                            android:layout_width="match_parent"
+                            android:layout_height="80dp"
+                            android:background="@drawable/bg_default"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:layout_marginTop="@dimen/margin_8">
+
+                            <TextView
+                                android:id="@+id/tv_1000rb"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_medium"
+                                android:text="Rp1.000.000"
+                                android:textColor="@color/colorAccent"
+                                android:textSize="18sp"
+                                android:layout_marginStart="@dimen/margin_8"/>
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_medium"
+                                android:text="Harga Rp1.000.000"
+                                android:textColor="@color/colorPrimary"
+                                android:textSize="12sp"
+                                android:layout_marginTop="4dp"
+                                android:layout_marginStart="@dimen/margin_8"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+            
+            <Button
+                android:id="@+id/btn_bayar"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_below="@id/layout_content"
+                android:background="@drawable/bg_button_red"
+                android:layout_margin="@dimen/margin_16"
+                android:text="@string/paynow"
+                android:textColor="@android:color/white"
+                android:textAllCaps="false"
+                android:textSize="18sp"/>
+
+        </RelativeLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</RelativeLayout>

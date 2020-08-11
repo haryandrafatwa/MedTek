@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="maxSeekBar">1000000</integer>
+    <integer name="minSeekBar">20000</integer>
+    <integer name="dropOff">10</integer>
+    <integer name="intensity">200</integer>
+</resources>

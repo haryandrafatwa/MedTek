@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:background="@drawable/bg_dialog"
+    android:layout_marginHorizontal="32dp"
+    android:layout_centerHorizontal="true">
+
+    <ImageView
+        android:id="@+id/image_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_done"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:contentDescription="@string/daftarberhasil"/>
+
+    <TextView
+        android:id="@+id/tv_daftar_berhasil"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/daftarberhasil"
+        android:layout_below="@id/image_view"
+        android:fontFamily="@font/roboto_bold"
+        android:textSize="18sp"
+        android:textColor="@android:color/black"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"/>
+
+    <com.codesgood.views.JustifiedTextView
+        android:id="@+id/tv_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/silahkanlakukanverifikasi"
+        android:layout_below="@id/tv_daftar_berhasil"
+        android:fontFamily="@font/roboto_regular"
+        android:textSize="14sp"
+        android:textColor="@android:color/black"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="12dp"
+        android:layout_marginHorizontal="16dp"/>
+
+</RelativeLayout>

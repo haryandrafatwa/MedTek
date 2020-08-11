@@ -73,6 +73,19 @@
         android:inputType="textEmailAddress"
         android:autofillHints="@string/hint_email"/>
 
+    <TextView
+        android:id="@+id/format_tidakvalid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/formattidakvalid"
+        android:layout_below="@id/tv_silahkan"
+        android:layout_marginTop="32dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="40dp"
+        android:textSize="12sp"
+        android:textColor="@color/colorPrimary"
+        android:visibility="gone"/>
+
     <EditText
         android:id="@+id/et_password"
         android:layout_width="match_parent"
@@ -120,6 +133,40 @@
         android:fontFamily="@font/roboto_medium"
         android:textSize="18sp"
         android:text="@string/masuk"/>
+
+    <RelativeLayout
+        android:id="@+id/btn_masuk_clone"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:background="@drawable/bg_button_red"
+        android:layout_below="@id/tv_lupa_password"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="32dp"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:id="@+id/pb_mohontunggu"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:indeterminate="true"
+            android:indeterminateTint="@android:color/white"
+            android:indeterminateTintMode="src_atop"
+            android:layout_centerVertical="true"/>
+
+        <TextView
+            android:id="@+id/mohontunggu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/mohontunggu"
+            android:textSize="18sp"
+            android:layout_toEndOf="@id/pb_mohontunggu"
+            android:textColor="@android:color/white"
+            android:fontFamily="@font/roboto_medium"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="8dp"/>
+
+    </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="wrap_content"

@@ -13,44 +13,73 @@
             android:background="@color/colorPrimary"
             android:padding="16dp">
 
-            <ImageButton
-                android:id="@+id/ib_edit"
+            <RelativeLayout
+                android:id="@+id/rl_profile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="invisible">
+
+                <ImageButton
+                    android:id="@+id/ib_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ic_edit"
+                    android:contentDescription="@string/topup"
+                    android:layout_alignParentEnd="true"/>
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/civ_user"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_centerHorizontal="true"/>
+
+                <TextView
+                    android:id="@+id/tv_nama_user"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/nama_user"
+                    android:layout_below="@id/civ_user"
+                    android:layout_centerHorizontal="true"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/white"
+                    android:textSize="18sp"
+                    android:layout_marginTop="16dp"/>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_nama_user"
+                    android:layout_marginBottom="22dp"
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/tv_email_user"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/email_user"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="@android:color/white"
+                        android:textSize="12sp"/>
+
+                    <ImageButton
+                        android:id="@+id/btn_cek_verified"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ic_verified"
+                        android:layout_toEndOf="@id/tv_email_user"
+                        android:layout_marginStart="4dp"
+                        android:contentDescription="@string/unverified"/>
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+            <ProgressBar
+                android:id="@+id/pb_profile"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/ic_edit"
-                android:contentDescription="@string/topup"
-                android:layout_alignParentEnd="true"/>
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/civ_user"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:layout_centerHorizontal="true"
-                android:background="@drawable/ellipse"/>
-
-            <TextView
-                android:id="@+id/tv_nama_user"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/nama_user"
-                android:layout_below="@id/civ_user"
-                android:layout_centerHorizontal="true"
-                android:textStyle="bold"
-                android:textColor="@android:color/white"
-                android:textSize="18sp"
-                android:layout_marginTop="16dp"/>
-
-            <TextView
-                android:id="@+id/tv_email_user"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/email_user"
-                android:layout_below="@id/tv_nama_user"
-                android:layout_centerHorizontal="true"
-                android:fontFamily="@font/roboto_medium"
-                android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:layout_marginBottom="22dp"/>
+                android:layout_centerInParent="true"
+                android:indeterminateTint="@android:color/white"/>
 
         </RelativeLayout>
 
@@ -125,8 +154,9 @@
                 android:gravity="center">
 
                 <ImageButton
+                    android:id="@+id/ib_wallet"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="24dp"
                     android:background="@drawable/ic_wallet"
                     android:contentDescription="@string/topup"/>
 
@@ -155,6 +185,7 @@
             android:padding="16dp">
 
             <LinearLayout
+                android:id="@+id/layout_invite_friends"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -165,7 +196,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="@drawable/ic_add_friends"
-                    android:contentDescription="@string/invitefriend"/>
+                    android:contentDescription="@string/invitefriend"
+                    android:layout_gravity="center"/>
 
                 <TextView
                     android:layout_width="0dp"
@@ -281,6 +313,7 @@
                 android:contentDescription="@string/separator"/>
 
             <LinearLayout
+                android:id="@+id/layout_nilai_kami"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -291,17 +324,29 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="@drawable/ic_rate_us"
-                    android:contentDescription="@string/nilaikami"/>
+                    android:contentDescription="@string/nilaikami"
+                    android:layout_gravity="center"/>
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:text="@string/nilaikami"
-                    android:layout_weight="10.7"
+                    android:layout_weight="8.7"
                     android:textSize="14sp"
                     android:fontFamily="@font/roboto_medium"
                     android:textColor="@color/colorPrimary"
                     android:layout_marginStart="16dp"
+                    android:layout_gravity="center"/>
+
+                <TextView
+                    android:id="@+id/app_version"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/nilaikami"
+                    android:layout_weight="2"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/roboto_black"
+                    android:textColor="@color/colorPrimary"
                     android:layout_gravity="center"/>
 
                 <ImageView
@@ -324,6 +369,7 @@
         </LinearLayout>
 
         <Button
+            android:id="@+id/btn_logout"
             android:layout_width="match_parent"
             android:layout_height="42dp"
             android:layout_below="@id/settings"

@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?actionBarSize"
+                android:theme="@style/ToolbarThemePrimary"
+                android:background="@android:color/transparent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/hi"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="18sp"
+                        android:fontFamily="@font/roboto_bold"/>
+
+                    <TextView
+                        android:id="@+id/tv_date"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/date"
+                        android:textSize="18sp"
+                        android:textColor="@color/colorPrimary"/>
+
+                </LinearLayout>
+
+            </androidx.appcompat.widget.Toolbar>
+
+            <RelativeLayout
+                android:id="@+id/wallet"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:layout_below="@id/toolbar"
+                android:layout_marginTop="8dp"
+                android:layout_marginHorizontal="16dp"
+                android:background="@drawable/bg_home_all_rounded">
+
+                <ImageView
+                    android:id="@+id/image_saving"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ic_savings"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentBottom="true"
+                    android:contentDescription="@string/saldo"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_toStartOf="@id/image_saving"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/totalsaldo"
+                            android:layout_marginStart="16dp"
+                            android:textColor="@android:color/white"/>
+
+                        <TextView
+                            android:id="@+id/tv_saldo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="18sp"
+                            android:fontFamily="@font/roboto_bold"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginTop="4dp"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            android:textColor="@android:color/white"/>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/action"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:orientation="horizontal"
+                android:weightSum="12"
+                android:layout_below="@id/wallet"
+                android:baselineAligned="true">
+
+                <LinearLayout
+                    android:id="@+id/layout_topup"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="6"
+                    android:background="@drawable/bg_recycler_item"
+                    android:layout_marginVertical="@dimen/margin_16"
+                    android:layout_marginHorizontal="16dp"
+                    android:elevation="4dp"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_marginStart="@dimen/margin_16"
+                    android:layout_marginEnd="4dp">
+
+                    <ImageButton
+                        android:id="@+id/ib_topup"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ic_topup_wallet"
+                        android:contentDescription="@string/topup"
+                        android:layout_gravity="center_horizontal"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/isiulang"
+                        android:layout_marginTop="8dp"
+                        android:textSize="18sp"
+                        android:fontFamily="@font/roboto_bold"
+                        android:textColor="@color/colorAccent"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_withdraw"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="6"
+                    android:background="@drawable/bg_recycler_item"
+                    android:layout_marginVertical="@dimen/margin_16"
+                    android:elevation="4dp"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="@dimen/margin_16">
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ic_withdraw_wallet"
+                        android:contentDescription="@string/topup"
+                        android:layout_gravity="center_horizontal"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tarik"
+                        android:layout_marginTop="8dp"
+                        android:textSize="18sp"
+                        android:fontFamily="@font/roboto_bold"
+                        android:textColor="@color/colorAccent"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_below="@id/action"
+                android:layout_marginHorizontal="16dp">
+
+                <TextView
+                    android:id="@+id/recenttransaction"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:text="@string/recenttransc"
+                    android:fontFamily="@font/roboto_bold"
+                    android:textColor="@color/colorPrimary"/>
+
+                <TextView
+                    android:id="@+id/tv_seerekrs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lihatsemua"
+                    android:textSize="12sp"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="@color/colorAccent"
+                    android:visibility="gone"
+                    android:gravity="end"/>
+
+            </LinearLayout>
+            
+            <TextView
+                android:id="@+id/today"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/title"
+                android:text="@string/today"
+                android:layout_marginStart="16dp"
+                android:textColor="@color/colorAccent"
+                android:fontFamily="@font/roboto_bold"
+                android:textAllCaps="true"
+                android:layout_marginTop="8dp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_today_transaction"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/today"
+                android:layout_marginTop="8dp"
+                android:visibility="visible"
+                android:orientation="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+            <TextView
+                android:id="@+id/yesterday"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/rv_today_transaction"
+                android:text="@string/kemarin"
+                android:layout_marginStart="16dp"
+                android:textColor="@color/colorAccent"
+                android:fontFamily="@font/roboto_bold"
+                android:textAllCaps="true"
+                android:layout_marginTop="8dp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_yesterday_transaction"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/yesterday"
+                android:layout_marginTop="8dp"
+                android:visibility="visible"
+                android:orientation="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        </RelativeLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</RelativeLayout>

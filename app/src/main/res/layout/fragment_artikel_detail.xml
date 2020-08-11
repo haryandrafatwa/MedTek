@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/iv_artikel"
+            android:layout_width="match_parent"
+            android:layout_height="240dp"
+            android:scaleType="centerCrop"
+            android:contentDescription="@string/titleartikel"/>
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"
+            android:theme="@style/ToolbarThemePrimary"
+            android:background="@android:color/transparent">
+
+            <ImageButton
+                android:id="@+id/ib_share"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_share"
+                android:backgroundTint="@android:color/white"
+                android:layout_gravity="end"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="@string/detail"/>
+
+        </androidx.appcompat.widget.Toolbar>
+
+        <RelativeLayout
+            android:id="@+id/layout_author"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/iv_artikel"
+            android:layout_marginHorizontal="@dimen/margin_16"
+            android:paddingVertical="@dimen/margin_8">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/civ_author"
+                android:layout_width="40dp"
+                android:layout_height="40dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/civ_author"
+                android:layout_marginStart="@dimen/margin_16"
+                android:orientation="vertical"
+                android:layout_centerVertical="true">
+                
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/author"
+                    android:textSize="12sp"
+                    android:textColor="@color/textColorGray"
+                    android:fontFamily="@font/roboto_regular"/>
+
+                <TextView
+                    android:id="@+id/tv_author_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="@color/colorAccent"
+                    android:fontFamily="@font/roboto_bold"/>
+                
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tv_judul_artikel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/layout_author"
+            android:text="@string/titleartikel"
+            android:textColor="@color/colorAccent"
+            android:textSize="20sp"
+            android:fontFamily="@font/roboto_medium"
+            android:justificationMode="inter_word"
+            android:layout_marginHorizontal="@dimen/margin_16"/>
+
+        <TextView
+            android:id="@+id/tv_date_artikel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/date"
+            android:textSize="12sp"
+            android:textColor="@color/textColorGray"
+            android:fontFamily="@font/roboto_regular"
+            android:layout_below="@id/tv_judul_artikel"
+            android:layout_marginHorizontal="@dimen/margin_16"
+            android:layout_marginTop="@dimen/margin_8"/>
+
+        <com.codesgood.views.JustifiedTextView
+            android:id="@+id/tv_content_artikel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_date_artikel"
+            android:text="@string/titleartikel"
+            android:textColor="@color/textColorDark"
+            android:fontFamily="@font/roboto_regular"
+            android:layout_marginHorizontal="@dimen/margin_16"
+            android:layout_marginTop="@dimen/margin_8"/>
+
+    </RelativeLayout>
+
+</androidx.core.widget.NestedScrollView>

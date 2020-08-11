@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:id="@+id/rekomendasi_rs"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/wallet"
+    android:visibility="visible"
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:id="@+id/st_rekrs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="12">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="8"
+            android:layout_height="wrap_content"
+            android:background="@color/shimmer_color"
+            android:layout_marginStart="@dimen/margin_16"
+            android:layout_marginEnd="@dimen/margin_8"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:autoSizeTextType="uniform"
+            app:autoSizeMinTextSize="16sp"
+            app:autoSizeMaxTextSize="100sp"
+            app:autoSizeStepGranularity="10sp"
+            android:textColor="@color/colorPrimary"/>
+
+        <TextView
+            android:id="@+id/tv_seerekrs"
+            android:layout_width="0dp"
+            android:layout_weight="4"
+            android:layout_height="wrap_content"
+            android:text="@string/lihatsemua"
+            android:textSize="12sp"
+            android:gravity="center_vertical|end"
+            android:layout_marginEnd="@dimen/margin_16"
+            android:fontFamily="@font/roboto_medium"
+            android:textColor="@color/colorAccent"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="12"
+        android:background="@drawable/bg_loading"
+        android:layout_marginBottom="16dp">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_weight="8"
+            android:layout_height="140dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/shimmer_color"
+            android:layout_marginStart="@dimen/margin_16"
+            android:layout_marginEnd="@dimen/margin_8"
+            android:contentDescription="@string/notfound"/>
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_weight="4"
+            android:layout_height="140dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/shimmer_color"
+            android:contentDescription="@string/notfound"/>
+
+    </LinearLayout>
+
+</LinearLayout>

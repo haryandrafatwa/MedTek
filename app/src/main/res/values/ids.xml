@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="tv_time_8" type="id"/>
+    <item name="tv_9am" type="id"/>
+    <item name="tv_10am" type="id"/>
+    <item name="tv_11am" type="id"/>
+    <item name="tv_12pm" type="id"/>
+    <item name="tv_1pm" type="id"/>
+    <item name="tv_2pm" type="id"/>
+    <item name="tv_3pm" type="id"/>
+    <item name="tv_4pm" type="id"/>
+    <item name="tv_5pm" type="id"/>
+    <item name="tv_6pm" type="id"/>
+    <item name="tv_7pm" type="id"/>
+    <item name="tv_8pm" type="id"/>
+</resources>
