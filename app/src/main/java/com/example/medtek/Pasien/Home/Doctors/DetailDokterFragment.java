@@ -120,9 +120,9 @@ public class DetailDokterFragment extends Fragment {
                     String path="";
                     if (new JSONArray(obj.getString("image")).length() !=0){
                         JSONArray jsonArray = new JSONArray(obj.getString("image"));
-                        path = "http://192.168.1.9:8000"+jsonArray.getJSONObject(0).getString("path");
+                        path = "http://192.168.137.1:8000"+jsonArray.getJSONObject(0).getString("path");
                     }else{
-                        path = "http://192.168.1.9:8000/storage/Dokter.png";
+                        path = "http://192.168.137.1:8000/storage/Dokter.png";
                     }
 
                     initRecyclerViewItem();

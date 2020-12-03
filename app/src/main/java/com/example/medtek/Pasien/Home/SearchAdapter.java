@@ -49,7 +49,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         final SearchModel model = mList.get(position);
         holder.tv_name.setText(model.getNama());
         holder.tv_detail.setText(model.getDetail());
-        if (model.getImage_url().equalsIgnoreCase("http://192.168.1.9:8000/storage/Dokter.png")){
+        if (model.getImage_url().equalsIgnoreCase("http://192.168.137.1:8000/storage/Dokter.png")){
             holder.circleImageView.setImageDrawable(mActivity.getDrawable(R.drawable.ic_dokter));
         }else{
             Picasso.get().load(R.drawable.ic_dokter).fit().into(holder.circleImageView);

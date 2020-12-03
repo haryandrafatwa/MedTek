@@ -83,7 +83,7 @@ public class DetailArtikelFragment extends Fragment {
                     if (jsonObject.getString("image")!="null"){final int radius = 0;
                         final int margin = 0;
                         final Transformation transformation = new RoundedCornersTransformation(radius, margin);
-                        path = "http://192.168.1.9:8000"+jsonObject.getJSONObject("image").getString("path");
+                        path = "http://192.168.137.1:8000"+jsonObject.getJSONObject("image").getString("path");
                         Picasso.get().load(path).fit().centerCrop().transform(transformation).into(iv_artikel);
                     }else{
                         Drawable drawable = getActivity().getDrawable(R.drawable.bg_default_artikel);
@@ -102,7 +102,7 @@ public class DetailArtikelFragment extends Fragment {
                     }else{
                         userImagePath = jsonArray.getJSONObject(0).getString("path");
                     }
-                    Picasso.get().load("http://192.168.1.9:8000"+userImagePath).into(civ_author);
+                    Picasso.get().load("http://192.168.137.1:8000"+userImagePath).into(civ_author);
                     Date date;
                     Locale locale = new Locale("in", "ID");
                     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", locale);

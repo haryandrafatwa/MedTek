@@ -86,7 +86,7 @@ public class ArtikelAdapter extends RecyclerView.Adapter<ArtikelAdapter.ViewHold
                 final Transformation transformation = new RoundedCornersTransformation(radius, margin);
                 JSONObject obj = new JSONObject(model.getImage_url());
                 Log.d("MODELARTIKEL",obj.getString("path"));
-                Picasso.get().load("http://192.168.1.9:8000"+obj.getString("path")).transform(transformation).fit().centerCrop().into(holder.riv_artikel);
+                Picasso.get().load("http://192.168.137.1:8000"+obj.getString("path")).transform(transformation).fit().centerCrop().into(holder.riv_artikel);
             } catch (JSONException e) {
                 e.printStackTrace();
             }

@@ -97,7 +97,7 @@ public class CheckoutAppointmentFragment extends Fragment {
     private String access, refresh;
 
     private Socket socket;
-    private String SERVER_URL = "http://192.168.1.9:6001";
+    private String SERVER_URL = "http://192.168.137.1:6001";
     private String CHANNEL_MESSAGES = "messages";
     private String EVENT_MESSAGE_CREATED = "MessageCreated";
     private String TAG = "msg";
@@ -145,9 +145,9 @@ public class CheckoutAppointmentFragment extends Fragment {
                     String path="";
                     if (new JSONArray(obj.getString("image")).length() !=0){
                         JSONArray jsonArray = new JSONArray(obj.getString("image"));
-                        path = "http://192.168.1.9:8000"+jsonArray.getJSONObject(0).getString("path");
+                        path = "http://192.168.137.1:8000"+jsonArray.getJSONObject(0).getString("path");
                     }else{
-                        path = "http://192.168.1.9:8000/storage/Dokter.png";
+                        path = "http://192.168.137.1:8000/storage/Dokter.png";
                     }
                     Picasso.get().load(path).into(circleImageView);
                     Call<ResponseBody> callUser = RetrofitClient.getInstance().getApi().getUser("Bearer "+access);

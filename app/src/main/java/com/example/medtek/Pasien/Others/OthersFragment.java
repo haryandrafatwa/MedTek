@@ -84,7 +84,7 @@ public class OthersFragment extends Fragment {
     private ProgressBar pb_profile;
 
     private Socket socket;
-    private String SERVER_URL = "http://192.168.1.9:6001";
+    private String SERVER_URL = "http://192.168.137.1:6001";
     private String CHANNEL_MESSAGES = "messages";
     private String EVENT_MESSAGE_CREATED = "MessageCreated";
     private String TAG = "msg";
@@ -178,7 +178,7 @@ public class OthersFragment extends Fragment {
                                     }else if (imageObj.getString("path").equalsIgnoreCase("/storage/Dokter.png")){
                                         civ_user.setImageDrawable(getActivity().getDrawable(R.drawable.ic_dokter));
                                     }else{
-                                        String path = "http://192.168.1.9:8000"+jsonArray.getJSONObject(0).getString("path");
+                                        String path = "http://192.168.137.1:8000"+jsonArray.getJSONObject(0).getString("path");
                                         Picasso.get().load(path).into(civ_user);
                                         break;
                                     }
@@ -304,7 +304,7 @@ public class OthersFragment extends Fragment {
         Log.e("MedTek", "ECHO START...");
 
         try {
-            socket = IO.socket("http://192.168.1.9:6001");
+            socket = IO.socket("http://192.168.137.1:6001");
             socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {

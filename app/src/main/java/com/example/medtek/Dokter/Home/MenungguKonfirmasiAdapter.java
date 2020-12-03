@@ -162,7 +162,7 @@ public class MenungguKonfirmasiAdapter extends RecyclerView.Adapter<MenungguKonf
                                         if (imageObj.getString("path").equalsIgnoreCase("/storage/Pasien.png")){
                                             holder.civ_pasien.setImageDrawable(mActivity.getDrawable(R.drawable.ic_pasien));
                                         }else{
-                                            String path = "http://192.168.1.9:8000"+jsonArray.getJSONObject(0).getString("path");
+                                            String path = "http://192.168.137.1:8000"+jsonArray.getJSONObject(0).getString("path");
                                             Picasso.get().load(path).into(holder.civ_pasien);
                                             break;
                                         }
@@ -173,7 +173,7 @@ public class MenungguKonfirmasiAdapter extends RecyclerView.Adapter<MenungguKonf
                             }
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 if (jsonArray.getJSONObject(i).getInt("type_id") == 2){
-                                    ktp = "http://192.168.1.9:8000"+jsonArray.getJSONObject(i).getString("path");
+                                    ktp = "http://192.168.137.1:8000"+jsonArray.getJSONObject(i).getString("path");
                                 }
                             }
                             holder.itemView.setOnClickListener(new View.OnClickListener() {

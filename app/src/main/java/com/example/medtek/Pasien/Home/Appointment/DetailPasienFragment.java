@@ -196,9 +196,9 @@ public class DetailPasienFragment extends Fragment {
                                         String path="";
                                         if (new JSONArray(obj.getString("image")).length() !=0){
                                             JSONArray jsonArray = new JSONArray(obj.getString("image"));
-                                            path = "http://192.168.1.9:8000"+jsonArray.getJSONObject(0).getString("path");
+                                            path = "http://192.168.137.1:8000"+jsonArray.getJSONObject(0).getString("path");
                                         }else{
-                                            path = "http://192.168.1.9:8000/storage/Dokter.png";
+                                            path = "http://192.168.137.1:8000/storage/Dokter.png";
                                         }
                                         Picasso.get().load(path).fit().centerCrop().into(circleImageView);
                                         rl_content.setVisibility(View.VISIBLE);
@@ -318,8 +318,8 @@ public class DetailPasienFragment extends Fragment {
                                 for (int i = 0; i < imageArray.length(); i++) {
                                     JSONObject imageObj = imageArray.getJSONObject(i);
                                     if (imageObj.getInt("type_id") == 2){
-                                        Picasso.get().load("http://192.168.1.9:8000"+imageObj.getString("path")).into(riv_id_card);
-                                        Log.e("TAG", "onResponse: "+ "http://192.168.1.9:8000"+imageObj.getString("path"));
+                                        Picasso.get().load("http://192.168.137.1:8000"+imageObj.getString("path")).into(riv_id_card);
+                                        Log.e("TAG", "onResponse: "+ "http://192.168.137.1:8000"+imageObj.getString("path"));
                                     }
                                 }
                             }

@@ -234,7 +234,7 @@ public class EditProfileFragment extends Fragment {
                             }else{
                                 userImagePath = jsonArray.getJSONObject(0).getString("path");
                             }
-                            Picasso.get().load("http://192.168.1.9:8000"+userImagePath).into(circleImageView);
+                            Picasso.get().load("http://192.168.137.1:8000"+userImagePath).into(circleImageView);
                             if (user.getString("jenis_kelamin").equalsIgnoreCase("Pria")){
                                 male.setTextColor(Color.WHITE);
                                 male.setBackground(getResources().getDrawable(R.drawable.bg_male));

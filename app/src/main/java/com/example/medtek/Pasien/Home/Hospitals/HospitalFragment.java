@@ -139,9 +139,9 @@ public class HospitalFragment extends Fragment {
                             String location = "Jl. "+jalanRs+", No. "+no_bangunanRs+", Rt/Rw. "+rtrwRs+", Kelurahan "+kelurahanRs+", Kecamatan "+kecamatanRs+", Kota "+kotaRs;
                             String hospitalImage="";
                             if (!obj.getString("image").equals("null")){
-                                hospitalImage = "http://192.168.1.9:8000"+obj.getString("image");
+                                hospitalImage = "http://192.168.137.1:8000"+obj.getString("image");
                             }else{
-                                hospitalImage = "http://192.168.1.9:8000/storage/Hospital.png";
+                                hospitalImage = "http://192.168.137.1:8000/storage/Hospital.png";
                             }
                             mListDokter.clear();
                             for (int j = 0; j < arrDokter.length(); j++) {
@@ -157,9 +157,9 @@ public class HospitalFragment extends Fragment {
                                 String path = "";
                                 if (jo.getJSONArray("image").length()!=0){
                                     JSONArray jsonArray = new JSONArray(jo.getString("image"));
-                                    path = "http://192.168.1.9:8000"+jsonArray.getJSONObject(0).getString("path");
+                                    path = "http://192.168.137.1:8000"+jsonArray.getJSONObject(0).getString("path");
                                 }else{
-                                    path = "http://192.168.1.9:8000/storage/Hospital.png";
+                                    path = "http://192.168.137.1:8000/storage/Hospital.png";
                                 }
                                 int harga = jo.getInt("harga");
                                 int idDokter = jo.getInt("id");

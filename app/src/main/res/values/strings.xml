@@ -205,8 +205,8 @@
     <string name="rsspesial">Rumah Sakit Spesialisasi</string>
     <string name="infroumum">Informasi Umum</string>
     <string name="listdoctor">List dokter</string>
-    <string name="hospitalURL" translatable="false">http://192.168.1.9:8000/storage/Hospital.png</string>
-    <string name="dokterURL" translatable="false">http://192.168.1.9:8000/storage/Dokter.png</string>
+    <string name="hospitalURL" translatable="false">http://192.168.137.1:8000/storage/Hospital.png</string>
+    <string name="dokterURL" translatable="false">http://192.168.137.1:8000/storage/Dokter.png</string>
     <string name="shareBody">Hai! Saya baru saja mendapatkan informasi kesehatan terbaik dari dokter MedTek! Klik link untuk konsultasi dengan dokter MedTek sekarang:</string>
     <string name="editjadwal">Edit jadwal</string>
     <string name="detailpasien">Detail pasien</string>

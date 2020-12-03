@@ -113,7 +113,7 @@ public class DokterFragment extends Fragment {
                         String path = "";
                         if (new JSONArray(jo.getString("image")).length() !=0){
                             JSONArray jsonArray = new JSONArray(jo.getString("image"));
-                            path = "http://192.168.1.9:8000"+jsonArray.getJSONObject(0).getString("path");
+                            path = "http://192.168.137.1:8000"+jsonArray.getJSONObject(0).getString("path");
                         }
                         JSONObject rsObject = new JSONObject(jo.getString("hospital"));
                         String rs_name = rsObject.getString("name");
