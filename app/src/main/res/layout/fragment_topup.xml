@@ -37,8 +37,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/margin_16"
                 android:layout_marginTop="@dimen/margin_16"
-                android:background="@drawable/bg_dialog"
-                android:elevation="4dp">
+                android:background="@drawable/bg_home_all_rounded"
+                android:backgroundTint="@android:color/white"
+                android:elevation="@dimen/margin_4">
 
                 <me.abhinay.input.CurrencyEditText
                     android:id="@+id/et_nominal_topup"

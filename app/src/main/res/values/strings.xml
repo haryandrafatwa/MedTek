@@ -158,8 +158,11 @@
     <string name="jk">Jenis Kelamin</string>
     <string name="tgl">Tanggal Lahir</string>
     <string name="no_hp">Nomor Telepon</string>
-    <string name="male">Laki-Laki</string>
-    <string name="female">Perempuan</string>
+    <string name="male">Pria</string>
+    <string name="female">Wanita</string>
+    <string name="cari">Cari</string>
+    <string name="spesialisasi">Spesialisasi</string>
+    <string name="semualokasi">Semua Lokasi</string>
     <string name="simpan">Simpan</string>
     <string name="bacaanharian">Artikel harian</string>
     <string name="emptyartikel">Artikel Kosong!</string>
@@ -175,10 +178,24 @@
     <string name="drname">dr. Mahadlan Fatimah</string>
     <string name="drspe">Cardiology Intervention</string>
     <string name="drrs">RSUPN Cipto Mangunkusumo</string>
+
+    <string name="kardiologiintervensi">Kardiologi intervensi</string>
+    <string name="aritmiadanelektrofisiologi">Aritmia dan elektrofisiologi</string>
+    <string name="kardiologipediatri">Kardiologi pediatri</string>
+    <string name="pencitraankardiovaskuler">Pencitraan kardiovaskuler</string>
+    <string name="kardiologiklinik">Kardiologi klinik</string>
+    <string name="rehabilitasidanprevensi">Rehabilitasi dan prevensi</string>
+    <string name="vaskuler">Vaskuler</string>
+    <string name="perawatanjantungakut">Perawatan jantung akut</string>
+    <string name="ahlijantungumum">Ahli jantung umum</string>
+
+    <string name="selectfromhere">Pilih dari lokasi saya saat ini</string>
+
     <string name="drrsloc">Senen, Jakarta Pusat</string>
     <string name="shareTitle">Bagikan URL</string>
     <string name="shareSubject">Bagikan dokter</string>
     <string name="author">Penulis</string>
+    <string name="rumahsakit">Rumah sakit</string>
     <string name="rsterdekat">Rumah sakit terdekat</string>
     <string name="callrs">Hubungi Rumah Sakit</string>
     <string name="emptyHospital">Tidak ada Rumah Sakit di lokasi anda.</string>
@@ -194,18 +211,48 @@
     <string name="editjadwal">Edit jadwal</string>
     <string name="detailpasien">Detail pasien</string>
     <string name="inputdetailspasien">Masukkan detail pasien</string>
+    <string name="inputdetailsjanji">Masukkan detail janji</string>
     <string name="inputinfo">Silakan masukkan detail yang sama dengan disebutkan dalam kartu ID pasien.</string>
+    <string name="inputdetail">Silakan masukkan keluhan yang Anda rasakan agar Dokter memahaminya. Dapat berupa riwayat penyakit Anda atau pengobatan sebelumnya.</string>
     <string name="uploadidcard">Unggah kartu ID</string>
+    <string name="uploadsupportfile">Unggah file pendukung</string>
+    <string name="uploadfiles">Pilih file di perangkat ini</string>
     <string name="ringkasanbuatjanji">Ringkasan konsultasi</string>
     <string name="ringkasanpembayaran">Ringkasan pembayaran</string>
     <string name="walletsaya">Dompet saya</string>
     <string name="namadokter">Nama dokter</string>
     <string name="tanggalbuatjanji">Tanggal konsultasi</string>
     <string name="jambuatjanji">Jam konsultasi</string>
+    <string name="biayakonsultasi">Biaya konsultasi</string>
+    <string name="ktppasien">KTP Pasien</string>
+    <string name="filepasien">File Pasien</string>
+    <string name="lihatktppasien">Lihat KTP Pasien</string>
+    <string name="lihatfilepasien">Lihat File Pasien</string>
+    <string name="kodeunik">Kode unik</string>
+    <string name="sisasaldo">Sisa saldo</string>
     <string name="biayalayanan">Biaya layanan</string>
     <string name="totalpembayaran">Total pembayaran</string>
     <string name="payment">Pembayaran</string>
     <string name="berhasil">Berhasil</string>
+    <string name="batal">Batal</string>
+    <string name="tanggal">Tanggal</string>
+    <string name="pukul">Pukul</string>
+    <string name="umur">Umur</string>
+    <string name="keluhan">Keluhan Anda</string>
+    <string name="klhn">Keluhan</string>
+    <string name="beratbadan">Berat badan (kg)</string>
+    <string name="bb">Berat badan</string>
+    <string name="tb">Tinggi badan</string>
+    <string name="tidakadajanji">Anda sedang tidak memiliki janji</string>
+    <string name="tidakadakonfirmasi">Anda sedang tidak memiliki antrian konfirmasi</string>
+    <string name="tidakadariwayattransaksi">Anda tidak memiliki riwayat transaksi</string>
+    <string name="lp">Lingkar perut</string>
+    <string name="tinggibadan">Tinggi badan (cm)</string>
+    <string name="lingkarperut">Lingkar perut (cm)</string>
     <string name="pembayaranberhasil">Pembayaran Anda telah berhasil.</string>
     <string name="haraptunggu">Harap tunggu konfirmasi dari dokter.</string>
+    <string name="konfirmasipasienkamu">Konfirmasi janji</string>
+    <string name="apakahkamuyakin">Apakah anda yakin ingin menerima janji ini?</string>
+    <string name="apakahkamuyakintolak">Apakah anda yakin ingin menolak janji ini?</string>
+    <string name="denganmenerimaini">Dengan menerima janji ini, kamu setuju dengan <a href="http://www.google.com"><i>syarat</i></a> dan <a href="http://www.google.com"><i>ketentuan</i></a> pada aplikasi ini.</string>
 </resources>

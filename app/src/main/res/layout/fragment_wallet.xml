@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -197,50 +198,94 @@
                     android:gravity="end"/>
 
             </LinearLayout>
-            
-            <TextView
-                android:id="@+id/today"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+
+            <RelativeLayout
+                android:id="@+id/layout_empty_transaction"
+                android:layout_width="match_parent"
+                android:layout_height="140dp"
+                android:background="@drawable/bg_recycler_item"
+                android:layout_marginHorizontal="@dimen/margin_16"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
                 android:layout_below="@id/title"
-                android:text="@string/today"
-                android:layout_marginStart="16dp"
-                android:textColor="@color/colorAccent"
-                android:fontFamily="@font/roboto_bold"
-                android:textAllCaps="true"
-                android:layout_marginTop="8dp"/>
+                android:elevation="4dp"
+                android:gravity="center"
+                android:visibility="gone">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_today_transaction"
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/civ_empty"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_centerHorizontal="true"
+                    android:background="@drawable/ic_transactions"/>
+
+                <TextView
+                    android:id="@+id/tv_hospital_empty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textColorDark"
+                    android:fontFamily="@font/roboto_medium"
+                    android:layout_below="@id/civ_empty"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/tidakadariwayattransaksi"
+                    android:layout_marginTop="@dimen/margin_8"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/layout_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/today"
-                android:layout_marginTop="8dp"
-                android:visibility="visible"
-                android:orientation="vertical"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+                android:layout_below="@id/layout_empty_transaction">
 
-            <TextView
-                android:id="@+id/yesterday"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/rv_today_transaction"
-                android:text="@string/kemarin"
-                android:layout_marginStart="16dp"
-                android:textColor="@color/colorAccent"
-                android:fontFamily="@font/roboto_bold"
-                android:textAllCaps="true"
-                android:layout_marginTop="8dp"/>
+                <TextView
+                    android:id="@+id/today"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/today"
+                    android:layout_marginStart="16dp"
+                    android:textColor="@color/colorAccent"
+                    android:fontFamily="@font/roboto_bold"
+                    android:textAllCaps="true"
+                    android:layout_marginTop="8dp"/>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_yesterday_transaction"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/yesterday"
-                android:layout_marginTop="8dp"
-                android:visibility="visible"
-                android:orientation="vertical"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_today_transaction"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/today"
+                    android:layout_marginTop="8dp"
+                    android:visibility="visible"
+                    android:orientation="vertical"
+                    tools:itemCount="5"
+                    tools:listitem="@layout/item_transaction_history"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+                <TextView
+                    android:id="@+id/yesterday"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/rv_today_transaction"
+                    android:text="@string/kemarin"
+                    android:layout_marginStart="16dp"
+                    android:textColor="@color/colorAccent"
+                    android:fontFamily="@font/roboto_bold"
+                    android:textAllCaps="true"
+                    android:layout_marginTop="8dp"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_yesterday_transaction"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/yesterday"
+                    android:layout_marginTop="8dp"
+                    android:visibility="visible"
+                    tools:itemCount="5"
+                    tools:listitem="@layout/item_transaction_history"
+                    android:orientation="vertical"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+            </RelativeLayout>
 
         </RelativeLayout>
 

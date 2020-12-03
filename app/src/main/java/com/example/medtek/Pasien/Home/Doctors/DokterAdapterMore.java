@@ -118,7 +118,8 @@ public class DokterAdapterMore extends RecyclerView.Adapter<DokterAdapterMore.Vi
             }else{
                 String filterPattern = constraint.toString().toLowerCase().trim();
                 for (DokterModel itemArticle:mListFull){
-                    if(itemArticle.getNama().toLowerCase().contains(filterPattern)){
+                    if(itemArticle.getNama().toLowerCase().contains(filterPattern) || itemArticle.getSpesialisasi().toLowerCase().contains(filterPattern) ||
+                            itemArticle.getNama_rs().toLowerCase().contains(filterPattern) || itemArticle.getAlamat_rs().toLowerCase().contains(filterPattern) ){
                         filteredDoctors.add(itemArticle);
                     }
                 }

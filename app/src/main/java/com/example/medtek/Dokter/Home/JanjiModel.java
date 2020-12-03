@@ -6,9 +6,9 @@ import android.os.Parcelable;
 public class JanjiModel implements Parcelable {
 
     private int id, idPasien, idDokter, idConversation, idReport, idDay, idStatus;
-    private String tglJanji, detailJanji;
+    private String tglJanji, detailJanji, filePath;
 
-    public JanjiModel(int id, int idPasien, int idDokter, int idConversation, int idReport, int idDay, int idStatus, String tglJanji, String detailJanji) {
+    public JanjiModel(int id, int idPasien, int idDokter, int idConversation, int idReport, int idDay, int idStatus, String tglJanji, String detailJanji, String filePath) {
         this.id = id;
         this.idPasien = idPasien;
         this.idDokter = idDokter;
@@ -18,6 +18,7 @@ public class JanjiModel implements Parcelable {
         this.idStatus = idStatus;
         this.tglJanji = tglJanji;
         this.detailJanji = detailJanji;
+        this.filePath = filePath;
     }
 
     public int getId() {
@@ -92,6 +93,14 @@ public class JanjiModel implements Parcelable {
         this.detailJanji = detailJanji;
     }
 
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
     protected JanjiModel(Parcel in) {
         id = in.readInt();
         idPasien = in.readInt();
@@ -102,6 +111,7 @@ public class JanjiModel implements Parcelable {
         idStatus = in.readInt();
         tglJanji = in.readString();
         detailJanji = in.readString();
+        filePath = in.readString();
     }
 
     public static final Creator<JanjiModel> CREATOR = new Creator<JanjiModel>() {
@@ -132,5 +142,6 @@ public class JanjiModel implements Parcelable {
         dest.writeInt(idStatus);
         dest.writeString(tglJanji);
         dest.writeString(detailJanji);
+        dest.writeString(filePath);
     }
 }

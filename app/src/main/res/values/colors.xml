@@ -11,4 +11,5 @@
     <color name="textColorDark">#212121</color>
     <color name="textColorLightRed">#E19B9E</color>
     <color name="textColorDarkRed">#B2151B</color>
+    <color name="colorFormInfo">#FFD77B</color>
 </resources>

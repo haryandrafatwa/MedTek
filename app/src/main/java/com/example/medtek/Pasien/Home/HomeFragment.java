@@ -2,13 +2,16 @@ package com.example.medtek.Pasien.Home;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
 import android.icu.text.NumberFormat;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,6 +36,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.ethanhua.skeleton.Skeleton;
 import com.ethanhua.skeleton.SkeletonScreen;
 import com.example.medtek.API.RetrofitClient;
+import com.example.medtek.Dokter.Home.JanjiModel;
+import com.example.medtek.NotificationService;
 import com.example.medtek.Pasien.Home.Articles.ArtikelAdapter;
 import com.example.medtek.Pasien.Home.Articles.ArtikelFragment;
 import com.example.medtek.Pasien.Home.Doctors.DokterAdapter;
@@ -56,8 +61,11 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.threeten.bp.LocalDate;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -65,9 +73,17 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
+import io.socket.client.Ack;
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 import io.supercharge.shimmerlayout.ShimmerLayout;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -134,6 +150,10 @@ public class HomeFragment extends Fragment {
     private TextView tv_artikel, tv_seeartikel;
     private LinearLayout ll_artikel;
 
+    private Socket socket;
+    private String SERVER_URL = "http://192.168.137.1:6001", CHANNEL_MESSAGES="";
+    private int idDokter=0;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -158,6 +178,37 @@ public class HomeFragment extends Fragment {
         };
 
         loadData(getActivity());
+        Call<ResponseBody> getJanji = RetrofitClient.getInstance().getApi().getUserJanji("Bearer "+access);
+        getJanji.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    if (response.isSuccessful()){
+                        if (response.body() != null){
+                            String s = response.body().string();
+                            JSONObject janjiObject = new JSONObject(s);
+                            JSONArray janjiArr = janjiObject.getJSONArray("data");
+                            for (int i = 0; i < janjiArr.length(); i++) {
+                                JSONObject janjiObj = janjiArr.getJSONObject(i);
+                                if (janjiObj.getInt("idStatus") == 1){
+                                    idDokter = janjiObj.getInt("id");
+                                    Log.e("TAG", "onResponse: "+idDokter);
+                                    startSocket();
+                                }
+                            }
+                        }
+                    }
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
+                    getJanji.clone().enqueue(this);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
 
         Call<ResponseBody> callArticles = RetrofitClient.getInstance().getApi().getAllArticles();
         callArticles.enqueue(new Callback<ResponseBody>() {
@@ -214,13 +265,22 @@ public class HomeFragment extends Fragment {
                                     JSONObject obj = new JSONObject(s);
                                     userName = obj.getString("name");
                                     JSONArray jsonArray = new JSONArray(obj.getString("image"));
-//                                    String path = "http://192.168.1.9:8000"+jsonArray.getJSONObject(0).getString("path");
-                                    if (jsonArray.getJSONObject(0).getString("path").equals("/storage/Pasien.png") || jsonArray.length() == 0){
-//                                        circleImageView.setImageDrawable(getActivity().getDrawable(R.drawable.ic_pasien));
+                                    if (jsonArray.length() == 0){
                                         userImagePath = "/storage/Pasien.png";
                                     }else{
-                                        userImagePath = jsonArray.getJSONObject(0).getString("path");
-//                                        Picasso.get().load(path).into(circleImageView);
+                                        for (int i = 0; i < jsonArray.length(); i++) {
+                                            JSONObject imageObj = jsonArray.getJSONObject(i);
+                                            if (imageObj.getInt("type_id") == 1){
+                                                if (imageObj.getString("path").equalsIgnoreCase("/storage/Pasien.png")){
+                                                    userImagePath = "/storage/Pasien.png";
+                                                }else{
+                                                    userImagePath = jsonArray.getJSONObject(0).getString("path");
+                                                    break;
+                                                }
+                                            }else{
+                                                userImagePath = "/storage/Pasien.png";
+                                            }
+                                        }
                                     }
 
                                     Call<ResponseBody> callWallet = RetrofitClient.getInstance().getApi().getUserWallet("Bearer "+access);
@@ -260,7 +320,7 @@ public class HomeFragment extends Fragment {
                                                                     String path = "";
                                                                     if (new JSONArray(jo.getString("image")).length() !=0){
                                                                         JSONArray jsonArray = new JSONArray(jo.getString("image"));
-                                                                        path = "http://192.168.1.9:8000"+jsonArray.getJSONObject(0).getString("path");
+                                                                        path = "http://192.168.137.1:8000"+jsonArray.getJSONObject(0).getString("path");
                                                                     }
                                                                     JSONObject rsObject = new JSONObject(jo.getString("hospital"));
                                                                     String rs_name = rsObject.getString("name");
@@ -318,9 +378,9 @@ public class HomeFragment extends Fragment {
                                                                                     String location = "Jl. "+jalanRs+", No. "+no_bangunanRs+", Rt/Rw. "+rtrwRs+", Kelurahan "+kelurahanRs+", Kecamatan "+kecamatanRs+", Kota "+kotaRs;
                                                                                     String hospitalImage="";
                                                                                     if (!obj.getString("image").equals("null")){
-                                                                                        hospitalImage = "http://192.168.1.9:8000"+obj.getString("image");
+                                                                                        hospitalImage = "http://192.168.137.1:8000"+obj.getString("image");
                                                                                     }else{
-                                                                                        hospitalImage = "http://192.168.1.9:8000/storage/Hospital.png";
+                                                                                        hospitalImage = "http://192.168.137.1:8000/storage/Hospital.png";
                                                                                     }
                                                                                     mListDokterHospital.clear();
                                                                                     for (int j = 0; j < arrDokter.length(); j++) {
@@ -335,9 +395,9 @@ public class HomeFragment extends Fragment {
                                                                                         }
                                                                                         String path = "";
                                                                                         if (jo.has("image")){
-                                                                                            path = "http://192.168.1.9:8000"+jo.getString("image");
+                                                                                            path = "http://192.168.137.1:8000"+jo.getString("image");
                                                                                         }else{
-                                                                                            path = "http://192.168.1.9:8000/storage/Hospital.png";
+                                                                                            path = "http://192.168.137.1:8000/storage/Hospital.png";
                                                                                         }
                                                                                         int harga = jo.getInt("harga");
                                                                                         int idDokter = jo.getInt("id");
@@ -404,7 +464,7 @@ public class HomeFragment extends Fragment {
                                                                                 tv_name.setBackground(null);
                                                                                 tv_name.setText(userName);
                                                                                 circleImageView.setBackground(null);
-                                                                                Picasso.get().load("http://192.168.1.9:8000"+userImagePath).into(circleImageView);
+                                                                                Picasso.get().load("http://192.168.137.1:8000"+userImagePath).into(circleImageView);
                                                                                 ll_search.setBackground(getActivity().getDrawable(R.drawable.bg_search));
                                                                                 placeholderSearch.setVisibility(View.VISIBLE);
                                                                                 iv_search.setVisibility(View.VISIBLE);
@@ -541,6 +601,113 @@ public class HomeFragment extends Fragment {
 
     }
 
+    private void startSocket() {
+        Log.e("MedTek", "SOCOKET START...");
+        try {
+            socket = IO.socket("http://192.168.137.1:6001");
+            socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
+                @Override
+                public void call(Object... args) {
+                    Log.e("SOCKETSOCKETAN", "Connected!");
+                    JSONObject object = new JSONObject();
+                    JSONObject auth = new JSONObject();
+                    JSONObject headers = new JSONObject();
+
+                    try {
+                        object.put("channel", "private-App.User.Janji."+idDokter);
+                        object.put("name", "subscribe");
+
+                        headers.put("Authorization", "Bearer " + access);
+                        auth.put("headers", headers);
+                        object.put("auth", auth);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    socket.emit("subscribe", object, new Ack() {
+                        @Override
+                        public void call(Object... args) {
+                            String messageJson = new String(args[1].toString());
+                            Log.e("MedTek", "onResponse: "+messageJson);
+                        }
+                    });
+                }
+            }).on(Socket.EVENT_ERROR, new Emitter.Listener() {
+                @Override
+                public void call(Object... args) {
+                    Log.e("SOCKETSOCKETAN", "Error!");
+                }
+            }).on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
+                @Override
+                public void call(Object... args) {
+                    Log.e("SOCKETSOCKETAN", "Connect Error!");
+                }
+            }).on("janji-update", new Emitter.Listener() {
+                @Override
+                public void call(Object... args) {
+                    try {
+                        String s = new String(args[1].toString());
+                        JSONObject jsonObject = new JSONObject(s);
+                        JSONObject janjiObj = jsonObject.getJSONObject("janji");
+                        Call<ResponseBody> getDokter = RetrofitClient.getInstance().getApi().getDokterId(janjiObj.getInt("idDokter"));
+                        getDokter.enqueue(new Callback<ResponseBody>() {
+                            @Override
+                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                try {
+                                    if (response.isSuccessful()){
+                                        if (response.body() != null){
+                                            String s = response.body().string();
+                                            JSONObject dataDokter = new JSONObject(s);
+                                            String drName = dataDokter.getJSONObject("data").getString("name");
+
+                                            if (jsonObject.getString("message").equalsIgnoreCase("janji declined")){
+                                                CHANNEL_MESSAGES = "Yahh, sepertinya Dr. "+drName+" sedang sibuk. Janji kamu dibatalkan.";
+                                                new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE)
+                                                        .setTitleText("Janji Ditolak!")
+                                                        .setContentText("Dokter sedang sibuk, sehingga janji anda dibatalkan. Silahkan cek saldo anda anda pada halaman wallet.")
+                                                        .setConfirmButtonBackgroundColor(Color.parseColor("#2196F3"))
+                                                        .show();
+                                            }else if (jsonObject.getString("message").equalsIgnoreCase("Janji Queued")){
+                                                CHANNEL_MESSAGES = drName+" telah mengkonfirmasi janji anda, mohon tunggu.";
+                                                new SweetAlertDialog(getActivity(), SweetAlertDialog.SUCCESS_TYPE)
+                                                        .setTitleText("Janji Diterima!")
+                                                        .setContentText("Janji anda telah diterima, silahkan menunggu antrian pada halaman chat")
+                                                        .setConfirmButtonBackgroundColor(Color.parseColor("#2196F3"))
+                                                        .show();
+                                            }
+                                            startService();
+                                        }
+                                    }
+                                } catch (IOException | JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                            }
+                        });
+                        Log.e("TAG", "call: "+s );
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            socket.connect();
+
+        } catch (URISyntaxException e) {
+            Log.e("MedTek", "ECHO ERROR");
+            e.printStackTrace();
+        }
+    }
+
+    private void startService() throws JSONException {
+        Intent serviceIntent = new Intent(getActivity(), NotificationService.class);
+        serviceIntent.putExtra("data",CHANNEL_MESSAGES);
+        getActivity().startService(serviceIntent);
+    }
+
     private void initialize(){
         bottomNavigationView = getActivity().findViewById(R.id.bottomBar);
         bottomNavigationView.setVisibility(View.VISIBLE);
@@ -587,6 +754,26 @@ public class HomeFragment extends Fragment {
         ll_artikel = getActivity().findViewById(R.id.ll_artikel_loader);
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
+
+        ll_search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SearchFragment searchFragment = new SearchFragment();
+                setFragment(searchFragment,"FragmentSearch");
+            }
+        });
+        iv_search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ll_search.performClick();
+            }
+        });
+        placeholderSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ll_search.performClick();
+            }
+        });
     }
 
     private void getLocation() {

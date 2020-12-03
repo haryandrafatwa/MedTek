@@ -24,6 +24,7 @@
             android:orientation="vertical"
             android:layout_toStartOf="@id/layout_action"
             android:layout_toEndOf="@id/civ_pasien"
+            android:layout_centerVertical="true"
             android:layout_marginHorizontal="@dimen/margin_8">
 
             <TextView

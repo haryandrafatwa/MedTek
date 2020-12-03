@@ -79,11 +79,11 @@ public class OthersFragment extends Fragment {
 
     private String access, refresh;
     private boolean isVerified;
-    private Socket socket;
 
     private RelativeLayout rl_profile;
     private ProgressBar pb_profile;
 
+    private Socket socket;
     private String SERVER_URL = "http://192.168.1.9:6001";
     private String CHANNEL_MESSAGES = "messages";
     private String EVENT_MESSAGE_CREATED = "MessageCreated";
@@ -162,14 +162,35 @@ public class OthersFragment extends Fragment {
                             }
                         });
 
-                        String path = "";
-                        if (new JSONArray(obj.getString("image")).length() !=0){
-                            JSONArray jsonArray = new JSONArray(obj.getString("image"));
-                            path = "http://192.168.1.9:8000"+jsonArray.getJSONObject(0).getString("path");
+                        JSONArray jsonArray = new JSONArray(obj.getString("image"));
+                        if (jsonArray.length() == 0){
+                            if (obj.getInt("role_id") == 1){
+                                civ_user.setImageDrawable(getActivity().getDrawable(R.drawable.ic_pasien));
+                            }else{
+                                civ_user.setImageDrawable(getActivity().getDrawable(R.drawable.ic_dokter));
+                            }
                         }else{
-                            path = "http://192.168.1.9:8000/storage/bg_recycler_default.png";
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                JSONObject imageObj = jsonArray.getJSONObject(i);
+                                if (imageObj.getInt("type_id") == 1){
+                                    if (imageObj.getString("path").equalsIgnoreCase("/storage/Pasien.png")){
+                                        civ_user.setImageDrawable(getActivity().getDrawable(R.drawable.ic_pasien));
+                                    }else if (imageObj.getString("path").equalsIgnoreCase("/storage/Dokter.png")){
+                                        civ_user.setImageDrawable(getActivity().getDrawable(R.drawable.ic_dokter));
+                                    }else{
+                                        String path = "http://192.168.1.9:8000"+jsonArray.getJSONObject(0).getString("path");
+                                        Picasso.get().load(path).into(civ_user);
+                                        break;
+                                    }
+                                }else{
+                                    if (obj.getInt("role_id") == 1){
+                                        civ_user.setImageDrawable(getActivity().getDrawable(R.drawable.ic_pasien));
+                                    }else{
+                                        civ_user.setImageDrawable(getActivity().getDrawable(R.drawable.ic_dokter));
+                                    }
+                                }
+                            }
                         }
-                        Picasso.get().load(path).fit().centerCrop().into(civ_user);
 
                     } catch (JSONException | IOException e) {
                         e.printStackTrace();
@@ -244,7 +265,6 @@ public class OthersFragment extends Fragment {
             }
         });
 
-//        startEcho();
     }
 
     private void initialize(){
@@ -270,76 +290,6 @@ public class OthersFragment extends Fragment {
         ll_wallet = getActivity().findViewById(R.id.layout_wallet);
 
         startEcho();
-
-        /*PusherOptions options = new PusherOptions();
-        options.setCluster("ap1");
-
-        Pusher pusher = new Pusher("2014a5052483f3c31fd5",options);
-
-        pusher.connect(new ConnectionEventListener() {
-            @Override
-            public void onConnectionStateChange(ConnectionStateChange change) {
-                Log.i("Pusher", "State changed from " + change.getPreviousState() + " to " + change.getCurrentState());
-            }
-
-            @Override
-            public void onError(String message, String code, Exception e) {
-                Log.i("Pusher", "There was a problem connecting! " +
-                        "\ncode: " + code +
-                        "\nmessage: " + message +
-                        "\nException: " + e
-                );
-            }
-        }, ConnectionState.ALL);
-
-        Channel channel = pusher.subscribe("test");
-        channel.bind("App\\Events\\TestEvent", new SubscriptionEventListener() {
-            @Override
-            public void onEvent(PusherEvent event) {
-                Log.i("Pusher", "Received event with data: " + event.toString());
-            }
-        });*/
-
-        /*OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder().url("ws://192.168.1.9:6001").build();
-        WebSocket webSocket = client.newWebSocket(request, new WebSocketListener() {
-            @Override
-            public void onClosed(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
-                super.onClosed(webSocket, code, reason);
-            }
-
-            @Override
-            public void onClosing(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
-                super.onClosing(webSocket, code, reason);
-            }
-
-            @Override
-            public void onFailure(@NotNull WebSocket webSocket, @NotNull Throwable t, @Nullable okhttp3.Response response) {
-                super.onFailure(webSocket, t, response);
-            }
-
-            @Override
-            public void onMessage(@NotNull WebSocket webSocket, @NotNull String text) {
-                super.onMessage(webSocket, text);
-            }
-
-            @Override
-            public void onMessage(@NotNull WebSocket webSocket, @NotNull ByteString bytes) {
-                super.onMessage(webSocket, bytes);
-            }
-
-            @Override
-            public void onOpen(@NotNull WebSocket webSocket, @NotNull okhttp3.Response response) {
-                super.onOpen(webSocket, response);
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toasty.info(getActivity(),"Connection Established!").show();
-                    }
-                });
-            }
-        });
-        webSocket.send("lol");*/
 
     }
 
@@ -370,42 +320,9 @@ public class OthersFragment extends Fragment {
                 public void call(Object... args) {
                     Log.e("SOCKETSOCKETAN", "Connect Error!");
                 }
-            }).on("App\\Events\\TestEvent", new Emitter.Listener() {
-                @Override
-                public void call(Object... args) {
-                    try {
-                        String messageJson = new String(args[1].toString());
-                        Log.e("SOCKETSOCKETAN", messageJson);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
             });
             socket.connect();
 
-            JSONObject object = new JSONObject();
-            JSONObject auth = new JSONObject();
-            JSONObject headers = new JSONObject();
-
-            try {
-                object.put("channel", "test");
-                object.put("name", "subscribe");
-
-                headers.put("Authorization", "Bearer " + access);
-                auth.put("headers", headers);
-                object.put("auth", auth);
-
-                Log.d("MedTekMedTek",object.toString());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            socket.emit("subscribe", object, new Ack() {
-                @Override
-                public void call(Object... args) {
-                    Log.e("MedTek", "ECHO SUBSCRIBED"); // This event never occurs. I don't know why...
-                }
-            });
         } catch (URISyntaxException e) {
             Log.e("MedTek", "ECHO ERROR");
             e.printStackTrace();

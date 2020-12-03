@@ -1,6 +1,8 @@
 package com.example.medtek.Pasien.Home.Articles;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +16,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
@@ -93,10 +96,10 @@ public class ArtikelAdapterMore extends RecyclerView.Adapter<ArtikelAdapterMore.
             }
 
             if (model.getImage_url().isEmpty() || model.getImage_url().equals("null")){
-                final int radius = 36;
-                final int margin = 0;
-                final Transformation transformation = new RoundedCornersTransformation(radius, margin);
-                Picasso.get().load("http://192.168.1.9:8000/storage/bg_recycler_default.png").transform(transformation).fit().centerCrop().into(holder.riv_artikel);
+                Drawable drawable = mActivity.getDrawable(R.drawable.bg_dialog);
+                drawable = DrawableCompat.wrap(drawable);
+                DrawableCompat.setTint(drawable, Color.parseColor("#80878787"));
+                holder.riv_artikel.setBackground(drawable);
             }else {
                 try {
                     final int radius = 36;

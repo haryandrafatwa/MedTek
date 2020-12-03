@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"
+            android:theme="@style/ToolbarThemePrimary"
+            android:background="@color/colorPrimary">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/cari"
+                android:textSize="18sp"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:layout_gravity="start"/>
+
+        </androidx.appcompat.widget.Toolbar>
+
+        <LinearLayout
+            android:id="@+id/layout_search"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="16dp"
+            android:background="@drawable/bg_home_bottom_rounded"
+            android:orientation="horizontal"
+            android:weightSum="12">
+
+            <TextView
+                android:id="@+id/tv_lokasi"
+                android:layout_width="0dp"
+                android:layout_height="42dp"
+                android:layout_weight="4"
+                android:background="@drawable/bg_search"
+                android:paddingHorizontal="@dimen/margin_4"
+                android:drawableStart="@drawable/ic_my_location"
+                android:drawableTint="@color/textColorLightGray"
+                android:textColor="@color/textColorLightGray"
+                android:text="@string/semualokasi"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
+                android:textSize="12sp"
+                android:fontFamily="@font/roboto_regular"
+                android:drawablePadding="@dimen/margin_4"
+                android:enabled="false"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+
+            <EditText
+                android:id="@+id/et_search"
+                android:layout_width="0dp"
+                android:layout_height="42dp"
+                android:layout_weight="8"
+                android:background="@drawable/bg_search"
+                android:drawableStart="@drawable/ic_search"
+                android:paddingHorizontal="@dimen/margin_8"
+                android:autofillHints="@string/search"
+                android:layout_gravity="center_vertical"
+                android:inputType="text"
+                android:hint="@string/search"
+                android:textColorHint="@color/textColorLightGray"
+                android:drawableTint="@color/textColorLightGray"
+                android:textColor="@color/textColorLightGray"
+                android:textSize="14sp"
+                android:fontFamily="@font/roboto_regular"
+                android:drawablePadding="@dimen/margin_4"
+                android:layout_marginStart="@dimen/margin_8"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_spesialisasi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="@dimen/margin_16">
+
+            <TextView
+                android:id="@+id/tv_spesialisasi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_spesialisasi"
+                android:layout_marginHorizontal="@dimen/margin_16"
+                android:text="@string/spesialisasi"
+                android:fontFamily="@font/roboto_medium"
+                android:textColor="@color/colorAccent"
+                android:textSize="18sp"
+                android:drawablePadding="@dimen/margin_16"
+                android:drawableTint="@color/colorAccent"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginHorizontal="@dimen/margin_16"
+                android:layout_marginTop="@dimen/margin_8">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="12">
+
+                    <TextView
+                        android:id="@+id/tv_kardiologiintervensi"
+                        android:layout_width="0dp"
+                        android:layout_height="42dp"
+                        android:layout_weight="4"
+                        android:background="@drawable/bg_button_stroke_red"
+                        android:backgroundTint="@color/textColorGray"
+                        android:drawableStart="@drawable/ic_add_circle_outline"
+                        android:drawableTint="@color/textColorGray"
+                        android:drawablePadding="@dimen/margin_4"
+                        android:paddingHorizontal="@dimen/margin_8"
+                        android:maxLines="2"
+                        android:ellipsize="end"
+                        android:textSize="12sp"
+                        android:text="@string/kardiologiintervensi"
+                        android:gravity="center_vertical"/>
+
+                    <TextView
+                        android:id="@+id/tv_aritmiadanelektrofisiologi"
+                        android:layout_width="0dp"
+                        android:layout_height="42dp"
+                        android:layout_weight="4"
+                        android:background="@drawable/bg_button_stroke_red"
+                        android:backgroundTint="@color/textColorGray"
+                        android:drawableStart="@drawable/ic_add_circle_outline"
+                        android:drawableTint="@color/textColorGray"
+                        android:drawablePadding="@dimen/margin_4"
+                        android:paddingHorizontal="@dimen/margin_8"
+                        android:maxLines="2"
+                        android:ellipsize="end"
+                        android:textSize="12sp"
+                        android:text="@string/aritmiadanelektrofisiologi"
+                        android:layout_marginHorizontal="@dimen/margin_8"
+                        android:gravity="center_vertical"/>
+
+                    <TextView
+                        android:id="@+id/tv_kardiologipediatri"
+                        android:layout_width="0dp"
+                        android:layout_height="42dp"
+                        android:layout_weight="4"
+                        android:background="@drawable/bg_button_stroke_red"
+                        android:backgroundTint="@color/textColorGray"
+                        android:drawableStart="@drawable/ic_add_circle_outline"
+                        android:drawableTint="@color/textColorGray"
+                        android:drawablePadding="@dimen/margin_4"
+                        android:paddingHorizontal="@dimen/margin_8"
+                        android:maxLines="2"
+                        android:ellipsize="end"
+                        android:textSize="12sp"
+                        android:text="@string/kardiologipediatri"
+                        android:gravity="center_vertical"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="12"
+                    android:layout_marginTop="@dimen/margin_8">
+
+                    <TextView
+                        android:id="@+id/tv_pencitraankardiovaskuler"
+                        android:layout_width="0dp"
+                        android:layout_height="42dp"
+                        android:layout_weight="4"
+                        android:background="@drawable/bg_button_stroke_red"
+                        android:backgroundTint="@color/textColorGray"
+                        android:drawableStart="@drawable/ic_add_circle_outline"
+                        android:drawableTint="@color/textColorGray"
+                        android:drawablePadding="@dimen/margin_4"
+                        android:paddingHorizontal="@dimen/margin_8"
+                        android:maxLines="2"
+                        android:ellipsize="end"
+                        android:textSize="12sp"
+                        android:text="@string/pencitraankardiovaskuler"
+                        android:gravity="center_vertical"/>
+
+                    <TextView
+                        android:id="@+id/tv_kardiologiklinik"
+                        android:layout_width="0dp"
+                        android:layout_height="42dp"
+                        android:layout_weight="4"
+                        android:background="@drawable/bg_button_stroke_red"
+                        android:backgroundTint="@color/textColorGray"
+                        android:drawableStart="@drawable/ic_add_circle_outline"
+                        android:drawableTint="@color/textColorGray"
+                        android:drawablePadding="@dimen/margin_4"
+                        android:paddingHorizontal="@dimen/margin_8"
+                        android:maxLines="2"
+                        android:ellipsize="end"
+                        android:textSize="12sp"
+                        android:text="@string/kardiologiklinik"
+                        android:layout_marginHorizontal="@dimen/margin_8"
+                        android:gravity="center_vertical"/>
+
+                    <TextView
+                        android:id="@+id/tv_rehabilitasidanprevensi"
+                        android:layout_width="0dp"
+                        android:layout_height="42dp"
+                        android:layout_weight="4"
+                        android:background="@drawable/bg_button_stroke_red"
+                        android:backgroundTint="@color/textColorGray"
+                        android:drawableStart="@drawable/ic_add_circle_outline"
+                        android:drawableTint="@color/textColorGray"
+                        android:drawablePadding="@dimen/margin_4"
+                        android:paddingHorizontal="@dimen/margin_8"
+                        android:maxLines="2"
+                        android:ellipsize="end"
+                        android:textSize="12sp"
+                        android:text="@string/rehabilitasidanprevensi"
+                        android:gravity="center_vertical"/>
+
+                </LinearLayout><LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="12"
+                android:layout_marginTop="@dimen/margin_8">
+
+                <TextView
+                    android:id="@+id/tv_vaskuler"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="4"
+                    android:background="@drawable/bg_button_stroke_red"
+                    android:backgroundTint="@color/textColorGray"
+                    android:drawableStart="@drawable/ic_add_circle_outline"
+                    android:drawableTint="@color/textColorGray"
+                    android:drawablePadding="@dimen/margin_4"
+                    android:paddingHorizontal="@dimen/margin_8"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:textSize="12sp"
+                    android:text="@string/vaskuler"
+                    android:gravity="center_vertical"
+                    android:layout_gravity="center_vertical"/>
+
+                <TextView
+                    android:id="@+id/tv_perawatanjantungakut"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="4"
+                    android:background="@drawable/bg_button_stroke_red"
+                    android:backgroundTint="@color/textColorGray"
+                    android:drawableStart="@drawable/ic_add_circle_outline"
+                    android:drawableTint="@color/textColorGray"
+                    android:drawablePadding="@dimen/margin_4"
+                    android:paddingHorizontal="@dimen/margin_8"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:textSize="12sp"
+                    android:text="@string/perawatanjantungakut"
+                    android:layout_marginHorizontal="@dimen/margin_8"
+                    android:gravity="center_vertical"
+                    android:layout_gravity="center_vertical"/>
+
+                <TextView
+                    android:id="@+id/tv_ahlijantungumum"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="4"
+                    android:background="@drawable/bg_button_stroke_red"
+                    android:backgroundTint="@color/textColorGray"
+                    android:drawableStart="@drawable/ic_add_circle_outline"
+                    android:drawableTint="@color/textColorGray"
+                    android:drawablePadding="@dimen/margin_4"
+                    android:paddingHorizontal="@dimen/margin_8"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:textSize="12sp"
+                    android:text="@string/ahlijantungumum"
+                    android:gravity="center_vertical"
+                    android:layout_gravity="center_vertical"/>
+
+            </LinearLayout>
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_rs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="@dimen/margin_16">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/margin_16">
+
+                <TextView
+                    android:id="@+id/tv_rs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/ic_hospital"
+                    android:text="@string/rumahsakit"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="18sp"
+                    android:drawablePadding="@dimen/margin_16"
+                    android:drawableTint="@color/colorAccent"
+                    android:layout_toStartOf="@id/tv_rs_seeall"/>
+
+                <TextView
+                    android:id="@+id/tv_rs_seeall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lihatsemua"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="12sp"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"
+                    android:visibility="gone"/>
+
+            </RelativeLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_rs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical"
+                tools:listitem="@layout/item_search"
+                tools:itemCount="3"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_dokter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="@dimen/margin_16">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/margin_16">
+
+                <TextView
+                    android:id="@+id/tv_dokter"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/ic_doctor"
+                    android:text="@string/dokter"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="18sp"
+                    android:drawablePadding="@dimen/margin_16"
+                    android:drawableTint="@color/colorAccent"
+                    android:layout_toStartOf="@id/tv_dokter_seeall"/>
+
+                <TextView
+                    android:id="@+id/tv_dokter_seeall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lihatsemua"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="12sp"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"
+                    android:visibility="gone"/>
+
+            </RelativeLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_dokter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical"
+                tools:listitem="@layout/item_search"
+                tools:itemCount="3"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

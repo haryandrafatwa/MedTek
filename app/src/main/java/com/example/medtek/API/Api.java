@@ -9,6 +9,7 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -62,6 +63,12 @@ public interface Api {
     @Headers({"Accept:application/json"})
     @GET("user/")
     Call<ResponseBody> getUser(
+            @Header("Authorization") String token
+    );
+
+    @Headers({"Accept:application/json"})
+    @GET("transaction-history/")
+    Call<ResponseBody> getTransaction(
             @Header("Authorization") String token
     );
 
@@ -126,10 +133,33 @@ public interface Api {
             @Path("id") int id
     );
 
-    @Headers({"Connection:close"})
+    @Headers({"'Accept':'application/json'","'Connection':'close'"})
+    @GET("janji-file/{id}")
+    Call<ResponseBody> getFile(
+            @Header("Authorization") String token,
+            @Path("id") int id
+    );
+
+    @Headers({"Connection:close","Content-Type:image/*","Accept:application/json"})
     @GET("ktp/")
     Call<ResponseBody> getKTP(
             @Header("Authorization") String token
+    );
+
+    @Headers({"Connection:close","Content-Type:image/*","Accept:application/json"})
+    @GET("get-pasienktp/{id}")
+    Call<ResponseBody> getPasienKTP(
+            @Header("Authorization") String token,
+            @Path("id") int id
+    );
+
+    @Headers({"Accept:application/json"})
+    @POST("janji-file/{id}")
+    @Multipart
+    Call<ResponseBody> uploadFile(
+            @Header("Authorization") String token,
+            @Path("id") int id,
+            @Part MultipartBody.Part file
     );
 
     @Headers({"Accept:application/json"})
@@ -140,9 +170,17 @@ public interface Api {
             @Part MultipartBody.Part ktp
     );
 
+    @Headers({"Accept:application/json"})
+    @POST("edit-avatar/")
+    @Multipart
+    Call<ResponseBody> uploadAvatar(
+            @Header("Authorization") String token,
+            @Part MultipartBody.Part profilePic
+    );
+
     @Headers({"Accept:application/json","Content-Type:application/json"})
     @PUT("editprofile/")
-    Call<ResponseBody> updateProfileTglLahir(
+    Call<ResponseBody> updateProfile(
             @Header("Authorization") String token,
             @Body RequestBody body
     );
@@ -166,11 +204,27 @@ public interface Api {
     );
 
     @Headers({"Accept:application/json"})
+    @GET("janji-queue")
+    @Nullable
+    Call<ResponseBody> getAntrianUser(
+            @Header("Authorization") String token
+    );
+
+    @Headers({"Accept:application/json"})
+    @GET("janji-queue/{id}")
+    @Nullable
+    Call<ResponseBody> getAntrianId(
+            @Header("Authorization") String token,
+            @Path("id") int id
+    );
+
+    @Headers({"Accept:application/json"})
     @POST("payment/")
     @FormUrlEncoded
     Call<ResponseBody> bayar(
             @Header("Authorization") String token,
-            @Field("idTransaksi") int idTransaksi
+            @Field("idTransaksi") int idTransaksi,
+            @Field("idJanji") int idJanji
     );
 
     @Headers({"Accept:application/json"})
@@ -184,5 +238,27 @@ public interface Api {
     Call<ResponseBody> getJanjiId(
             @Header("Authorization") String token,
             @Path("id") int id
+    );
+
+    @Headers({"Accept:application/json"})
+    @GET("janji-decline/{id}")
+    Call<ResponseBody> declineJanji(
+            @Header("Authorization") String token,
+            @Path("id") int id
+    );
+
+    @Headers({"Accept:application/json"})
+    @GET("city/?key=21878b04bed20a2f2bb05bf41cd68d9c")
+    Call<ResponseBody> getCityRajaOngkir(
+    );
+
+    @Headers({"Accept:application/json"})
+    @GET("get-city/")
+    Call<ResponseBody> getCity(
+    );
+
+    @Headers({"Accept:application/json"})
+    @GET("get-servicefee/")
+    Call<ResponseBody> getServiceFee(
     );
 }

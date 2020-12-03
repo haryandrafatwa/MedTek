@@ -32,18 +32,28 @@
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/civ_user"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="32dp"
                 android:src="@drawable/ellipse"/>
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/civ_temp"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="32dp"
+                android:src="@drawable/ellipse"
+                android:layout_below="@id/civ_user"
+                android:visibility="gone"/>
 
             <LinearLayout
                 android:id="@+id/nama"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_below="@id/civ_user"
+                android:layout_below="@id/civ_temp"
                 android:layout_marginTop="42dp"
                 android:layout_marginHorizontal="16dp">
 
@@ -212,7 +222,10 @@
                     android:fontFamily="@font/roboto_regular"
                     android:inputType="date"
                     android:autofillHints="@string/tgl"
-                    android:paddingTop="4dp"/>
+                    android:paddingTop="4dp"
+                    android:drawableEnd="@drawable/ic_expand_more"
+                    android:focusable="false"
+                    android:drawableTint="@color/textColorGray"/>
 
             </LinearLayout>
 

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:layout_centerInParent="true"
+    android:gravity="center"
+    android:padding="16dp"
+    android:id="@+id/bottomSheetRSDetail"
+    android:background="@drawable/bg_bottom_sheet"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/layout_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_selectfromhere"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/selectfromhere"
+            android:drawableStart="@drawable/ic_my_location"
+            android:drawableTint="@color/colorAccent"
+            android:drawablePadding="@dimen/margin_8"
+            android:textSize="18sp"
+            android:textColor="@color/colorAccent"
+            android:fontFamily="@font/roboto_bold"/>
+
+        <TextView
+            android:id="@+id/tv_all_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/semualokasi"
+            android:textSize="16sp"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/roboto_medium"
+            android:textColor="@color/textColorGray"/>
+
+    </LinearLayout>
+
+
+</androidx.core.widget.NestedScrollView>

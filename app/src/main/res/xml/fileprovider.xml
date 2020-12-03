@@ -3,4 +3,10 @@
     <external-files-path
         name="images"
         path="Pictures" />
+
+    <files-path
+        name="janji"
+        path="Download/MedTek/janji" />
+
+    <external-path name="external_files" path="." />
 </paths>

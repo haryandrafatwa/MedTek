@@ -61,259 +61,498 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <RelativeLayout
-                android:id="@+id/header"
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmerLayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_home_bottom_rounded">
+                android:layout_height="wrap_content">
 
-                <RelativeLayout
+                <LinearLayout
+                    android:id="@+id/layout_loader"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/margin_16"
-                    android:layout_marginBottom="@dimen/margin_16"
-                    android:padding="@dimen/margin_16"
-                    android:background="@drawable/bg_header_appointment">
+                    android:orientation="vertical">
 
-                    <de.hdodenhof.circleimageview.CircleImageView
-                        android:id="@+id/civ_dokter"
-                        android:layout_width="70dp"
-                        android:layout_height="70dp"
-                        android:src="@drawable/ellipse"/>
+                    <include layout="@layout/placeholder_buat_janji_header"/>
+                    <include layout="@layout/placeholder_buat_janji_detail_pasien"/>
 
-                    <LinearLayout
-                        android:id="@+id/layout_info"
+                </LinearLayout>
+
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
+            <RelativeLayout
+                android:id="@+id/layout_visible"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+
+                <RelativeLayout
+                    android:id="@+id/header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_home_bottom_rounded">
+
+                    <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_toEndOf="@id/civ_dokter"
-                        android:orientation="vertical"
-                        android:layout_centerVertical="true"
-                        android:layout_marginStart="8dp">
+                        android:layout_marginHorizontal="@dimen/margin_16"
+                        android:layout_marginBottom="@dimen/margin_16"
+                        android:padding="@dimen/margin_16"
+                        android:background="@drawable/bg_header_appointment">
 
-                        <TextView
-                            android:id="@+id/tv_dr_name"
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/civ_dokter"
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
+                            android:src="@drawable/ellipse"/>
+
+                        <LinearLayout
+                            android:id="@+id/layout_info"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/drname"
-                            android:textColor="@android:color/white"
-                            android:fontFamily="@font/roboto_bold"
-                            android:textSize="18sp"
-                            android:ellipsize="end"
-                            android:maxLines="1"/>
+                            android:layout_toEndOf="@id/civ_dokter"
+                            android:orientation="vertical"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp">
 
-                        <TextView
-                            android:id="@+id/tv_dr_special"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/drspe"
-                            android:textColor="@android:color/white"
-                            android:fontFamily="@font/roboto_regular"
-                            android:textSize="12sp"
-                            android:ellipsize="end"
-                            android:maxLines="1"/>
+                            <TextView
+                                android:id="@+id/tv_dr_name"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/drname"
+                                android:textColor="@android:color/white"
+                                android:fontFamily="@font/roboto_bold"
+                                android:textSize="18sp"
+                                android:ellipsize="end"
+                                android:maxLines="1"/>
 
-                        <TextView
-                            android:id="@+id/tv_dr_rs"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/drrs"
-                            android:textColor="@color/colorAccent"
-                            android:fontFamily="@font/roboto_medium"
-                            android:ellipsize="end"
-                            android:maxLines="1"/>
+                            <TextView
+                                android:id="@+id/tv_dr_special"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/drspe"
+                                android:textColor="@android:color/white"
+                                android:fontFamily="@font/roboto_regular"
+                                android:textSize="12sp"
+                                android:ellipsize="end"
+                                android:maxLines="1"/>
 
-                        <TextView
-                            android:id="@+id/tv_dr_rs_loc"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/drrsloc"
-                            android:textColor="@android:color/white"
-                            android:fontFamily="@font/roboto_regular"
-                            android:textSize="12sp"
-                            android:ellipsize="end"
-                            android:maxLines="1"/>
+                            <TextView
+                                android:id="@+id/tv_dr_rs"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/drrs"
+                                android:textColor="@color/colorAccent"
+                                android:fontFamily="@font/roboto_medium"
+                                android:ellipsize="end"
+                                android:maxLines="1"/>
 
-                    </LinearLayout>
+                            <TextView
+                                android:id="@+id/tv_dr_rs_loc"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/drrsloc"
+                                android:textColor="@android:color/white"
+                                android:fontFamily="@font/roboto_regular"
+                                android:textSize="12sp"
+                                android:ellipsize="end"
+                                android:maxLines="1"/>
+
+                        </LinearLayout>
+
+                    </RelativeLayout>
 
                 </RelativeLayout>
 
-            </RelativeLayout>
-
-            <TextView
-                android:id="@+id/inputdetails"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/inputdetailspasien"
-                android:layout_marginTop="16dp"
-                android:layout_below="@id/header"
-                android:textSize="18sp"
-                android:fontFamily="@font/roboto_medium"
-                android:textColor="@color/colorAccent"
-                android:layout_marginStart="@dimen/margin_16"/>
-
-            <LinearLayout
-                android:id="@+id/form_input"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_below="@id/inputdetails"
-                android:layout_marginHorizontal="@dimen/margin_16"
-                android:layout_marginTop="@dimen/margin_8"
-                android:background="@drawable/bg_form_input">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/uploadidcard"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="@dimen/margin_32"
-                    android:paddingVertical="@dimen/margin_8"
-                    android:background="@drawable/bg_input_info_top_rounded">
+                    android:text="@string/uploadidcard"
+                    android:layout_marginTop="16dp"
+                    android:layout_below="@id/header"
+                    android:textSize="18sp"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="@color/colorAccent"
+                    android:layout_marginStart="@dimen/margin_16"/>
+
+                <com.makeramen.roundedimageview.RoundedImageView
+                    android:id="@+id/riv_upload_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="180dp"
+                    android:scaleType="centerCrop"
+                    android:layout_below="@+id/uploadidcard"
+                    android:layout_marginTop="@dimen/margin_16"
+                    android:layout_marginHorizontal="@dimen/margin_16"
+                    app:riv_border_width="0.5dip"
+                    app:riv_border_color="#80000000"
+                    app:riv_corner_radius="12dip"
+                    android:visibility="gone"/>
+
+                <RelativeLayout
+                    android:id="@+id/upload_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="180dp"
+                    android:background="@drawable/bg_upload_id_card"
+                    android:layout_below="@+id/riv_upload_image"
+                    android:layout_marginTop="@dimen/margin_16"
+                    android:layout_marginHorizontal="@dimen/margin_16"
+                    android:minHeight="144dp"
+                    android:gravity="center">
 
                     <ImageButton
-                        android:id="@+id/ib_rs_loc"
+                        android:id="@+id/image_cloud"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/ic_info"
-                        android:backgroundTint="#B3944F"
-                        android:layout_gravity="center"
-                        android:contentDescription="@string/drrsloc"/>
+                        android:background="@drawable/ic_upload_cloud"
+                        android:backgroundTint="#80000000"
+                        android:contentDescription="@string/unggahfoto"
+                        android:layout_centerHorizontal="true"/>
 
                     <TextView
-                        android:id="@+id/inputinfo"
+                        android:id="@+id/tv_upload_image"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/inputinfo"
-                        android:fontFamily="@font/roboto_regular"
+                        android:text="@string/unggahfoto"
                         android:textColor="#80000000"
-                        android:textSize="12sp"
-                        android:ellipsize="end"
-                        android:maxLines="2"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textSize="18sp"
+                        android:layout_below="@+id/image_cloud"
+                        android:layout_centerHorizontal="true"/>
+
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/uploadFile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/uploadsupportfile"
+                    android:layout_marginTop="16dp"
+                    android:layout_below="@id/upload_image"
+                    android:textSize="18sp"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="@color/colorAccent"
+                    android:layout_marginStart="@dimen/margin_16"/>
+
+                <RelativeLayout
+                    android:id="@+id/upload_file"
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:background="@drawable/bg_upload_id_card"
+                    android:layout_below="@+id/uploadFile"
+                    android:layout_marginTop="@dimen/margin_16"
+                    android:layout_marginHorizontal="@dimen/margin_16">
+
+                    <ImageView
+                        android:id="@+id/image_attach"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ic_attach_file"
+                        android:backgroundTint="#50000000"
+                        android:contentDescription="@string/unggahfoto"
+                        android:layout_centerVertical="true"
                         android:layout_marginStart="@dimen/margin_16"/>
+                    
+                    <ImageView
+                        android:id="@+id/separator"
+                        android:layout_width="0.5dp"
+                        android:layout_height="match_parent"
+                        android:layout_toEndOf="@id/image_attach"
+                        android:background="#80000000"
+                        android:layout_marginStart="@dimen/margin_16"/>
+
+                    <TextView
+                        android:id="@+id/tv_upload_file"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/uploadfiles"
+                        android:textColor="#60000000"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textSize="18sp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:layout_toEndOf="@+id/separator"
+                        android:layout_toStartOf="@id/iv_clear"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="@dimen/margin_16"
+                        android:layout_marginEnd="@dimen/margin_8"/>
+
+                    <ImageView
+                        android:id="@+id/iv_clear"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ic_clear"
+                        android:backgroundTint="@color/colorAccent"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="@dimen/margin_16"
+                        android:visibility="gone"/>
+
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/inputdetails"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/inputdetailspasien"
+                    android:layout_marginTop="16dp"
+                    android:layout_below="@id/upload_file"
+                    android:textSize="18sp"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="@color/colorAccent"
+                    android:layout_marginStart="@dimen/margin_16"/>
+
+                <LinearLayout
+                    android:id="@+id/form_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_below="@id/inputdetails"
+                    android:layout_marginHorizontal="@dimen/margin_16"
+                    android:layout_marginTop="@dimen/margin_8"
+                    android:background="@drawable/bg_form_input">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="@dimen/margin_32"
+                        android:paddingVertical="@dimen/margin_8"
+                        android:background="@drawable/bg_input_info_top_rounded">
+
+                        <ImageButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/ic_info"
+                            android:backgroundTint="#B3944F"
+                            android:layout_gravity="center"
+                            android:contentDescription="@string/drrsloc"/>
+
+                        <com.codesgood.views.JustifiedTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/inputinfo"
+                            android:fontFamily="@font/roboto_regular"
+                            android:textColor="#80000000"
+                            android:textSize="12sp"
+                            android:ellipsize="end"
+                            android:maxLines="2"
+                            android:layout_marginStart="@dimen/margin_16"/>
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/namalengkap"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="@color/textColorGray"
+                        android:textSize="12sp"
+                        android:layout_marginHorizontal="@dimen/margin_32"
+                        android:layout_marginTop="@dimen/margin_16"
+                        android:labelFor="@id/et_fullname"/>
+
+                    <EditText
+                        android:id="@+id/et_fullname"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_edit_text"
+                        android:layout_marginHorizontal="@dimen/margin_32"
+                        android:inputType="text"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="4dp"
+                        android:fontFamily="@font/roboto_medium"
+                        android:autofillHints="@string/hint_nama_lngkap"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tgl"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="@color/textColorGray"
+                        android:textSize="12sp"
+                        android:layout_marginHorizontal="@dimen/margin_32"
+                        android:layout_marginTop="@dimen/margin_16"
+                        android:labelFor="@id/et_dob"/>
+
+                    <EditText
+                        android:id="@+id/et_dob"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_edit_text"
+                        android:layout_marginHorizontal="@dimen/margin_32"
+                        android:inputType="text"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="4dp"
+                        android:fontFamily="@font/roboto_medium"
+                        android:autofillHints="@string/hint_nama_lngkap"
+                        android:drawableEnd="@drawable/ic_expand_more"
+                        android:drawableTint="@color/textColorGray"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/beratbadan"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="@color/textColorGray"
+                        android:textSize="12sp"
+                        android:layout_marginHorizontal="@dimen/margin_32"
+                        android:layout_marginTop="@dimen/margin_16"
+                        android:labelFor="@id/et_fullname"/>
+
+                    <EditText
+                        android:id="@+id/et_beratbadan"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_edit_text"
+                        android:layout_marginHorizontal="@dimen/margin_32"
+                        android:inputType="number"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="4dp"
+                        android:fontFamily="@font/roboto_medium"
+                        android:autofillHints="@string/hint_nama_lngkap"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tinggibadan"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="@color/textColorGray"
+                        android:textSize="12sp"
+                        android:layout_marginHorizontal="@dimen/margin_32"
+                        android:layout_marginTop="@dimen/margin_16"
+                        android:labelFor="@id/et_fullname"/>
+
+                    <EditText
+                        android:id="@+id/et_tinggibadan"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_edit_text"
+                        android:layout_marginHorizontal="@dimen/margin_32"
+                        android:inputType="number"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="4dp"
+                        android:fontFamily="@font/roboto_medium"
+                        android:autofillHints="@string/hint_nama_lngkap"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/lingkarperut"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="@color/textColorGray"
+                        android:textSize="12sp"
+                        android:layout_marginHorizontal="@dimen/margin_32"
+                        android:layout_marginTop="@dimen/margin_16"
+                        android:labelFor="@id/et_fullname"/>
+
+                    <EditText
+                        android:id="@+id/et_lingkarperut"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_edit_text"
+                        android:layout_marginHorizontal="@dimen/margin_32"
+                        android:layout_marginBottom="@dimen/margin_32"
+                        android:inputType="number"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="4dp"
+                        android:fontFamily="@font/roboto_medium"
+                        android:autofillHints="@string/hint_nama_lngkap"/>
 
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/inputdetailjanji"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/namalengkap"
+                    android:text="@string/inputdetailsjanji"
+                    android:layout_marginTop="16dp"
+                    android:layout_below="@id/form_input"
+                    android:textSize="18sp"
                     android:fontFamily="@font/roboto_medium"
-                    android:textColor="@color/textColorGray"
-                    android:textSize="12sp"
-                    android:layout_marginHorizontal="@dimen/margin_32"
-                    android:layout_marginTop="@dimen/margin_16"
-                    android:labelFor="@id/et_fullname"/>
+                    android:textColor="@color/colorAccent"
+                    android:layout_marginStart="@dimen/margin_16"/>
 
-                <EditText
-                    android:id="@+id/et_fullname"
+                <LinearLayout
+                    android:id="@+id/form_input_detail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_edit_text"
-                    android:layout_marginHorizontal="@dimen/margin_32"
-                    android:inputType="text"
-                    android:paddingTop="4dp"
-                    android:paddingBottom="4dp"
-                    android:fontFamily="@font/roboto_medium"
-                    android:autofillHints="@string/hint_nama_lngkap"/>
+                    android:orientation="vertical"
+                    android:layout_below="@id/inputdetailjanji"
+                    android:layout_marginHorizontal="@dimen/margin_16"
+                    android:layout_marginTop="@dimen/margin_8"
+                    android:background="@drawable/bg_form_input">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/tgl"
-                    android:fontFamily="@font/roboto_medium"
-                    android:textColor="@color/textColorGray"
-                    android:textSize="12sp"
-                    android:layout_marginHorizontal="@dimen/margin_32"
-                    android:layout_marginTop="@dimen/margin_16"
-                    android:labelFor="@id/et_dob"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="@dimen/margin_32"
+                        android:paddingVertical="@dimen/margin_8"
+                        android:background="@drawable/bg_input_info_top_rounded">
 
-                <EditText
-                    android:id="@+id/et_dob"
+                        <ImageButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/ic_info"
+                            android:backgroundTint="#B3944F"
+                            android:layout_gravity="center"
+                            android:contentDescription="@string/drrsloc"/>
+
+                        <com.codesgood.views.JustifiedTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/inputdetail"
+                            android:fontFamily="@font/roboto_regular"
+                            android:justificationMode="inter_word"
+                            android:textColor="#80000000"
+                            android:textSize="12sp"
+                            android:layout_marginStart="@dimen/margin_16"/>
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/keluhan"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="@color/textColorGray"
+                        android:textSize="12sp"
+                        android:layout_marginHorizontal="@dimen/margin_32"
+                        android:layout_marginTop="@dimen/margin_16"
+                        android:labelFor="@id/et_fullname"/>
+
+                    <EditText
+                        android:id="@+id/et_detail_janji"
+                        android:layout_width="match_parent"
+                        android:layout_height="120dp"
+                        android:background="@drawable/bg_textarea"
+                        android:layout_marginHorizontal="@dimen/margin_32"
+                        android:inputType="text|textMultiLine"
+                        android:padding="@dimen/margin_4"
+                        android:textSize="12sp"
+                        android:gravity="start|top"
+                        android:layout_marginTop="@dimen/margin_4"
+                        android:layout_marginBottom="@dimen/margin_32"
+                        android:fontFamily="@font/roboto_medium"
+                        android:autofillHints="@string/hint_nama_lngkap"/>
+
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btnNext"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_edit_text"
-                    android:layout_marginHorizontal="@dimen/margin_32"
-                    android:layout_marginBottom="@dimen/margin_32"
-                    android:inputType="text"
-                    android:paddingTop="4dp"
-                    android:paddingBottom="4dp"
-                    android:fontFamily="@font/roboto_medium"
-                    android:autofillHints="@string/hint_nama_lngkap"
-                    android:drawableEnd="@drawable/ic_expand_more"
-                    android:drawableTint="@color/textColorGray"/>
-
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/uploadidcard"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/uploadidcard"
-                android:layout_marginTop="16dp"
-                android:layout_below="@id/form_input"
-                android:textSize="18sp"
-                android:fontFamily="@font/roboto_medium"
-                android:textColor="@color/colorAccent"
-                android:layout_marginStart="@dimen/margin_16"/>
-
-            <com.makeramen.roundedimageview.RoundedImageView
-                android:id="@+id/riv_upload_image"
-                android:layout_width="match_parent"
-                android:layout_height="180dp"
-                android:scaleType="centerCrop"
-                android:layout_below="@+id/uploadidcard"
-                android:layout_marginTop="@dimen/margin_16"
-                android:layout_marginHorizontal="@dimen/margin_16"
-                app:riv_border_width="0.5dip"
-                app:riv_border_color="#80000000"
-                app:riv_corner_radius="12dip"
-                android:visibility="gone"/>
-
-            <RelativeLayout
-                android:id="@+id/upload_image"
-                android:layout_width="match_parent"
-                android:layout_height="180dp"
-                android:background="@drawable/bg_upload_id_card"
-                android:layout_below="@+id/riv_upload_image"
-                android:layout_marginTop="@dimen/margin_16"
-                android:layout_marginHorizontal="@dimen/margin_16"
-                android:minHeight="144dp"
-                android:gravity="center">
-
-                <ImageButton
-                    android:id="@+id/image_cloud"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/ic_upload_cloud"
-                    android:backgroundTint="#80000000"
-                    android:contentDescription="@string/unggahfoto"
-                    android:layout_centerHorizontal="true"/>
-
-                <TextView
-                    android:id="@+id/tv_upload_image"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/unggahfoto"
-                    android:textColor="#80000000"
+                    android:layout_height="42dp"
+                    android:background="@drawable/bg_button_selector"
+                    android:layout_below="@id/form_input_detail"
+                    android:layout_margin="16dp"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white"
                     android:fontFamily="@font/roboto_medium"
                     android:textSize="18sp"
-                    android:layout_below="@+id/image_cloud"
-                    android:layout_centerHorizontal="true"/>
+                    android:text="@string/selanjutnya"
+                    android:enabled="false"/>
 
             </RelativeLayout>
-
-            <Button
-                android:id="@+id/btnNext"
-                android:layout_width="match_parent"
-                android:layout_height="42dp"
-                android:background="@drawable/bg_button_selector"
-                android:layout_below="@id/upload_image"
-                android:layout_margin="16dp"
-                android:textAllCaps="false"
-                android:textColor="@android:color/white"
-                android:fontFamily="@font/roboto_medium"
-                android:textSize="18sp"
-                android:text="@string/selanjutnya"
-                android:enabled="false"/>
 
         </RelativeLayout>
 

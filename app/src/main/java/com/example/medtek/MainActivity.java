@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     FragmentManager fragmentManager;
 
     private String access, refresh;
+    private String TAG;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                                 chipNavigationBar.setItemSelected(R.id.homee,true);
                                 fragmentManager = getSupportFragmentManager();
                                 HomeFragment homeFragment = new HomeFragment();
-                                fragmentManager.beginTransaction().replace(R.id.frameFragment,homeFragment).commit();
+                                fragmentManager.beginTransaction().replace(R.id.frameFragment,homeFragment).addToBackStack("FragmentHomePasien").commit();
                             }
 
                             chipNavigationBar.setOnItemSelectedListener(new ChipNavigationBar.OnItemSelectedListener() {
@@ -71,18 +72,21 @@ public class MainActivity extends AppCompatActivity {
                                     switch (i){
                                         case R.id.chat:
                                             fragment = new ChatFragment();
+                                            TAG = "FragmentChatPasien";
                                             break;
                                         case R.id.homee:
                                             fragment = new HomeFragment();
+                                            TAG = "FragmentHomePasien";
                                             break;
                                         case R.id.others:
                                             fragment = new OthersFragment();
+                                            TAG = "FragmentOthersPasien";
                                             break;
                                     }
 
                                     if (fragment!= null){
                                         fragmentManager = getSupportFragmentManager();
-                                        fragmentManager.beginTransaction().replace(R.id.frameFragment,fragment).commit();
+                                        fragmentManager.beginTransaction().replace(R.id.frameFragment,fragment).addToBackStack(TAG).commit();
                                     }
 
                                 }
@@ -92,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
                                 chipNavigationBar.setItemSelected(R.id.homee,true);
                                 fragmentManager = getSupportFragmentManager();
                                 com.example.medtek.Dokter.Home.HomeFragment homeFragment = new com.example.medtek.Dokter.Home.HomeFragment();
-                                fragmentManager.beginTransaction().replace(R.id.frameFragment,homeFragment).commit();
+                                fragmentManager.beginTransaction().replace(R.id.frameFragment,homeFragment,"FragmentHomeDokter").addToBackStack("FragmentHomeDokter").commit();
                             }
 
                             chipNavigationBar.setOnItemSelectedListener(new ChipNavigationBar.OnItemSelectedListener() {
@@ -103,18 +107,21 @@ public class MainActivity extends AppCompatActivity {
                                     switch (i){
                                         case R.id.chat:
                                             fragment = new ChatFragment();
+                                            TAG = "FragmentChatDokter";
                                             break;
                                         case R.id.homee:
-                                            fragment = new HomeFragment();
+                                            fragment = new  com.example.medtek.Dokter.Home.HomeFragment();
+                                            TAG = "FragmentHomeDokter";
                                             break;
                                         case R.id.others:
                                             fragment = new OthersFragment();
+                                            TAG = "FragmentOthersDokter";
                                             break;
                                     }
 
                                     if (fragment!= null){
                                         fragmentManager = getSupportFragmentManager();
-                                        fragmentManager.beginTransaction().replace(R.id.frameFragment,fragment).commit();
+                                        fragmentManager.beginTransaction().replace(R.id.frameFragment,fragment,TAG).addToBackStack(TAG).commit();
                                     }
 
                                 }

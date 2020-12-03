@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <inset xmlns:android="http://schemas.android.com/apk/res/android"
-    android:drawable="@drawable/bg_dialog"
+    android:drawable="@drawable/bg_home_all_rounded"
     android:insetRight="32dp"
     android:insetLeft="32dp">
 </inset>

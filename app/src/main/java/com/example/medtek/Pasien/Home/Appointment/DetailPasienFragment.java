@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -16,17 +17,24 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.ArrayMap;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -41,6 +49,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.medtek.API.RetrofitClient;
 import com.example.medtek.R;
 import com.example.medtek.Utils.FileUtil;
+import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 import com.jakewharton.threetenabp.AndroidThreeTen;
@@ -86,26 +95,34 @@ public class DetailPasienFragment extends Fragment {
     private ChipNavigationBar bottomBar;
     private Toolbar toolbar;
     private DatePickerDialog datePickerDialog;
+    private RelativeLayout rl_content;
+    private LinearLayout ll_loader;
+    private ShimmerFrameLayout shimmerFrameLayout;
 
     private CircleImageView circleImageView;
     private TextView tv_edit_jadwal,tv_dr_name, tv_dr_specialist, tv_dr_rs, tv_dr_rs_loc;
-    private EditText et_fullname, et_dob;
+    private EditText et_fullname, et_dob, et_bb, et_tb, et_lp, et_keluhan;
     private Button btnNext;
     private ImageButton ib_edit_jadwal;
 
-    private RelativeLayout rl_id_card;
+    private RelativeLayout rl_id_card, rl_file;
+    private TextView tv_upload_file;
+    private ImageView iv_attach, iv_clear;
     private RoundedImageView riv_id_card;
     private static final int GALLERY = 22 ;
     private static final String APP_TAG = "MedTek";
     private static final int CAMERAA = 33;
+    private static final int FILE = 44 ;
     private String photoFileName = "ktp.png";
-    private Uri filePath;
+    private String displayName, size;
+    private Uri filePath,docUri;
     private File finalFile;
     private String postPath;
     private RequestBody requestBody;
 
-    private String nama,email,tglLahir,nama_dokter,tgl_konsul,jam_konsul;
-    private int harga,balance;
+    private String nama,email,tglLahir,nama_dokter,  jam_konsul, tgl_konsul;
+    private int harga,balance, bb, tb, lp;
+    private Bitmap bmp;
     private Bundle bundle;
 
     @Override
@@ -123,7 +140,11 @@ public class DetailPasienFragment extends Fragment {
         super.onStart();
         AndroidThreeTen.init(getActivity());
         initialize();
-
+        if (displayName != null && docUri != null){
+            tv_upload_file.setText(displayName);
+            tv_upload_file.setTextColor(getActivity().getColor(R.color.colorAccent));
+            iv_clear.setVisibility(View.VISIBLE);
+        }
         bundle = getArguments();
         int id_dokter = bundle.getInt("id_dokter");
         jam_konsul = bundle.getString("time");
@@ -139,15 +160,14 @@ public class DetailPasienFragment extends Fragment {
                         try {
                             byte[] bytes = response.body().bytes();
 //                            Bitmap bmp = BitmapFactory.decodeStream(response.body().byteStream());
-                            Bitmap bmp = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+                            bmp = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+
                             if (bmp != null){
                                 riv_id_card.setImageBitmap(bmp);
                                 riv_id_card.setVisibility(View.VISIBLE);
                                 rl_id_card.setVisibility(View.GONE);
-                                btnNext.setEnabled(true);
                             }else{
                                 Log.e("RESPONSEBODY","NOKTP!");
-                                btnNext.setEnabled(false);
                             }
 
                             Call<ResponseBody> callDokter = RetrofitClient.getInstance().getApi().getDokterId(id_dokter);
@@ -181,6 +201,9 @@ public class DetailPasienFragment extends Fragment {
                                             path = "http://192.168.1.9:8000/storage/Dokter.png";
                                         }
                                         Picasso.get().load(path).fit().centerCrop().into(circleImageView);
+                                        rl_content.setVisibility(View.VISIBLE);
+                                        ll_loader.setVisibility(View.GONE);
+                                        shimmerFrameLayout.stopShimmer();
                                     } catch (IOException | JSONException e) {
                                         e.printStackTrace();
                                     }
@@ -202,6 +225,18 @@ public class DetailPasienFragment extends Fragment {
                                         et_fullname.setText(object.getString("name"));
                                         nama = object.getString("name");
                                         email = object.getString("email");
+                                        if (!object.isNull("berat_badan")){
+                                            bb = object.getInt("berat_badan");
+                                            et_bb.setText(bb+"");
+                                        }
+                                        if (!object.isNull("tinggi_badan")){
+                                            tb = object.getInt("tinggi_badan");
+                                            et_tb.setText(tb+"");
+                                        }
+                                        if (!object.isNull("lingkar_tubuh")){
+                                            lp = object.getInt("lingkar_tubuh");
+                                            et_lp.setText(lp+"");
+                                        }
                                         JSONObject walletObj = object.getJSONObject("wallet");
                                         balance = walletObj.getInt("balance");
                                         if (!object.getString("tglLahir").equalsIgnoreCase("null")){
@@ -246,6 +281,64 @@ public class DetailPasienFragment extends Fragment {
             }
         });
 
+        /*Call<ResponseBody> getUserDetail = RetrofitClient.getInstance().getApi().getUser("Bearer "+access);
+        getUserDetail.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    if (response.isSuccessful()){
+                        if (response.body() != null){
+                            String s = response.body().string();
+                            JSONObject object = new JSONObject(s);
+                            et_fullname.setText(object.getString("name"));
+                            nama = object.getString("name");
+                            email = object.getString("email");
+                            if (!object.isNull("berat_badan")){
+                                bb = object.getInt("berat_badan");
+                                et_bb.setText(bb+"");
+                            }
+                            if (!object.isNull("tinggi_badan")){
+                                tb = object.getInt("tinggi_badan");
+                                et_tb.setText(tb+"");
+                            }
+                            if (!object.isNull("lingkar_tubuh")){
+                                lp = object.getInt("lingkar_tubuh");
+                                et_lp.setText(lp+"");
+                            }
+                            JSONObject walletObj = object.getJSONObject("wallet");
+                            balance = walletObj.getInt("balance");
+                            if (!object.getString("tglLahir").equalsIgnoreCase("null")){
+                                Locale locale = new Locale("in", "ID");
+                                DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd MMMM YYYY",locale);
+                                LocalDate localDate = LocalDate.parse(object.getString("tglLahir"));
+                                et_dob.setText(localDate.format(dateFormat));
+                            }
+                            JSONArray imageArray = object.getJSONArray("image");
+                            if (imageArray.length() != 0 ){
+                                for (int i = 0; i < imageArray.length(); i++) {
+                                    JSONObject imageObj = imageArray.getJSONObject(i);
+                                    if (imageObj.getInt("type_id") == 2){
+                                        Picasso.get().load("http://192.168.1.9:8000"+imageObj.getString("path")).into(riv_id_card);
+                                        Log.e("TAG", "onResponse: "+ "http://192.168.1.9:8000"+imageObj.getString("path"));
+                                    }
+                                }
+                            }
+                            rl_content.setVisibility(View.VISIBLE);
+                            ll_loader.setVisibility(View.GONE);
+                            shimmerFrameLayout.stopShimmer();
+                        }
+                    }
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });*/
+
         rl_id_card.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -278,17 +371,47 @@ public class DetailPasienFragment extends Fragment {
             }
         });
 
+        rl_file.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                } else {
+                    if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+                    } else {
+                        Intent intent = new Intent();
+                        intent.setType("application/pdf");
+                        intent.setType("application/msword");
+                        intent.setType("*/*");
+                        String[] mimetypes = {"image/*","application/pdf","application/msword","video/*"};
+                        intent.setAction(Intent.ACTION_GET_CONTENT);
+                        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimetypes);
+                        startActivityForResult(Intent.createChooser(intent, "Pilih file"), FILE);
+                    }
+                }
+            }
+        });
+
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                bb = Integer.parseInt(et_bb.getText().toString().trim());
+                tb = Integer.parseInt(et_tb.getText().toString().trim());
+                lp = Integer.parseInt(et_lp.getText().toString().trim());
+
                 Map<String, Object> jsonParams = new ArrayMap<>();
                 jsonParams.put("name",nama);
                 jsonParams.put("email",email);
                 jsonParams.put("tglLahir",tglLahir);
+                jsonParams.put("berat_badan",bb);
+                jsonParams.put("tinggi_badan",tb);
+                jsonParams.put("lingkar_tubuh",lp);
 
                 RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"),(new JSONObject(jsonParams)).toString());
 
-                Call<ResponseBody> callUpdate = RetrofitClient.getInstance().getApi().updateProfileTglLahir("Bearer "+access,body);
+                Call<ResponseBody> callUpdate = RetrofitClient.getInstance().getApi().updateProfile("Bearer "+access,body);
                 callUpdate.enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -298,9 +421,16 @@ public class DetailPasienFragment extends Fragment {
                                     String s = response.body().string();
                                     JSONObject jsonObject = new JSONObject(s);
                                     if (jsonObject.has("success")){
+                                        bundle.putString("nama",nama);
                                         bundle.putString("nama_dokter",nama_dokter);
                                         bundle.putInt("harga",harga);
                                         bundle.putInt("balance",balance);
+                                        bundle.putString("detailJanji",et_keluhan.getText().toString().trim());
+
+                                        if (docUri != null){
+                                            bundle.putString("uri",docUri.toString());
+                                        }
+
                                         CheckoutAppointmentFragment checkoutAppointmentFragment = new CheckoutAppointmentFragment();
                                         checkoutAppointmentFragment.setArguments(bundle);
                                         setFragment(checkoutAppointmentFragment,"FragmentCheckoutAppointment");
@@ -335,6 +465,216 @@ public class DetailPasienFragment extends Fragment {
 
     }
 
+    private void initialize() {
+        loadData(getActivity());
+        bottomBar = getActivity().findViewById(R.id.bottomBar);
+        bottomBar.setVisibility(View.GONE);
+
+        shimmerFrameLayout = getActivity().findViewById(R.id.shimmerLayout);
+        shimmerFrameLayout.startShimmer();
+
+        rl_content = getActivity().findViewById(R.id.layout_visible);
+        ll_loader = getActivity().findViewById(R.id.layout_loader);
+
+        toolbar = getActivity().findViewById(R.id.toolbar);
+        setToolbar();
+
+        ib_edit_jadwal = getActivity().findViewById(R.id.ib_editjadwal);
+        tv_edit_jadwal = getActivity().findViewById(R.id.tv_edit_jadwal);
+
+        circleImageView = getActivity().findViewById(R.id.civ_dokter);
+        tv_dr_name = getActivity().findViewById(R.id.tv_dr_name);
+        tv_dr_specialist = getActivity().findViewById(R.id.tv_dr_special);
+        tv_dr_rs = getActivity().findViewById(R.id.tv_dr_rs);
+        tv_dr_rs_loc = getActivity().findViewById(R.id.tv_dr_rs_loc);
+        et_fullname = getActivity().findViewById(R.id.et_fullname);
+        et_dob = getActivity().findViewById(R.id.et_dob);
+        et_bb = getActivity().findViewById(R.id.et_beratbadan);
+        et_tb = getActivity().findViewById(R.id.et_tinggibadan);
+        et_lp = getActivity().findViewById(R.id.et_lingkarperut);
+        et_keluhan = getActivity().findViewById(R.id.et_detail_janji);
+        btnNext = getActivity().findViewById(R.id.btnNext);
+
+        rl_id_card = getActivity().findViewById(R.id.upload_image);
+        riv_id_card = getActivity().findViewById(R.id.riv_upload_image);
+        rl_file = getActivity().findViewById(R.id.upload_file);
+        tv_upload_file = getActivity().findViewById(R.id.tv_upload_file);
+        iv_attach = getActivity().findViewById(R.id.image_attach);
+        iv_clear = getActivity().findViewById(R.id.iv_clear);
+
+        ib_edit_jadwal.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                getActivity().onBackPressed();
+                FragmentManager fm = getActivity().getSupportFragmentManager();
+                fm.popBackStack("FragmentBuatJanji",0);
+            }
+        });
+        tv_edit_jadwal.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ib_edit_jadwal.performClick();
+            }
+        });
+        et_dob.setFocusable(false);
+        et_dob.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialog();
+            }
+        });
+
+        tv_upload_file.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rl_file.performClick();
+            }
+        });
+        iv_attach.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rl_file.performClick();
+            }
+        });
+        iv_clear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                docUri = null;
+                tv_upload_file.setText(R.string.uploadfiles);
+                tv_upload_file.setTextColor(Color.parseColor("#60000000"));
+                iv_clear.setVisibility(View.GONE);
+            }
+        });
+
+        et_keluhan.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (et_fullname.getText().toString().trim().isEmpty() || et_dob.getText().toString().trim().isEmpty() || et_bb.getText().toString().trim().isEmpty() ||
+                        et_tb.getText().toString().trim().isEmpty() || et_lp.getText().toString().trim().isEmpty() || et_keluhan.getText().toString().trim().isEmpty() || (filePath != null && bmp != null)){
+                    btnNext.setEnabled(false);
+                } else {
+                    btnNext.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        et_lp.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (et_fullname.getText().toString().trim().isEmpty() || et_dob.getText().toString().trim().isEmpty() || et_bb.getText().toString().trim().isEmpty() ||
+                        et_tb.getText().toString().trim().isEmpty() || et_lp.getText().toString().trim().isEmpty() || et_keluhan.getText().toString().trim().isEmpty() || (filePath != null && bmp != null)){
+                    btnNext.setEnabled(false);
+                } else {
+                    btnNext.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        et_tb.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (et_fullname.getText().toString().trim().isEmpty() || et_dob.getText().toString().trim().isEmpty() || et_bb.getText().toString().trim().isEmpty() ||
+                        et_tb.getText().toString().trim().isEmpty() || et_lp.getText().toString().trim().isEmpty() || et_keluhan.getText().toString().trim().isEmpty() || (filePath != null && bmp != null)){
+                    btnNext.setEnabled(false);
+                } else {
+                    btnNext.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        et_bb.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (et_fullname.getText().toString().trim().isEmpty() || et_dob.getText().toString().trim().isEmpty() || et_bb.getText().toString().trim().isEmpty() ||
+                        et_tb.getText().toString().trim().isEmpty() || et_lp.getText().toString().trim().isEmpty() || et_keluhan.getText().toString().trim().isEmpty() || (filePath != null && bmp != null)){
+                    btnNext.setEnabled(false);
+                } else {
+                    btnNext.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        et_dob.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (et_fullname.getText().toString().trim().isEmpty() || et_dob.getText().toString().trim().isEmpty() || et_bb.getText().toString().trim().isEmpty() ||
+                        et_tb.getText().toString().trim().isEmpty() || et_lp.getText().toString().trim().isEmpty() || et_keluhan.getText().toString().trim().isEmpty() || (filePath != null && bmp != null)){
+                    btnNext.setEnabled(false);
+                } else {
+                    btnNext.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        et_fullname.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (et_fullname.getText().toString().trim().isEmpty() || et_dob.getText().toString().trim().isEmpty() || et_bb.getText().toString().trim().isEmpty() ||
+                        et_tb.getText().toString().trim().isEmpty() || et_lp.getText().toString().trim().isEmpty() || et_keluhan.getText().toString().trim().isEmpty() || (filePath != null && bmp != null)){
+                    btnNext.setEnabled(false);
+                } else {
+                    btnNext.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+    }
+
     private void dispatchTakePictureIntent() {
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, 1);
@@ -363,17 +703,41 @@ public class DetailPasienFragment extends Fragment {
                 rl_id_card.setVisibility(View.GONE);
                 postPath = new File(FileUtil.getPath(filePath,getActivity())).getPath();
                 requestBody = RequestBody.create(MediaType.parse("image/*"),new File(FileUtil.getPath(filePath,getActivity())));
-                if (filePath!=null){
-                    btnNext.setEnabled(true);
-                }
+                File file = new File(postPath);
+                MultipartBody.Part part = MultipartBody.Part.createFormData("ktp",file.getName(),requestBody);
+                rl_content.setVisibility(View.GONE);
+                ll_loader.setVisibility(View.VISIBLE);
+                shimmerFrameLayout.startShimmer();
+
+                Call<ResponseBody> callKTP = RetrofitClient.getInstance().getApi().uploadKTP("Bearer "+access,part);
+                callKTP.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        try {
+                            String s = response.body().string();
+                            JSONObject jsonObject = new JSONObject(s);
+                            if (jsonObject.has("success")){
+                                rl_content.setVisibility(View.VISIBLE);
+                                ll_loader.setVisibility(View.GONE);
+                                shimmerFrameLayout.stopShimmer();
+                            }
+                            Log.e("RESPONSEBODY",s);
+                        } catch (IOException | JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                    }
+                });
             }
             catch (IOException e)
             {
                 e.printStackTrace();
             }
-        }
-
-        if (requestCode == CAMERAA && resultCode == RESULT_OK) {
+        }else if (requestCode == CAMERAA && resultCode == RESULT_OK) {
 
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), filePath);
@@ -382,36 +746,102 @@ public class DetailPasienFragment extends Fragment {
                 rl_id_card.setVisibility(View.GONE);
                 postPath = filePath.getPath();
                 requestBody = RequestBody.create(MediaType.parse("image/*"),getPhotoFileUri(new File(filePath.getPath()).getName()));
-                if (filePath!=null){
-                    btnNext.setEnabled(true);
-                }
+                File file = new File(postPath);
+                MultipartBody.Part part = MultipartBody.Part.createFormData("ktp",file.getName(),requestBody);
+                rl_content.setVisibility(View.GONE);
+                ll_loader.setVisibility(View.VISIBLE);
+                shimmerFrameLayout.startShimmer();
+
+                Call<ResponseBody> callKTP = RetrofitClient.getInstance().getApi().uploadKTP("Bearer "+access,part);
+                callKTP.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        try {
+                            String s = response.body().string();
+                            JSONObject jsonObject = new JSONObject(s);
+                            if (jsonObject.has("success")){
+                                rl_content.setVisibility(View.VISIBLE);
+                                ll_loader.setVisibility(View.GONE);
+                                shimmerFrameLayout.stopShimmer();
+                            }else{
+                                callKTP.clone().enqueue(this);
+                            }
+                            Log.e("RESPONSEBODY",s);
+                        } catch (IOException | JSONException e) {
+                            e.printStackTrace();
+                            callKTP.clone().enqueue(this);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        callKTP.clone().enqueue(this);
+                    }
+                });
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
-        File file = new File(postPath);
-        MultipartBody.Part part = MultipartBody.Part.createFormData("ktp",file.getName(),requestBody);
-
-        Call<ResponseBody> callKTP = RetrofitClient.getInstance().getApi().uploadKTP("Bearer "+access,part);
-        callKTP.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                try {
-                    String s = response.body().string();
-                    JSONObject jsonObject = new JSONObject(s);
-                    Log.e("RESPONSEBODY",s);
-                } catch (IOException | JSONException e) {
-                    e.printStackTrace();
-                }
+        if (requestCode == FILE && resultCode == RESULT_OK) {
+            docUri = data.getData();
+            dumpImageMetaData(docUri);
+            if (Integer.parseInt(size) > 10000000){
+                Toasty.error(getActivity(), "Ukuran file melebihi batas! Silahkan pilih file dengan ukuran maksimal 10MB.",Toasty.LENGTH_LONG).show();
+                docUri = null;
+                tv_upload_file.setText(R.string.uploadfiles);
+                tv_upload_file.setTextColor(Color.parseColor("#60000000"));
+                iv_clear.setVisibility(View.GONE);
+            }else{
+                tv_upload_file.setText(displayName);
+                tv_upload_file.setTextColor(getActivity().getColor(R.color.colorAccent));
+                iv_clear.setVisibility(View.VISIBLE);
             }
+        }
 
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-            }
-        });
     }
+
+    public void dumpImageMetaData(Uri uri) {
+
+        // The query, since it only applies to a single document, will only return
+        // one row. There's no need to filter, sort, or select fields, since we want
+        // all fields for one document.
+        Cursor cursor = getActivity().getContentResolver()
+                .query(uri, null, null, null, null, null);
+
+        try {
+            // moveToFirst() returns false if the cursor has 0 rows.  Very handy for
+            // "if there's anything to look at, look at it" conditionals.
+            if (cursor != null && cursor.moveToFirst()) {
+
+                // Note it's called "Display Name".  This is
+                // provider-specific, and might not necessarily be the file name.
+                displayName = cursor.getString(
+                        cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                Log.i("TAG", "Display Name: " + displayName);
+
+                int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+                // If the size is unknown, the value stored is null.  But since an
+                // int can't be null in Java, the behavior is implementation-specific,
+                // which is just a fancy term for "unpredictable".  So as
+                // a rule, check if it's null before assigning to an int.  This will
+                // happen often:  The storage API allows for remote files, whose
+                // size might not be locally known.
+                size = null;
+                if (!cursor.isNull(sizeIndex)) {
+                    // Technically the column stores an int, but cursor.getString()
+                    // will do the conversion automatically.
+                    size = cursor.getString(sizeIndex);
+                } else {
+                    size = "Unknown";
+                }
+                Log.i("TAG", "Size: " + size);
+            }
+        } finally {
+            cursor.close();
+        }
+    }
+
 
     //method utk melakukan konversi dari abstract path menjadi absolute path
     public File getPhotoFileUri(String fileName) {
@@ -437,7 +867,7 @@ public class DetailPasienFragment extends Fragment {
             } else {
                 Intent intent = new Intent();
                 intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
+                intent.setAction(Intent.ACTION_PICK);
                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), GALLERY);
             }
         }
@@ -465,53 +895,6 @@ public class DetailPasienFragment extends Fragment {
         datePickerDialog.setAccentColor(getActivity().getColor(R.color.colorPrimary));
         datePickerDialog.setCancelColor(getActivity().getColor(R.color.textColorGray));
         datePickerDialog.show(getActivity().getSupportFragmentManager(),"DatePickerDialog");
-    }
-
-    private void initialize() {
-        loadData(getActivity());
-        bottomBar = getActivity().findViewById(R.id.bottomBar);
-        bottomBar.setVisibility(View.GONE);
-
-        toolbar = getActivity().findViewById(R.id.toolbar);
-        setToolbar();
-
-        ib_edit_jadwal = getActivity().findViewById(R.id.ib_editjadwal);
-        tv_edit_jadwal = getActivity().findViewById(R.id.tv_edit_jadwal);
-
-        circleImageView = getActivity().findViewById(R.id.civ_dokter);
-        tv_dr_name = getActivity().findViewById(R.id.tv_dr_name);
-        tv_dr_specialist = getActivity().findViewById(R.id.tv_dr_special);
-        tv_dr_rs = getActivity().findViewById(R.id.tv_dr_rs);
-        tv_dr_rs_loc = getActivity().findViewById(R.id.tv_dr_rs_loc);
-        et_fullname = getActivity().findViewById(R.id.et_fullname);
-        et_dob = getActivity().findViewById(R.id.et_dob);
-        btnNext = getActivity().findViewById(R.id.btnNext);
-
-        rl_id_card = getActivity().findViewById(R.id.upload_image);
-        riv_id_card = getActivity().findViewById(R.id.riv_upload_image);
-
-        ib_edit_jadwal.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                getActivity().onBackPressed();
-                FragmentManager fm = getActivity().getSupportFragmentManager();
-                fm.popBackStack("FragmentBuatJanji",0);
-            }
-        });
-        tv_edit_jadwal.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ib_edit_jadwal.performClick();
-            }
-        });
-        et_dob.setFocusable(false);
-        et_dob.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDialog();
-            }
-        });
-
     }
 
     private void setFragment(Fragment fragment,String TAG) {

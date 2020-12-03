@@ -17,6 +17,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.medtek.API.RetrofitClient;
@@ -26,6 +27,7 @@ import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -77,21 +79,30 @@ public class DetailArtikelFragment extends Fragment {
                     JSONObject object = new JSONObject(s);
                     JSONObject jsonObject = object.getJSONObject("data");
                     String path;
-                    Log.e("ArtikelDetailId",jsonObject.getString("image"));
-                    if (jsonObject.getString("image")!="null"){
+                    Log.e("ArtikelDetailId",s);
+                    if (jsonObject.getString("image")!="null"){final int radius = 0;
+                        final int margin = 0;
+                        final Transformation transformation = new RoundedCornersTransformation(radius, margin);
                         path = "http://192.168.1.9:8000"+jsonObject.getJSONObject("image").getString("path");
+                        Picasso.get().load(path).fit().centerCrop().transform(transformation).into(iv_artikel);
                     }else{
-                        path = "http://192.168.1.9:8000/storage/bg_recycler_default.png";
+                        Drawable drawable = getActivity().getDrawable(R.drawable.bg_default_artikel);
+                        drawable = DrawableCompat.wrap(drawable);
+                        DrawableCompat.setTint(drawable, Color.parseColor("#80878787"));
+                        iv_artikel.setBackground(drawable);
                     }
-                    final int radius = 0;
-                    final int margin = 0;
-                    final Transformation transformation = new RoundedCornersTransformation(radius, margin);
-                    Picasso.get().load(path).fit().centerCrop().transform(transformation).into(iv_artikel);
                     String name = jsonObject.getJSONObject("author").getString("name");
                     tv_author_name.setText(name);
                     tv_judul_artikel.setText(jsonObject.getString("judul"));
                     tv_content_artikel.setText(jsonObject.getString("isi"));
-
+                    JSONArray jsonArray = new JSONArray(jsonObject.getJSONObject("author").getString("image"));
+                    String userImagePath;
+                    if (jsonArray.length() == 0){
+                        userImagePath = "/storage/Pasien.png";
+                    }else{
+                        userImagePath = jsonArray.getJSONObject(0).getString("path");
+                    }
+                    Picasso.get().load("http://192.168.1.9:8000"+userImagePath).into(civ_author);
                     Date date;
                     Locale locale = new Locale("in", "ID");
                     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", locale);

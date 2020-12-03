@@ -382,17 +382,25 @@ public class BuatJanjiFragment extends Fragment {
                                                     String dayLeft = tv_day_left.getText().toString().trim();
                                                     String dateLeft = tv_date_left.getText().toString().trim();
                                                     if (left > right){
-                                                        tv_day_left.setText("Hari Ini");
+                                                        tv_day_left.setText("Besok");
                                                         tv_date_left.setText(date.plusDays(j+1).format(halfDateFormat));
                                                         tv_day_center.setText(dayLeft);
                                                         tv_date_center.setText(dateLeft);
                                                         tv_day_right.setText(dayCenter);
                                                         tv_date_right.setText(dateCenter);
+                                                        long tempL = left;
+                                                        long tempC = center;
+                                                        left = right;
+                                                        center = tempL;
+                                                        right = tempC;
                                                     }else{
                                                         tv_day_center.setText(strDays[dayInt]);
                                                         tv_date_center.setText(date.plusDays(j+1).format(halfDateFormat));
                                                         tv_day_right.setText(dayCenter);
                                                         tv_date_right.setText(dateCenter);
+                                                        long tempC = center;
+                                                        center = right;
+                                                        right = tempC;
                                                     }
 
                                                 }else{
