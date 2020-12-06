@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/PaddedLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_rounded_dialog">
+
+    <View
+        android:layout_width="37.0dip"
+        android:layout_height="2.0dip"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/default_small_margin"
+        android:background="@drawable/ic_line_rounded" />
+
+    <View
+        android:layout_width="37.0dip"
+        android:layout_height="2.0dip"
+        android:layout_gravity="center"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="@dimen/default_long_margin"
+        android:background="@drawable/ic_line_rounded" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/default_screen_margin"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/iv_doctor_picture"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginEnd="@dimen/default_screen_margin"
+            android:scaleType="centerCrop"
+            tools:src="@drawable/ic_dokter_square" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_doctor_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/default_small_margin"
+                android:ellipsize="marquee"
+                android:fontFamily="@font/roboto_medium"
+                android:singleLine="true"
+                android:textColor="@color/blackSolid"
+                tools:text="dr. John Doe, Sp.JP" />
+
+            <TextView
+                android:id="@+id/tv_doctor_specialist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/default_small_margin"
+                android:ellipsize="marquee"
+                android:singleLine="true"
+                android:textColor="@color/blackSolid"
+                android:textSize="@dimen/text_xs"
+                tools:text="Spesialis Jantung" />
+
+            <Button
+                style="@style/ButtonSolid"
+                android:layout_width="wrap_content"
+                android:layout_height="20dp"
+                android:background="@drawable/bg_btn_small"
+                android:elevation="0dp"
+                android:paddingStart="@dimen/default_small_margin"
+                android:paddingTop="4dp"
+                android:paddingEnd="@dimen/default_small_margin"
+                android:paddingBottom="4dp"
+                android:text="@string/view_full_profile"
+                android:textSize="@dimen/text_xxs" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_jadwal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/default_screen_margin"
+        android:background="@drawable/bg_schedule_offline"
+        android:orientation="vertical"
+        android:padding="@dimen/default_small_margin">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="@dimen/default_small_margin"
+            android:fontFamily="@font/roboto_light"
+            android:text="@string/consultation_schedule"
+            android:textColor="@color/blackSolid"
+            android:textSize="@dimen/text_xs" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/default_screen_margin"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginEnd="@dimen/default_small_margin"
+                    android:src="@drawable/ic_date_black" />
+
+                <TextView
+                    android:id="@+id/tv_date_schedule"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@color/blackSolid"
+                    tools:text="22 Jun 2020" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginEnd="@dimen/default_small_margin"
+                    android:src="@drawable/ic_time_black" />
+
+                <TextView
+                    android:id="@+id/tv_time_schedule"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@color/blackSolid"
+                    tools:text="10:00 - 12:00" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/default_screen_margin"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/default_small_margin"
+                android:fontFamily="@font/roboto_light"
+                android:text="@string/charge"
+                android:textColor="@color/blackSolid"
+                android:textSize="@dimen/text_xs_13" />
+
+            <TextView
+                android:id="@+id/tv_charge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/default_small_margin"
+                android:fontFamily="@font/roboto_medium"
+                android:textColor="@color/blackSolid"
+                tools:text="Rp 25.000" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/default_small_margin"
+                android:fontFamily="@font/roboto_light"
+                android:text="@string/duration"
+                android:textColor="@color/blackSolid"
+                android:textSize="@dimen/text_xs_13" />
+
+            <TextView
+                android:id="@+id/tv_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/default_small_margin"
+                android:fontFamily="@font/roboto_medium"
+                android:textColor="@color/blackSolid"
+                tools:text="30 Menit" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_chat_now"
+        style="@style/ButtonSolid"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:fontFamily="@font/roboto_medium"
+        android:text="@string/chat_now"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <ProgressBar
+        android:id="@+id/loading"
+        style="@android:style/Widget.Holo.Light.ProgressBar"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:visibility="visible"
+        tools:visibility="gone" />
+
+
+</LinearLayout>

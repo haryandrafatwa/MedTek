@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:contentInsetStartWithNavigation="0dp"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/iv_sender_pict"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginEnd="@dimen/default_screen_margin"
+                    android:src="@drawable/ic_dokter_circle" />
+
+                <TextView
+                    android:id="@+id/tv_sender_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/default_screen_margin"
+                    android:layout_weight="1"
+                    android:ellipsize="marquee"
+                    android:singleLine="true"
+                    android:textColor="@color/whitePrimary"
+                    tools:text="dr. John Doe, Sp. OG" />
+
+                <RelativeLayout
+                    android:id="@+id/rl_end_chat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="@dimen/default_small_margin"
+                    android:foreground="?selectableItemBackground"
+                    android:paddingStart="@dimen/default_small_pad"
+                    android:paddingEnd="@dimen/default_small_pad">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="@string/end_chat"
+                        android:textAllCaps="true" />
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+        </androidx.appcompat.widget.Toolbar>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_chat"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/appbar"
+        android:layout_above="@id/rl_field_chat"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="-3dp"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/default_small_pad" />
+
+    <RelativeLayout
+        android:id="@+id/rl_field_chat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorPrimary"
+        android:paddingStart="@dimen/default_screen_pad"
+        android:paddingTop="@dimen/default_small_pad"
+        android:paddingEnd="@dimen/default_screen_pad"
+        android:paddingBottom="@dimen/default_small_pad">
+
+        <EditText
+            android:id="@+id/et_field_chat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginEnd="@dimen/default_long_margin_64"
+            android:background="@drawable/bg_round_box"
+            android:hint="@string/chat_hint"
+            android:maxLines="6"
+            android:paddingStart="@dimen/default_long_pad"
+            android:paddingTop="@dimen/default_small_pad"
+            android:paddingEnd="@dimen/default_long_margin_48"
+            android:paddingBottom="@dimen/default_small_pad"
+            android:scrollbars="vertical"
+            android:textSize="@dimen/text_xs_14" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_btn_chat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:paddingStart="@dimen/default_screen_pad"
+        android:paddingTop="@dimen/default_small_pad"
+        android:paddingEnd="@dimen/default_screen_pad"
+        android:paddingBottom="@dimen/default_small_pad">
+
+        <ImageButton
+            android:id="@+id/btn_send_chat"
+            android:layout_width="36dp"
+            android:layout_height="34dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="@dimen/default_small_margin"
+            android:background="@drawable/ic_send_chat_disable" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/default_long_margin_32"
+            android:layout_toStartOf="@id/btn_send_chat"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:id="@+id/rl_attach_file"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@drawable/bg_circle_transparent">
+
+                <ImageButton
+                    android:id="@+id/btn_attach_file"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/ic_attach_file_chat" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rl_vidvoice_call"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="@dimen/default_small_margin_4"
+                android:background="@drawable/bg_circle_transparent">
+
+                <ImageButton
+                    android:id="@+id/btn_vidvoice_call"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/ic_call_made" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_attachment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        android:visibility="invisible"
+        tools:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="@dimen/default_screen_margin"
+            android:layout_marginEnd="@dimen/default_screen_margin"
+            android:layout_marginBottom="@dimen/default_long_margin_64"
+            android:background="@drawable/bg_layout_normal"
+            android:elevation="5dp"
+            android:orientation="horizontal">
+
+            <com.github.captain_miao.optroundcardview.OptRoundCardView
+                android:id="@+id/opt_image_attach"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:foreground="?selectableItemBackground"
+                app:optRoundCardBackgroundColor="@color/whiteSolid"
+                app:optRoundCardCornerRadius="@dimen/default_small_margin"
+                app:optRoundCardRightBottomCorner="false"
+                app:optRoundCardRightTopCorner="false"
+                app:optRoundContentPaddingBottom="@dimen/default_screen_pad"
+                app:optRoundContentPaddingTop="@dimen/default_screen_pad">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginBottom="@dimen/default_small_margin"
+                        android:src="@drawable/ic_image_attach" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/image_attach" />
+
+                </LinearLayout>
+
+            </com.github.captain_miao.optroundcardview.OptRoundCardView>
+
+            <com.github.captain_miao.optroundcardview.OptRoundCardView
+                android:id="@+id/opt_video_attach"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:foreground="?selectableItemBackground"
+                app:optRoundCardBackgroundColor="@color/whiteSolid"
+                app:optRoundCardCornerRadius="0dp"
+                app:optRoundContentPaddingBottom="@dimen/default_screen_pad"
+                app:optRoundContentPaddingTop="@dimen/default_screen_pad">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginBottom="@dimen/default_small_margin"
+                        android:src="@drawable/ic_video_attach" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/video_attach" />
+
+                </LinearLayout>
+
+            </com.github.captain_miao.optroundcardview.OptRoundCardView>
+
+            <com.github.captain_miao.optroundcardview.OptRoundCardView
+                android:id="@+id/opt_docs_attach"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:foreground="?selectableItemBackground"
+                app:optRoundCardBackgroundColor="@color/whiteSolid"
+                app:optRoundCardCornerRadius="@dimen/default_small_margin"
+                app:optRoundCardLeftBottomCorner="false"
+                app:optRoundCardLeftTopCorner="false"
+                app:optRoundContentPaddingBottom="@dimen/default_screen_pad"
+                app:optRoundContentPaddingTop="@dimen/default_screen_pad">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginBottom="@dimen/default_small_margin"
+                        android:src="@drawable/ic_doc_attach" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/doc_attach" />
+
+                </LinearLayout>
+
+            </com.github.captain_miao.optroundcardview.OptRoundCardView>
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/v_layout_attachment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_access_video_voice"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        android:visibility="invisible"
+        tools:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="@dimen/default_screen_margin"
+            android:layout_marginEnd="@dimen/default_screen_margin"
+            android:layout_marginBottom="@dimen/default_long_margin_64"
+            android:background="@drawable/bg_layout_normal"
+            android:elevation="5dp"
+            android:orientation="horizontal">
+
+            <com.github.captain_miao.optroundcardview.OptRoundCardView
+                android:id="@+id/opt_voice_call"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:foreground="?selectableItemBackground"
+                app:optRoundCardBackgroundColor="@color/whiteSolid"
+                app:optRoundCardCornerRadius="@dimen/default_small_margin"
+                app:optRoundCardRightBottomCorner="false"
+                app:optRoundCardRightTopCorner="false"
+                app:optRoundContentPaddingBottom="@dimen/default_screen_pad"
+                app:optRoundContentPaddingTop="@dimen/default_screen_pad">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginBottom="@dimen/default_small_margin"
+                        android:src="@drawable/ic_phone" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/voice_call" />
+
+                </LinearLayout>
+
+            </com.github.captain_miao.optroundcardview.OptRoundCardView>
+
+            <com.github.captain_miao.optroundcardview.OptRoundCardView
+                android:id="@+id/opt_video_call"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:foreground="?selectableItemBackground"
+                app:optRoundCardBackgroundColor="@color/whiteSolid"
+                app:optRoundCardCornerRadius="@dimen/default_small_margin"
+                app:optRoundCardLeftBottomCorner="false"
+                app:optRoundCardLeftTopCorner="false"
+                app:optRoundContentPaddingBottom="@dimen/default_screen_pad"
+                app:optRoundContentPaddingTop="@dimen/default_screen_pad">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginBottom="@dimen/default_small_margin"
+                        android:src="@drawable/ic_videocam" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/video_call" />
+
+                </LinearLayout>
+
+            </com.github.captain_miao.optroundcardview.OptRoundCardView>
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/v_layout_access"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

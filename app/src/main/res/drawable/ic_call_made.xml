@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="false">
+        <vector android:width="16dp" android:height="16dp" android:viewportWidth="16" android:viewportHeight="16">
+            <path android:fillColor="@color/colorSecondary" android:pathData="M6.0003,3.3334V4.6667H10.3937L2.667,12.3934L3.607,13.3334L11.3337,5.6067V10H12.667V3.3334H6.0003Z" />
+        </vector>
+
+    </item>
+
+    <item android:state_pressed="true">
+        <vector android:width="16dp" android:height="16dp" android:viewportWidth="16" android:viewportHeight="16">
+            <path android:fillColor="@color/redDark" android:pathData="M6.0003,3.3334V4.6667H10.3937L2.667,12.3934L3.607,13.3334L11.3337,5.6067V10H12.667V3.3334H6.0003Z" />
+        </vector>
+    </item>
+</selector>

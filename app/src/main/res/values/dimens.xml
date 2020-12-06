@@ -8,4 +8,43 @@
     <dimen name="margin_6">6dp</dimen>
     <dimen name="margin_8">8dp</dimen>
     <dimen name="margin_4">4dp</dimen>
+
+    <dimen name="text_xxxs">9sp</dimen>
+    <dimen name="text_xxs">10sp</dimen>
+    <dimen name="text_xxs_11">11sp</dimen>
+    <dimen name="text_xs">12sp</dimen>
+    <dimen name="text_error_hint">13sp</dimen>
+    <dimen name="text_xs_13">13sp</dimen>
+    <dimen name="text_xs_14">14sp</dimen>
+    <dimen name="text_small">16sp</dimen>
+    <dimen name="text_small_16">16sp</dimen>
+    <dimen name="text_medium">18sp</dimen>
+    <dimen name="text_large">20sp</dimen>
+    <dimen name="text_extra_large">24sp</dimen>
+    <dimen name="text_24">24sp</dimen>
+    <dimen name="text_25">25sp</dimen>
+    <dimen name="text_extra_extra_large">32sp</dimen>
+    <dimen name="text_32">32sp</dimen>
+    <dimen name="text_40">40sp</dimen>
+
+    <dimen name="default_screen_pad">16dp</dimen>
+    <dimen name="default_small_pad">8dp</dimen>
+    <dimen name="default_long_pad">24dp</dimen>
+
+    <dimen name="default_small_margin_4">4dp</dimen>
+    <dimen name="default_small_margin">8dp</dimen>
+    <dimen name="default_small_margin_12">12dp</dimen>
+    <dimen name="default_screen_margin">16dp</dimen>
+    <dimen name="default_long_margin">24dp</dimen>
+    <dimen name="default_long_margin_32">32dp</dimen>
+    <dimen name="default_long_margin_48">48dp</dimen>
+    <dimen name="default_long_margin_56">56dp</dimen>
+    <dimen name="default_long_margin_64">64dp</dimen>
+    <dimen name="default_long_margin_128">128dp</dimen>
+    <dimen name="default_long_margin_160">160dp</dimen>
+
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="local_preview_margin_top">28dp</dimen>
+    <dimen name="local_preview_margin_right">24dp</dimen>
 </resources>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="false">
+        <vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="72dp" android:height="72dp" android:viewportWidth="72" android:viewportHeight="72">
+            <path android:fillColor="#FF5555" android:pathData="M36,36m-36,0a36,36 0,1 1,72 0a36,36 0,1 1,-72 0" />
+            <group>
+                <clip-path android:pathData="M61.9121,36.4559l-25.4558,25.4558l-25.4558,-25.4558l25.4558,-25.4558z" />
+                <path android:fillColor="#ffffff" android:pathData="M43.4457,32.0329C38.9167,30.5586 34.0058,30.5692 29.4662,32.0329V36.6998C29.4662,37.2726 29.1374,37.7923 28.6389,38.0363C27.0585,38.8318 25.563,39.903 24.2478,41.2182C23.6644,41.8016 22.7098,41.8016 22.1265,41.2182L18.4247,37.5165C17.8414,36.9332 17.8414,35.9786 18.4247,35.3952C28.3843,25.4356 44.5276,25.4356 54.4872,35.3952C55.0706,35.9786 55.0706,36.9332 54.4872,37.5165L50.7749,41.2288C50.1915,41.8122 49.2369,41.8122 48.6536,41.2288C47.3277,39.903 45.8428,38.8424 44.2624,38.0469C43.7745,37.7923 43.4457,37.2938 43.4457,36.6998L43.4457,32.0329Z" />
+            </group>
+        </vector>
+
+    </item>
+    <item android:state_pressed="true">
+        <vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="72dp" android:height="72dp" android:viewportWidth="72" android:viewportHeight="72">
+            <path android:fillColor="#D54242" android:pathData="M36,36m-36,0a36,36 0,1 1,72 0a36,36 0,1 1,-72 0" />
+            <group>
+                <clip-path android:pathData="M61.9121,36.4559l-25.4558,25.4558l-25.4558,-25.4558l25.4558,-25.4558z" />
+                <path android:fillColor="#ffffff" android:pathData="M43.4457,32.0329C38.9167,30.5586 34.0058,30.5692 29.4662,32.0329V36.6998C29.4662,37.2726 29.1374,37.7923 28.6389,38.0363C27.0585,38.8318 25.563,39.903 24.2478,41.2182C23.6644,41.8016 22.7098,41.8016 22.1265,41.2182L18.4247,37.5165C17.8414,36.9332 17.8414,35.9786 18.4247,35.3952C28.3843,25.4356 44.5276,25.4356 54.4872,35.3952C55.0706,35.9786 55.0706,36.9332 54.4872,37.5165L50.7749,41.2288C50.1915,41.8122 49.2369,41.8122 48.6536,41.2288C47.3277,39.903 45.8428,38.8424 44.2624,38.0469C43.7745,37.7923 43.4457,37.2938 43.4457,36.6998L43.4457,32.0329Z" />
+            </group>
+        </vector>
+
+    </item>
+</selector>

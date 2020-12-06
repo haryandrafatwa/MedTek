@@ -1,11 +1,613 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/whitePrimary"
+    android:clipToPadding="false"
+    android:clipChildren="false"
+    android:paddingStart="0dp"
+    android:paddingEnd="0dp"
+    android:paddingBottom="0dp">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Chat"
-        android:layout_centerInParent="true"/>
+        android:layout_below="@id/opt_header_chat"
+        android:layout_marginTop="-50dp"
+        android:paddingTop="50dp">
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/sfl_consul_schedule"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="@dimen/default_screen_pad"
+                    android:paddingTop="@dimen/default_long_pad"
+                    android:paddingEnd="@dimen/default_screen_pad"
+                    android:visibility="visible"
+                    tools:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/default_long_margin"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="@dimen/default_screen_margin"
+                            android:background="@color/grayLight"
+                            android:fontFamily="@font/roboto_medium"
+                            android:text="@string/consultation_schedule_title"
+                            android:textColor="@color/grayLight" />
+
+                        <com.github.captain_miao.optroundcardview.OptRoundCardView
+                            android:layout_width="250dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="@dimen/default_screen_margin"
+                            app:optRoundCardBackgroundColor="@color/whiteSolid"
+                            app:optRoundCardCornerRadius="@dimen/default_screen_margin"
+                            app:optRoundCardElevation="0dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@color/whiteSolid"
+                                android:orientation="vertical"
+                                android:padding="@dimen/default_screen_margin"
+                                android:visibility="visible">
+
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="@dimen/default_screen_margin">
+
+                                    <RelativeLayout
+                                        android:id="@+id/rl_picture_doc"
+                                        android:layout_width="32dp"
+                                        android:layout_height="32dp">
+
+                                        <ImageView
+                                            android:id="@+id/iv_doctor_picture"
+                                            android:layout_width="32dp"
+                                            android:layout_height="32dp"
+                                            android:background="@color/grayLight"
+                                            tools:src="@color/grayLight" />
+
+                                    </RelativeLayout>
+
+                                    <TextView
+                                        android:id="@+id/tv_doctor_name"
+                                        android:layout_width="100dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="@dimen/default_small_margin"
+                                        android:layout_toEndOf="@id/rl_picture_doc"
+                                        android:background="@color/grayLight"
+                                        android:textColor="@color/grayLight"
+                                        android:textSize="@dimen/text_xxs"
+                                        tools:text="dr. John Doe, Sp.JP" />
+
+                                    <TextView
+                                        android:id="@+id/tv_doctor_specialist"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_below="@id/tv_doctor_name"
+                                        android:layout_marginStart="@dimen/default_small_margin"
+                                        android:layout_toEndOf="@id/rl_picture_doc"
+                                        android:background="@color/grayLight"
+                                        android:textColor="@color/grayLight"
+                                        android:textSize="@dimen/text_xxs"
+                                        tools:text="Spesialis Jantung" />
+
+
+                                </RelativeLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal">
+
+                                    <LinearLayout
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginEnd="@dimen/default_screen_margin"
+                                        android:layout_weight="1"
+                                        android:orientation="horizontal">
+
+                                        <ImageView
+                                            android:layout_width="16dp"
+                                            android:layout_height="16dp"
+                                            android:layout_marginEnd="@dimen/default_small_margin"
+                                            android:src="@color/grayLight" />
+
+                                        <TextView
+                                            android:id="@+id/tv_date_schedule"
+                                            android:layout_width="75dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center_vertical"
+                                            android:background="@color/grayLight"
+                                            android:textColor="@color/grayLight"
+                                            android:textSize="@dimen/text_xxs"
+                                            android:visibility="visible"
+                                            tools:text="22 Jun 2020" />
+
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:orientation="horizontal">
+
+                                        <ImageView
+                                            android:layout_width="16dp"
+                                            android:layout_height="16dp"
+                                            android:layout_marginEnd="@dimen/default_small_margin"
+                                            android:src="@color/grayLight" />
+
+                                        <TextView
+                                            android:id="@+id/tv_time_schedule"
+                                            android:layout_width="60dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center_vertical"
+                                            android:background="@color/grayLight"
+                                            android:textColor="@color/grayLight"
+                                            android:textSize="@dimen/text_xxs"
+                                            tools:text="10:00 - 12:00" />
+
+                                    </LinearLayout>
+
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:padding="@dimen/default_screen_margin"
+                                android:visibility="gone">
+
+                                <ImageView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/ic_agenda" />
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_marginStart="@dimen/default_screen_margin"
+                                    android:orientation="vertical">
+
+                                    <LinearLayout
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginBottom="@dimen/default_small_margin"
+                                        android:layout_weight="1"
+                                        android:orientation="horizontal">
+
+                                        <ImageView
+                                            android:layout_width="16dp"
+                                            android:layout_height="16dp"
+                                            android:layout_marginEnd="@dimen/default_small_margin"
+                                            android:src="@drawable/ic_date_red" />
+
+                                        <TextView
+                                            android:id="@+id/tv_date_schedule_doctor"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center_vertical"
+                                            android:textColor="@color/colorPrimary"
+                                            android:textSize="@dimen/text_xxs"
+                                            tools:text="22 Jun 2020" />
+
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:orientation="horizontal">
+
+                                        <ImageView
+                                            android:layout_width="16dp"
+                                            android:layout_height="16dp"
+                                            android:layout_marginEnd="@dimen/default_small_margin"
+                                            android:src="@drawable/ic_time_red" />
+
+                                        <TextView
+                                            android:id="@+id/tv_time_schedule_doctor"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center_vertical"
+                                            android:textColor="@color/colorPrimary"
+                                            android:textSize="@dimen/text_xxs"
+                                            tools:text="10:00 - 12:00" />
+
+                                    </LinearLayout>
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                        </com.github.captain_miao.optroundcardview.OptRoundCardView>
+
+                    </LinearLayout>
+
+                </com.facebook.shimmer.ShimmerFrameLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_consul_schedule"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:paddingTop="@dimen/default_long_margin"
+                    android:paddingStart="@dimen/default_screen_pad"
+                    android:paddingBottom="@dimen/default_long_margin"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/default_screen_margin"
+                        android:fontFamily="@font/roboto_medium"
+                        android:text="@string/consultation_schedule_title"
+                        android:textColor="@color/blackSolid" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_schedule"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="-8dp"
+                        android:layout_marginTop="-8dp"
+                        android:layout_marginBottom="-8dp"
+                        android:visibility="visible"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:listitem="@layout/item_consultation_schedule"
+                        tools:orientation="horizontal" />
+
+                    <LinearLayout
+                        android:id="@+id/ll_no_schedule"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="@dimen/default_screen_margin"
+                            android:src="@drawable/ic_schedule_empty" />
+
+                        <TextView
+                            android:id="@+id/tv_no_schedule_desc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/no_schedule_desc"
+                            android:textSize="@dimen/text_xs" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_active_chat"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/default_small_margin"
+                    android:paddingStart="@dimen/default_small_pad"
+                    android:paddingEnd="@dimen/default_small_pad"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/default_small_margin"
+                        android:layout_marginBottom="@dimen/default_small_margin"
+                        android:fontFamily="@font/roboto_medium"
+                        android:text="@string/active_chats_title"
+                        android:textColor="@color/blackSolid" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_active_chats"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:itemCount="1"
+                        tools:listitem="@layout/item_preview_chat" />
+
+                </LinearLayout>
+
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/sfl_chat_history"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="@dimen/default_screen_pad"
+                    android:paddingEnd="@dimen/default_screen_pad"
+                    android:visibility="visible"
+                    tools:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="@dimen/default_screen_margin"
+                            android:background="@color/grayLight"
+                            android:fontFamily="@font/roboto_medium"
+                            android:text="@string/tv_recent_chats_title"
+                            android:textColor="@color/grayLight" />
+
+                        <com.github.captain_miao.optroundcardview.OptRoundCardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="@dimen/default_screen_margin"
+                            app:optRoundCardBackgroundColor="@color/grayLight"
+                            app:optRoundCardCornerRadius="10dp"
+                            app:optRoundCardElevation="0dp">
+
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@color/whiteSolid"
+                                android:padding="@dimen/default_screen_margin">
+
+                                <ImageView
+                                    android:id="@+id/iv_chat_picture"
+                                    android:layout_width="48dp"
+                                    android:layout_height="48dp"
+                                    android:layout_marginEnd="@dimen/default_screen_margin"
+                                    android:background="@color/grayLight"
+                                    android:src="@color/grayLight" />
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_centerVertical="true"
+                                    android:layout_toEndOf="@id/iv_chat_picture"
+                                    android:orientation="vertical">
+
+                                    <RelativeLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginBottom="6dp">
+
+                                        <TextView
+                                            android:id="@+id/tv_name_chat"
+                                            android:layout_width="150dp"
+                                            android:layout_height="wrap_content"
+                                            android:background="@color/grayLight"
+                                            android:textColor="@color/grayLight"
+                                            android:textSize="@dimen/text_xs"
+                                            tools:text="dr. John Doe, Sp.JP" />
+
+                                        <TextView
+                                            android:id="@+id/tv_time_chat"
+                                            android:layout_width="10dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_alignParentEnd="true"
+                                            android:layout_marginLeft="90dp"
+                                            android:layout_toEndOf="@id/tv_name_chat"
+                                            android:background="@color/grayLight"
+                                            android:fontFamily="@font/roboto_light"
+                                            android:textColor="@color/grayLight"
+                                            android:textSize="@dimen/text_xxs"
+                                            tools:text="16:30" />
+
+                                    </RelativeLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:orientation="horizontal">
+
+                                        <TextView
+                                            android:id="@+id/tv_value_chat"
+                                            android:layout_width="150dp"
+                                            android:layout_height="wrap_content"
+                                            android:background="@color/grayLight"
+                                            android:fontFamily="@font/roboto_light"
+                                            android:textColor="@color/grayLight"
+                                            android:textSize="@dimen/text_xs"
+                                            tools:text="Semoga cepat sembuh" />
+
+
+                                    </LinearLayout>
+
+                                </LinearLayout>
+
+                            </RelativeLayout>
+
+                        </com.github.captain_miao.optroundcardview.OptRoundCardView>
+
+
+                    </LinearLayout>
+
+                </com.facebook.shimmer.ShimmerFrameLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_recent_chat"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="@dimen/default_small_pad"
+                    android:paddingEnd="@dimen/default_small_pad"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/default_small_margin"
+                        android:layout_marginBottom="@dimen/default_small_margin"
+                        android:fontFamily="@font/roboto_medium"
+                        android:text="@string/tv_recent_chats_title"
+                        android:textColor="@color/blackSolid" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_chat_history"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        tools:itemCount="5"
+                        tools:listitem="@layout/item_preview_chat"
+                        tools:visibility="visible" />
+
+                    <LinearLayout
+                        android:id="@+id/ll_no_chats_history"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="@dimen/default_long_margin_32"
+                        android:layout_marginBottom="@dimen/default_long_margin_64"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:visibility="visible"
+                        tools:visibility="gone">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="@dimen/default_long_margin"
+                            android:src="@drawable/ic_chats_empty" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/no_chats_desc"
+                            android:textSize="@dimen/text_xs" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <com.github.captain_miao.optroundcardview.OptRoundCardView
+        android:id="@+id/opt_header_chat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:optRoundCardBackgroundColor="@color/colorPrimary"
+        android:background="@drawable/bg_home_bottom_rounded"
+        app:optRoundCardCornerRadius="@dimen/default_screen_margin"
+        app:optRoundCardElevation="0dp"
+        app:optRoundCardLeftTopCorner="false"
+        app:optRoundCardRightTopCorner="false"
+        app:optRoundContentPaddingBottom="@dimen/default_screen_margin"
+        app:optRoundContentPaddingTop="@dimen/default_long_margin">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/default_screen_pad"
+            android:paddingEnd="@dimen/default_screen_pad">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/default_screen_margin"
+                android:fontFamily="@font/roboto_medium"
+                android:text="@string/chats_title"
+                android:textColor="@color/whitePrimary"
+                android:textSize="@dimen/text_24" />
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/sfl_search_chats"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/grayLight"
+                    android:padding="@dimen/default_small_margin">
+
+                    <ImageView
+                        android:id="@+id/sfl_iv_Search"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/default_screen_margin"
+                        android:src="@color/grayLight" />
+
+                    <TextView
+                        style="@style/AppTheme.TextView"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/sfl_iv_Search"
+                        android:alpha=".6"
+                        android:background="@color/grayLight"
+                        android:text="@string/search_hints"
+                        android:textColor="@color/grayLight" />
+
+                </RelativeLayout>
+
+
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
+            <com.github.captain_miao.optroundcardview.OptRoundCardView
+                android:id="@+id/opt_search_chats"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:optRoundCardBackgroundColor="@color/greySemiPrimary"
+                app:optRoundCardCornerRadius="@dimen/default_small_margin"
+                app:optRoundCardElevation="0dp">
+
+                <RelativeLayout
+                    android:id="@+id/rl_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_layout_search"
+                    android:padding="@dimen/default_small_margin">
+
+                    <ImageView
+                        android:id="@+id/iv_search"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/default_screen_margin"
+                        android:src="@drawable/ic_search" />
+
+                    <TextView
+                        style="@style/AppTheme.TextView"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/iv_search"
+                        android:alpha=".6"
+                        android:text="@string/search_hints"
+                        android:textColor="@color/whitePrimary" />
+
+                </RelativeLayout>
+
+            </com.github.captain_miao.optroundcardview.OptRoundCardView>
+
+        </LinearLayout>
+
+    </com.github.captain_miao.optroundcardview.OptRoundCardView>
+
 
 </RelativeLayout>

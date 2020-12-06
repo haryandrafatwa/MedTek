@@ -167,7 +167,7 @@
     <string name="bacaanharian">Artikel harian</string>
     <string name="emptyartikel">Artikel Kosong!</string>
     <string name="writer">Bung Gilang • 7 Maret</string>
-    <string name="date">7 Maret</string>
+<!--    <string name="date">7 Maret</string>-->
     <string name="searchartikel">Cari artikel di sini...</string>
     <string name="searchhospital">Cari rumah sakit di sini...</string>
     <string name="sebelum">Sebelumnya</string>
@@ -255,4 +255,87 @@
     <string name="apakahkamuyakin">Apakah anda yakin ingin menerima janji ini?</string>
     <string name="apakahkamuyakintolak">Apakah anda yakin ingin menolak janji ini?</string>
     <string name="denganmenerimaini">Dengan menerima janji ini, kamu setuju dengan <a href="http://www.google.com"><i>syarat</i></a> dan <a href="http://www.google.com"><i>ketentuan</i></a> pada aplikasi ini.</string>
+
+    //Ghazi
+    <string name="nav_chat">Chat</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_others">Others</string>
+
+    <string name="search_menu">Search</string>
+    <string name="media_menu">Media and Docs</string>
+    <string name="report_menu">Report</string>
+
+    <string name="transition_name">zoomTransition</string>
+
+    <string name="doctor">Dokter</string>
+    <string name="patient">Pasien</string>
+    <string name="welcome_msg">Hai, selamat datang kembali</string>
+    <string name="welcome_msg_desc">Silahkan masuk terlebih dahulu untuk menggunakan jasa kami</string>
+    <string name="btn_as_doctor">Sebagai Dokter</string>
+    <string name="btn_as_patient">Sebagai Pasien</string>
+    <string name="login_msg">Selamat datang</string>
+    <string name="login_msg_desc">Silahkan masuk untuk melanjutkan</string>
+    <string name="email_field">Email</string>
+    <string name="password_field">Password</string>
+    <string name="forgot_password">Lupa Password?</string>
+    <string name="login">Masuk</string>
+    <string name="register">Daftar</string>
+    <string name="no_account">Belum punya akun?</string>
+
+    <string name="email_not_found_title">Email Tidak Terdaftar</string>
+    <string name="email_not_found_desc">Email yang anda masukkan tidak terdaftar, mohon masukkan kembali email yang sesuai.</string>
+    <string name="wrong_password_title">Password Salah</string>
+    <string name="wrong_password_desc">Password yang anda masukkan salah, mohon masukkan kembali password yang sesuai.</string>
+    <string name="error_title">Error</string>
+    <string name="error_null_desc">Mohon maaf, terjadi kesalahan pada sistem.</string>
+    <string name="error_busy_desc">Mohon maaf, sistem sedang sibuk saat ini.</string>
+    <string name="error_no_conn_desc">Mohon maaf, periksa koneksi internet kamu kembali.</string>
+    <string name="error_wrong_role_desc">Mohon maaf, email ini tidak terdaftar sebagai akun &lt;b>__role__&lt;/b>.</string>
+    <string name="btn_try_again">Coba lagi</string>
+    <string name="btn_close">Tutup</string>
+
+    <string name="chats_title">Chats</string>
+    <string name="search_hints">Search recent chats…</string>
+    <string name="search_title">Search</string>
+    <string name="consultation_schedule_title">Consultation Schedule</string>
+    <string name="tv_recent_chats_title">Recent Chats</string>
+    <string name="active_chats_title">Active Chats</string>
+    <string name="no_chats_desc">Tidak ada histori chat saat ini.</string>
+    <string name="no_schedule_desc">Anda tidak mempunyai jadwal konsultasi saat ini.\nUntuk membuat janji,</string>
+    <string name="klik_disini">klik disini.</string>
+    <string name="amount_patient">__amount__ orang</string>
+    <string name="incoming_call">Incoming</string>
+    <string name="outcoming_call">Outcoming</string>
+
+    <string name="logout">Logout</string>
+    <string name="view_full_profile">Lihat Profil Lengkap</string>
+    <string name="consultation_schedule">Jadwal Konsultasi</string>
+    <string name="charge">Biaya</string>
+    <string name="list_schedule">Daftar Janji</string>
+    <string name="charge_amount">Rp __amount__</string>
+    <string name="duration">Durasi</string>
+    <string name="chat_now">Chat Sekarang</string>
+    <string name="waiting_for_queue">Menunggu Antrian</string>
+    <string name="add_to_queue">Tambah Antrian</string>
+    <string name="remove_to_queue">Hapus Antrian</string>
+    <string name="cancel">Batal</string>
+    <string name="end_chat">End</string>
+    <string name="image_attach">Image</string>
+    <string name="video_attach">Video</string>
+    <string name="doc_attach">Document</string>
+    <string name="voice_call">Voice Call</string>
+    <string name="video_call">Video Call</string>
+    <string name="chat_hint">Ketik pesan…</string>
+    <string name="choose_camera">Kamera</string>
+    <string name="choose_gallery">Galeri</string>
+    <string name="choose_from">Pilih Dari</string>
+    <string name="date">Tanggal</string>
+    <string name="num_patients">Jumlah Pasien</string>
+
+    <string name="end_session_title">Konfirmasi Akhiri Sesi</string>
+    <string name="end_session_first_p">Apakah Anda yakin ingin mengakhiri sesi?</string>
+    <string name="end_session_second_p">Anda tidak dapat mengirim pesan kembali ketika sesi berakhir.</string>
+    <string name="end_session_btn">Ya, Saya ingin mengakhiri sesi ini</string>
+    <string name="end_session_time">Konsultasi selesai pada pukul __waktu__</string>
+
 </resources>

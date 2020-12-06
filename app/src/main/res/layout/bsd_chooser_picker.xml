@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/PaddedLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_rounded_dialog">
+
+    <View
+        android:layout_width="37.0dip"
+        android:layout_height="2.0dip"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/default_small_margin"
+        android:background="@drawable/ic_line_rounded" />
+
+    <View
+        android:layout_width="37.0dip"
+        android:layout_height="2.0dip"
+        android:layout_gravity="center"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="@dimen/default_long_margin"
+        android:background="@drawable/ic_line_rounded" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/default_screen_margin"
+        android:fontFamily="@font/roboto_medium"
+        android:text="@string/choose_from"
+        android:textColor="@color/blackSolid"
+        android:textSize="@dimen/text_24" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/default_screen_margin"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/ll_choose_camera"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginBottom="@dimen/default_small_margin"
+                android:src="@drawable/ic_camera" />
+
+            <TextView
+                android:id="@+id/tv_charge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/default_small_margin"
+                android:fontFamily="@font/roboto_medium"
+                android:text="@string/choose_camera"
+                android:textColor="@color/blackSolid" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_choose_gallery"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginBottom="@dimen/default_small_margin"
+                android:src="@drawable/ic_gallery" />
+
+            <TextView
+                android:id="@+id/tv_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/default_small_margin"
+                android:fontFamily="@font/roboto_medium"
+                android:text="@string/choose_gallery"
+                android:textColor="@color/blackSolid" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_close"
+        style="@style/ButtonSolidWhite"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:fontFamily="@font/roboto_medium"
+        android:text="@string/cancel" />
+
+
+</LinearLayout>

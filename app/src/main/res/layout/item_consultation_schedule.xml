@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="250dp"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="@dimen/default_small_margin"
+    android:paddingStart="@dimen/default_small_pad"
+    android:paddingTop="@dimen/default_small_pad"
+    android:paddingEnd="@dimen/default_small_margin"
+    android:paddingBottom="@dimen/default_small_pad"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <LinearLayout
+        android:id="@+id/ll_schedule_patient"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_layout_select"
+        android:elevation="5dp"
+        android:orientation="vertical"
+        android:padding="@dimen/default_screen_margin"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/default_screen_margin">
+
+            <RelativeLayout
+                android:id="@+id/rl_picture_doc"
+                android:layout_width="32dp"
+                android:layout_height="32dp">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/iv_doctor_picture"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    tools:src="@drawable/ic_dokter_circle" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentBottom="true"
+                    android:src="@drawable/ic_online"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/tv_doctor_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/default_small_margin"
+                android:layout_marginBottom="2dp"
+                android:layout_toEndOf="@id/rl_picture_doc"
+                android:ellipsize="marquee"
+                android:singleLine="true"
+                android:textColor="@color/blackSolid"
+                android:textSize="@dimen/text_xs"
+                tools:text="dr. John Doe, Sp.JP" />
+
+            <TextView
+                android:id="@+id/tv_doctor_specialist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_doctor_name"
+                android:layout_marginStart="@dimen/default_small_margin"
+                android:layout_toEndOf="@id/rl_picture_doc"
+                android:fontFamily="@font/roboto_light"
+                android:textColor="@color/greySemiPrimary"
+                android:textSize="@dimen/text_xs"
+                tools:text="Spesialis Jantung" />
+
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/default_screen_margin"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="@dimen/default_small_margin"
+                    android:src="@drawable/ic_date_gold" />
+
+                <TextView
+                    android:id="@+id/tv_date_schedule"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@color/goldPrimary"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textSize="@dimen/text_xxs_11"
+                    tools:text="22 Jun 2020" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginEnd="@dimen/default_small_margin"
+                    android:src="@drawable/ic_time_gold" />
+
+                <TextView
+                    android:id="@+id/tv_time_schedule"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@color/goldPrimary"
+                    android:fontFamily="@font/roboto_bold"
+                    android:textSize="@dimen/text_xxs_11"
+                    tools:text="10:00 - 12:00" />
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_schedule_doctor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/bg_layout_select"
+        android:elevation="5dp"
+        android:padding="@dimen/default_screen_margin"
+        android:visibility="visible"
+        tools:visibility="gone">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_agenda" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="@dimen/default_screen_margin"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/default_small_margin"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginEnd="@dimen/default_small_margin"
+                    android:src="@drawable/ic_date_red" />
+
+                <TextView
+                    android:id="@+id/tv_date_schedule_doctor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="@dimen/text_xs_13"
+                    tools:text="22 Jun 2020" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginEnd="@dimen/default_small_margin"
+                    android:src="@drawable/ic_people_red" />
+
+                <TextView
+                    android:id="@+id/tv_amount_patient"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="@dimen/text_xs_13"
+                    tools:text="12 People" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/ll_top_call"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorSecondary"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="@dimen/default_long_margin">
+
+        <TextView
+            android:id="@+id/tv_name_user"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/default_small_margin"
+            android:fontFamily="@font/roboto_medium"
+            android:textColor="@color/whitePrimary"
+            android:textSize="@dimen/text_medium"
+            tools:text="dr. John Doe, Sp. OG" />
+
+        <TextView
+            android:id="@+id/chrono_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/incoming_call"
+            android:textColor="@color/whitePrimary"
+            android:textSize="@dimen/text_xs" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/ll_top_call"
+        android:scaleType="centerCrop"
+        android:src="@color/blackSolid60" />
+
+    <ImageView
+        android:id="@+id/iv_sender_avatar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/ll_top_call"
+        android:scaleType="centerCrop"
+        tools:src="@drawable/ic_dokter_square" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/ll_top_call"
+        android:background="@color/blackSolid40"
+        android:scaleType="centerCrop" />
+
+    <LinearLayout
+        android:id="@+id/ll_bottom_call"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="@dimen/default_screen_pad">
+
+        <ImageView
+            android:id="@+id/btn_hangup"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:background="@drawable/bg_button_hangup_selected" />
+
+        <ImageView
+            android:id="@+id/btn_call"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_marginLeft="120dp"
+            android:background="@drawable/bg_button_call_selected" />
+
+    </LinearLayout>
+
+</RelativeLayout>

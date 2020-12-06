@@ -198,4 +198,8 @@
 
     </RelativeLayout>
 
+    <include
+        android:id="@+id/loading_layout"
+        layout="@layout/loading" />
+
 </RelativeLayout>

@@ -12,4 +12,21 @@
     <color name="textColorLightRed">#E19B9E</color>
     <color name="textColorDarkRed">#B2151B</color>
     <color name="colorFormInfo">#FFD77B</color>
+
+    <color name="whitePrimary">#F6F8FA</color>
+    <color name="whiteSecondary">#F7F8F3</color>
+    <color name="whiteSecondary2">#fff2f2f2</color>
+    <color name="whiteSecondary3">#f8f8ff</color>
+    <color name="whiteSecondary3_60">#63f8f8ff</color>
+    <color name="whiteSolid">#FFFFFF</color>
+    <color name="redSecondary">#FF4047</color>
+    <color name="redLight">#FF1E27</color>
+    <color name="redDark">#CF1017</color>
+    <color name="greyPrimary">#666773</color>
+    <color name="greySemiPrimary">#5F6061</color>
+    <color name="grayLight">#C5C5C5</color>
+    <color name="blackSolid">#000000</color>
+    <color name="blackSolid60">#99000000</color>
+    <color name="blackSolid40">#63000000</color>
+    <color name="goldPrimary">#B3944F</color>
 </resources>
