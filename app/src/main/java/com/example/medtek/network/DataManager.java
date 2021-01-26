@@ -3,6 +3,7 @@ package com.example.medtek.network;
 import com.example.medtek.network.base.BaseResponse;
 import com.example.medtek.network.request.LoginRequest;
 import com.example.medtek.network.response.AuthTokenResponse;
+import com.example.medtek.network.response.GetConversationListResponse;
 import com.example.medtek.network.response.GetConversationResponse;
 import com.example.medtek.network.response.GetInfoUserResponse;
 import com.example.medtek.network.response.GetJanjiListResponse;
@@ -81,6 +82,10 @@ public class DataManager {
 
     public Observable<GetConversationResponse> getConversation(String idConversation) {
         return apiInterface.getConversation(APIService.getAuthHeader(), idConversation);
+    }
+
+    public Observable<GetConversationListResponse> getConversationList() {
+        return apiInterface.getConversationList(APIService.getAuthHeader());
     }
 
     public Call<ResponseBody> getMessageImage(HashMap<String, String> body) {

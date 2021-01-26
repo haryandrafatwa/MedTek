@@ -233,8 +233,10 @@ public class DetailPasienFragment extends Fragment {
                                         if (!object.getString("tglLahir").equalsIgnoreCase("null")){
                                             Locale locale = new Locale("in", "ID");
                                             DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd MMMM YYYY",locale);
+                                            DateTimeFormatter dbFormat = DateTimeFormatter.ofPattern("YYYY-MM-dd",locale);
                                             LocalDate localDate = LocalDate.parse(object.getString("tglLahir"));
                                             et_dob.setText(localDate.format(dateFormat));
+                                            tglLahir = localDate.format(dbFormat);
                                         }
                                     } catch (IOException | JSONException e) {
                                         e.printStackTrace();

@@ -7,6 +7,9 @@ import android.util.Log;
 import com.example.medtek.App;
 import com.example.medtek.callback.BaseCallback;
 import com.example.medtek.network.APIService;
+import com.example.medtek.network.response.GetConversationListResponse;
+import com.example.medtek.network.response.GetConversationResponse;
+import com.example.medtek.utils.RxUtils;
 
 import java.util.HashMap;
 
@@ -18,6 +21,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.example.medtek.utils.ErrorHandler.handlerError;
+import static java.lang.String.valueOf;
 
 public class ConversationController extends APIService {
     private static final String TAG = ConversationController.class.getSimpleName();
@@ -26,6 +30,66 @@ public class ConversationController extends APIService {
 
     public ConversationController() {
         this.context = App.getContext();
+    }
+
+    @SuppressLint("CheckResult")
+    public void getConversation(int idConversation, BaseCallback<GetConversationResponse> callback) {
+        dataManager.getConversation(valueOf(idConversation))
+                .doOnTerminate(() -> {
+                })
+                .compose(RxUtils.INSTANCE.applyScheduler())
+                .compose(RxUtils.INSTANCE.applyApiCall())
+                .subscribe(getConversationResponse -> {
+                    GetConversationResponse.Conversation response  = getConversationResponse.getData();
+                    Log.d(TAG, "CheckId :" + response.getIdConversation());
+                    if (!getConversationResponse.getError()) {
+                        try {
+                            callback.onSuccess(getConversationResponse);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        String msg = getConversationResponse.getMessage();
+                        Log.e(TAG, msg);
+                        callback.onError(new Throwable("Failed to get data"));
+                    }
+                }, throwable -> {
+                    String errorMsg = handlerError(throwable);
+                    if (errorMsg.equals("Server Broken")) {
+                        callback.onServerBroken();
+                    } else {
+                        callback.onNoConnection();
+                    }
+                });
+    }
+
+    @SuppressLint("CheckResult")
+    public void getConversationList(BaseCallback<GetConversationListResponse> callback) {
+        dataManager.getConversationList()
+                .doOnTerminate(() -> {
+                })
+                .compose(RxUtils.INSTANCE.applyScheduler())
+                .compose(RxUtils.INSTANCE.applyApiCall())
+                .subscribe(getConversationListResponse -> {
+                    if (!getConversationListResponse.getError()) {
+                        try {
+                            callback.onSuccess(getConversationListResponse);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        String msg = getConversationListResponse.getMessage();
+                        Log.e(TAG, msg);
+                        callback.onError(new Throwable("Failed to get data"));
+                    }
+                }, throwable -> {
+                    String errorMsg = handlerError(throwable);
+                    if (errorMsg.equals("Server Broken")) {
+                        callback.onServerBroken();
+                    } else {
+                        callback.onNoConnection();
+                    }
+                });
     }
 
     @SuppressLint("StaticFieldLeak")

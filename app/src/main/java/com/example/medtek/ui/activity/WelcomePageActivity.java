@@ -15,12 +15,8 @@ import com.example.medtek.R;
 import com.example.medtek.ui.dokter.auth.LoginDokterActivity;
 import com.example.medtek.ui.pasien.auth.LoginPasienActivity;
 
-import static com.example.medtek.utils.Utils.getPermissionStorageList;
-import static com.example.medtek.utils.Utils.requestPermissionCompat;
-
 public class WelcomePageActivity extends AppCompatActivity {
 
-    private static final int PERMISSION_STORAGE = 7669;
     private Button dokter,pasien;
 
     @Override
@@ -47,7 +43,6 @@ public class WelcomePageActivity extends AppCompatActivity {
             }
         });
 
-        requestPermissionCompat(this, getPermissionStorageList(), PERMISSION_STORAGE);
     }
 
     public static void saveData(Context context, String TEXT) {

@@ -53,7 +53,7 @@ public class SocketUtil {
         echo = new Echo(echoOptions);
         echo.connect(args -> {
             Log.d(TAG, "successConnectSocket");
-        }, args -> Log.e(TAG, "errConnectSocket"));
+        }, args -> Log.e(TAG, "errConnectSocket: " + args[0].toString()));
     }
 
     public static String getMessageFromObject(Object... args) {

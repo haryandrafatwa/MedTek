@@ -20,7 +20,7 @@ public class MediaModel implements Parcelable {
     private final int idMedia;
     private final int idChat;
     private final String filename;
-    private final String path;
+    private String path;
     private final String extension;
     private final ChatType type;
 
@@ -57,6 +57,10 @@ public class MediaModel implements Parcelable {
 
     public String getPath() {
         return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public String getExtension() {

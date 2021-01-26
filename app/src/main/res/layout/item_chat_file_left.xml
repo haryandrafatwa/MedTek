@@ -41,6 +41,22 @@
                         android:textSize="@dimen/text_xxxs"
                         tools:text="PDF" />
 
+                    <ImageView
+                        android:id="@+id/iv_download_file"
+                        android:layout_centerInParent="true"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_arrow_down"
+                        android:visibility="gone"/>
+
+                    <ProgressBar
+                        android:id="@+id/loading"
+                        android:layout_centerInParent="true"
+                        style="@android:style/Widget.Holo.Light.ProgressBar"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:visibility="gone"/>
+
                 </RelativeLayout>
 
                 <TextView
@@ -64,7 +80,7 @@
                 android:layout_gravity="end"
                 android:layout_marginEnd="@dimen/default_small_margin_4"
                 android:textSize="@dimen/text_xxs"
-                tools:text="1 MB" />
+                tools:text="@string/click_download" />
 
         </LinearLayout>
 

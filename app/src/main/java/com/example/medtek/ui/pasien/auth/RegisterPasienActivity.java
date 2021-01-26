@@ -9,6 +9,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -89,6 +90,8 @@ public class RegisterPasienActivity extends AppCompatActivity {
                                     @Override
                                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                                         try {
+                                            Log.d("errorRegist", response.errorBody().string());
+                                            Log.d("errorRegist", response.message() + response.code());
                                             btn_clone.setVisibility(View.GONE);
                                             String s = response.errorBody().string();
                                             JSONObject obj = new JSONObject(s);

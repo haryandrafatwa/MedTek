@@ -1,7 +1,9 @@
 package com.example.medtek.constant;
 
+import com.example.medtek.BuildConfig;
+
 public class APPConstant {
-    public static final int API_TIMEOUT = 1; // in minutes
+    public static final int API_TIMEOUT = 5; // in minutes
 
     public static final int LOGIN_DOKTER = 2;
     public static final int LOGIN_PASIEN = 1;
@@ -41,7 +43,7 @@ public class APPConstant {
     public static final int NOTIFICATION_MESSAGE_REQUEST_CODE = 201;
 
     //Socket
-    public static final String BASE_SOCKET_URL = "http://10.0.2.2:6001";
+    public static final String BASE_SOCKET_URL = BuildConfig.BASE_URL + ":6001";
 
     //Channel
     public static final String CHANNEL_MESSAGES = "App.User.Conversation.";
@@ -49,8 +51,8 @@ public class APPConstant {
     public static final String CHANNEL_JANJI = "App.User.Janji.";
 
     //Event
-    public static final String EVENT_MESSAGE_CREATED = "NewChat";
-    public static final String EVENT_JANJI = "JanjiUpdate";
+    public static final String EVENT_MESSAGE_CREATED = ".new-chat";
+    public static final String EVENT_JANJI = ".janji-update";
     public static final String EVENT_REQUEST_CALL = "request-call-";
     public static final String EVENT_RESPONSE_CALL = "response-call-";
     public static final String EVENT_RESPONSE_ON_CALL = "response-on-call-";

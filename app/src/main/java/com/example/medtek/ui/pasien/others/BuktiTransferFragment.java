@@ -44,6 +44,7 @@ import java.io.File;
 import java.io.IOException;
 
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -61,6 +62,7 @@ public class BuktiTransferFragment extends Fragment {
     private Toolbar toolbar;
     private String access,refresh;
     private int nominal;
+    private String penerima, rekPenerima, pengirim, rekPengirim;
 
     private RelativeLayout upload_image;
     private Button kirim;
@@ -92,6 +94,11 @@ public class BuktiTransferFragment extends Fragment {
         loadData(getActivity());
         Bundle bundle = getArguments();
         nominal = bundle.getInt("nominal");
+        penerima = bundle.getString("penerima");
+        rekPenerima = bundle.getString("rekPenerima");
+        pengirim = bundle.getString("pengirim");
+        rekPengirim = bundle.getString("rekPengirim");
+
         upload_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -145,7 +152,11 @@ public class BuktiTransferFragment extends Fragment {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
 
-                Call<ResponseBody> call = RetrofitClient.getInstance().getApi().postTopup("Bearer "+access,nominal);
+                File file = new File(postPath);
+
+                MultipartBody.Part part = MultipartBody.Part.createFormData("bukti", file.getName(),requestBody);
+
+                Call<ResponseBody> call = RetrofitClient.getInstance().getApi().postTopup("Bearer "+access, nominal, penerima, rekPenerima, pengirim, rekPengirim, part);
                 call.enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {

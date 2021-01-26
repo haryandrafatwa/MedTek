@@ -315,7 +315,9 @@
     <string name="charge_amount">Rp __amount__</string>
     <string name="duration">Durasi</string>
     <string name="chat_now">Chat Sekarang</string>
+    <string name="waiting_for_confirm">Menunggu Konfirmasi</string>
     <string name="waiting_for_queue">Menunggu Antrian</string>
+    <string name="waiting_for_schedule">Menunggu Jadwal</string>
     <string name="add_to_queue">Tambah Antrian</string>
     <string name="remove_to_queue">Hapus Antrian</string>
     <string name="cancel">Batal</string>
@@ -331,6 +333,11 @@
     <string name="choose_from">Pilih Dari</string>
     <string name="date">Tanggal</string>
     <string name="num_patients">Jumlah Pasien</string>
+    <string name="click_download">Klik untuk mengunduh</string>
+    <string name="give_feedback_title">Berikan Penilaian</string>
+    <string name="feedback_title">Penilaian</string>
+    <string name="feedback_desc_title">Berikan pengalaman anda terhadap konsultasi ini</string>
+    <string name="send_feedback">Kirim Penilaian</string>
 
     <string name="end_session_title">Konfirmasi Akhiri Sesi</string>
     <string name="end_session_first_p">Apakah Anda yakin ingin mengakhiri sesi?</string>

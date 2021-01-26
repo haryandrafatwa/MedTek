@@ -6,6 +6,7 @@ import com.example.medtek.constant.APIConstant;
 import com.example.medtek.network.base.BaseResponse;
 import com.example.medtek.network.request.LoginRequest;
 import com.example.medtek.network.response.AuthTokenResponse;
+import com.example.medtek.network.response.GetConversationListResponse;
 import com.example.medtek.network.response.GetConversationResponse;
 import com.example.medtek.network.response.GetInfoUserResponse;
 import com.example.medtek.network.response.GetJanjiListResponse;
@@ -40,7 +41,7 @@ import retrofit2.http.Streaming;
 public interface APIInterface {
 
     @Headers({"Accept:application/json"})
-    @POST("register-dokter/")
+    @POST("register-dokter")
     @Multipart
     Call<JSONObject> register_dokter(
             @Query("name") String name,
@@ -51,7 +52,7 @@ public interface APIInterface {
     );
 
     @Headers({"Accept:application/json"})
-    @POST("register/")
+    @POST("register")
     @FormUrlEncoded
     Call<ResponseBody> register_pasien(
             @Query("name") String name,
@@ -61,11 +62,9 @@ public interface APIInterface {
     );
 
     @Headers({"Accept:application/json"})
-    @POST("login/")
-    @FormUrlEncoded
+    @POST("login")
     Call<ResponseBody> login(
-            @Query("email") String email,
-            @Field("password") String password
+            @Body LoginRequest body
     );
 
     @Headers({"Accept:application/json"})
@@ -111,10 +110,15 @@ public interface APIInterface {
 
     @Headers({"Accept:application/json"})
     @POST("wallet/topup")
-    @FormUrlEncoded
+    @Multipart
     Call<ResponseBody> postTopup(
             @Header("Authorization") String token,
-            @Field("topup") int topup
+            @Query("topup") int topup,
+            @Query("penerima") String penerima,
+            @Query("rekeningPenerima") String rekeningPenerima,
+            @Query("pengirim") String pengirim,
+            @Query("rekeningPengirim") String rekeningPengirim,
+            @Part MultipartBody.Part bukti
 
     );
 
@@ -317,6 +321,9 @@ public interface APIInterface {
 
     @GET(APIConstant.GET_CONVERSATION)
     Observable<GetConversationResponse> getConversation(@HeaderMap HashMap<String, String> token, @Path("id") String id);
+
+    @GET(APIConstant.GET_CONVERSATION_LIST)
+    Observable<GetConversationListResponse> getConversationList(@HeaderMap HashMap<String, String> token);
 
     //POST
 

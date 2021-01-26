@@ -30,6 +30,7 @@ import com.example.medtek.controller.LoginController;
 import com.example.medtek.model.ImageModel;
 import com.example.medtek.model.state.ApplyStateType;
 import com.example.medtek.network.RetrofitClient;
+import com.example.medtek.network.request.LoginRequest;
 import com.example.medtek.network.response.AuthTokenResponse;
 import com.example.medtek.network.response.GetUserResponse;
 import com.example.medtek.ui.activity.MainActivity;
@@ -98,7 +99,8 @@ public class LoginDokterActivity extends AppCompatActivity {
                         Toasty.error(LoginDokterActivity.this,getResources().getString(R.string.formatemail),Toasty.LENGTH_LONG).show();
                         btn_clone.setVisibility(View.GONE);
                     }else{
-                        Call<ResponseBody> call = RetrofitClient.getInstance().getApi().login(str_em,str_pw);
+                        LoginRequest request = new LoginRequest(str_em, str_pw);
+                        Call<ResponseBody> call = RetrofitClient.getInstance().getApi().login(request);
                         call.enqueue(new Callback<ResponseBody>() {
                             @Override
                             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {

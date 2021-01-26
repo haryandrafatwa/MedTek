@@ -20,7 +20,9 @@ import com.bumptech.glide.Glide;
 import com.example.medtek.App;
 import com.example.medtek.R;
 import com.example.medtek.model.UserModel;
+import com.example.medtek.model.state.ChatType;
 
+import org.apache.commons.io.FilenameUtils;
 import org.jitsi.meet.sdk.JitsiMeet;
 import org.jitsi.meet.sdk.JitsiMeetConferenceOptions;
 import org.jitsi.meet.sdk.JitsiMeetUserInfo;
@@ -64,10 +66,11 @@ public class Utils {
         return (int) getData(USER_TYPE) == LOGIN_DOKTER;
     }
 
-    public static String[] getPermissionStorageList() {
+    public static String[] getPermissionStorageAndLocationList() {
         return new String[]{
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.ACCESS_FINE_LOCATION
         };
     }
 
@@ -113,23 +116,23 @@ public class Utils {
     }
 
     public static String dateTimeToStringDate(DateTime date) {
-        return DateTimeFormat.forPattern("yyy-MM-dd").print(date);
+        return DateTimeFormat.forPattern("yyyy-MM-dd").print(date);
     }
 
     public static String dateTimeToString(DateTime date) {
-        return DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZ").print(date);
+        return DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'").print(date);
     }
 
     public static DateTime getDateTime(String date, DateTimeZone timeZone) {
         return DateTimeFormat
-                .forPattern("yyyy-MM-dd'T'HH:mm:ssZ")
+                .forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'")
                 .withZone(timeZone)
                 .parseDateTime(date);
     }
 
     public static DateTime getDateTime(String date) {
         return DateTimeFormat
-                .forPattern("yyyy-MM-dd'T'HH:mm:ssZ")
+                .forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'")
                 .parseDateTime(date);
     }
 
@@ -157,6 +160,12 @@ public class Utils {
         );
     }
 
+    public static String changeDatePatternSlash(String date) {
+        return DateTimeFormat.forPattern("dd/MM/yyyy").print(
+                DateTimeFormat.forPattern("yyyy-MM-dd").parseDateTime(date)
+        );
+    }
+
     public static String setNewFileName(Context context) {
         return context.getResources().getString(R.string.app_name) +
                 "_" +
@@ -169,6 +178,10 @@ public class Utils {
 
     public static String getFileName(String path) {
         return path.substring(path.lastIndexOf("/") + 1);
+    }
+
+    public static String getFileNameNoExt(String path) {
+        return FilenameUtils.removeExtension(getFileName(path));
     }
 
     public static String getFileExt(String path) {
@@ -211,7 +224,7 @@ public class Utils {
     }
 
     public static String getImagePath() {
-        return Environment.getExternalStorageDirectory() +
+        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) +
                 File.separator +
                 "Medtek" +
                 File.separator +
@@ -220,7 +233,7 @@ public class Utils {
     }
 
     public static String getVideoPath() {
-        return Environment.getExternalStorageDirectory() +
+        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) +
                 File.separator +
                 "Medtek" +
                 File.separator +
@@ -229,7 +242,7 @@ public class Utils {
     }
 
     public static String getDocumentPath() {
-        return Environment.getExternalStorageDirectory() +
+        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) +
                 File.separator +
                 "Medtek" +
                 File.separator +
@@ -383,6 +396,26 @@ public class Utils {
                 });
                 break;
         }
+    }
+
+    public static String getPath(ChatType type) {
+        switch (type) {
+            default:
+            case IMAGE:
+                return getImagePath();
+            case VIDEO:
+                return getVideoPath();
+            case FILE:
+                return getDocumentPath();
+        }
+    }
+
+    public static String getFileInfo(File file) {
+        return getFileName(file.getPath()) + ","
+                + getFileMimeTypeWithoutDot(getFileMimeType(Uri.fromFile(file))) + ","
+                + getFileSize(file.length()) + ","
+                + file.getPath() + ","
+                + getFileMimeType(Uri.fromFile(file));
     }
 }
 

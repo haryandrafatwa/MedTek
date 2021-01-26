@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.medtek">
 
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -31,17 +30,17 @@
         android:requestLegacyExternalStorage="true"
         android:usesCleartextTraffic="true">
 
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="com.example.medtek.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true"
-            tools:replace="android:authorities">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                tools:replace="android:resource"
-                android:resource="@xml/fileprovider" />
-        </provider>
+<!--        <provider-->
+<!--            android:name="androidx.core.content.FileProvider"-->
+<!--            android:authorities="com.example.medtek.fileprovider"-->
+<!--            android:exported="false"-->
+<!--            android:grantUriPermissions="true"-->
+<!--            tools:replace="android:authorities">-->
+<!--            <meta-data-->
+<!--                android:name="android.support.FILE_PROVIDER_PATHS"-->
+<!--                tools:replace="android:resource"-->
+<!--                android:resource="@xml/fileprovider" />-->
+<!--        </provider>-->
 
         <service android:name=".service.NotificationService"/>
 

@@ -38,7 +38,8 @@ public class APIService {
 
                     Request request = originalRequest.newBuilder()
                             .header("Content-type", "application/json")
-//                            .addHeader("Connection", "close")
+                            .header("Accept", "application/json")
+                            .header("Connection", "close")
 //                            .addHeader("Accept-Encoding", "identity")
                             .build();
 
@@ -50,6 +51,7 @@ public class APIService {
 //                })
                 .connectTimeout(APPConstant.API_TIMEOUT, TimeUnit.MINUTES)
                 .readTimeout(APPConstant.API_TIMEOUT, TimeUnit.MINUTES)
+                .writeTimeout(APPConstant.API_TIMEOUT, TimeUnit.MINUTES)
                 .build();
 
         return httpClient;

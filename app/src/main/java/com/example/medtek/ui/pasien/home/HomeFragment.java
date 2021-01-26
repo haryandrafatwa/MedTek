@@ -23,6 +23,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -57,18 +58,22 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
 import io.socket.client.Ack;
 import io.socket.client.IO;
+import io.socket.client.Manager;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
+import io.socket.engineio.client.Transport;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -79,6 +84,8 @@ import static com.example.medtek.network.RetrofitClient.BASE_URL;
 import static com.example.medtek.utils.PropertyUtil.ACCESS_TOKEN;
 import static com.example.medtek.utils.PropertyUtil.REFRESH_TOKEN;
 import static com.example.medtek.utils.PropertyUtil.getData;
+import static com.example.medtek.utils.Utils.TAG;
+import static java.lang.String.valueOf;
 
 public class HomeFragment extends Fragment {
 
@@ -112,7 +119,7 @@ public class HomeFragment extends Fragment {
     private LinearLayout ll_loader;
 
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private final int REQUEST_CODE = 46;
+    public static int REQUEST_CODE_LOC = 46;
     private Location location;
     private double sLat, sLong;
 
@@ -400,26 +407,28 @@ public class HomeFragment extends Fragment {
                                                                                         }
                                                                                     }
                                                                                     if (!kota.isEmpty() && mListHospital.size() < 5){
-                                                                                        double distance;
+                                                                                        double distance = -1.0;
                                                                                         Locale locale = new Locale("in", "ID");
                                                                                         Geocoder geocoder = new Geocoder(getActivity(), locale);
 
                                                                                         List<Address> addressesD = geocoder.getFromLocationName(name,1);
-                                                                                        double dLat = addressesD.get(0).getLatitude();
-                                                                                        double dLong = addressesD.get(0).getLongitude();
-                                                                                        double longDiff = sLong - dLong;
-                                                                                        distance = Math.sin(sLat*Math.PI/180.0)*Math.sin(dLat*Math.PI/180.0) + Math.cos(sLat*Math.PI/180.0)*Math.cos(dLat*Math.PI/180.0)*Math.cos(longDiff*Math.PI/180.0);
-                                                                                        distance = Math.acos(distance);
-                                                                                        distance = distance*180.0/Math.PI;
-                                                                                        distance = distance*60*1.1515;
-                                                                                        distance = distance*1.609344;
+                                                                                        if (addressesD.size() > 0) {
+                                                                                            double dLat = addressesD.get(0).getLatitude();
+                                                                                            double dLong = addressesD.get(0).getLongitude();
+                                                                                            double longDiff = sLong - dLong;
+                                                                                            distance = Math.sin(sLat*Math.PI/180.0)*Math.sin(dLat*Math.PI/180.0) + Math.cos(sLat*Math.PI/180.0)*Math.cos(dLat*Math.PI/180.0)*Math.cos(longDiff*Math.PI/180.0);
+                                                                                            distance = Math.acos(distance);
+                                                                                            distance = distance*180.0/Math.PI;
+                                                                                            distance = distance*60*1.1515;
+                                                                                            distance = distance*1.609344;
+                                                                                        }
                                                                                         String jenis="";
                                                                                         if (obj.getString("jenis").equalsIgnoreCase("umum")){
                                                                                             jenis = getActivity().getString(R.string.rsumum);
                                                                                         }else if (obj.getString("jenis").equalsIgnoreCase("spesialisasi")){
                                                                                             jenis = getActivity().getString(R.string.rsspesial);
                                                                                         }
-                                                                                        if (distance < 20){
+                                                                                        if (distance < 20 && distance >= 0){
                                                                                             mListHospital.add(new HospitalModel(name, no_telp, jalanRs, no_bangunanRs, rtrwRs, kelurahanRs, kecamatanRs, kotaRs, "Provinsi", infoRs,jenis,hospitalImage,id,distance, mListDokterHospital));
                                                                                         }
                                                                                     }
@@ -503,7 +512,7 @@ public class HomeFragment extends Fragment {
                                                                 }else{
                                                                     ActivityCompat.requestPermissions(getActivity(), new String[]{
                                                                             Manifest.permission.ACCESS_FINE_LOCATION
-                                                                    },REQUEST_CODE);
+                                                                    }, REQUEST_CODE_LOC);
                                                                 }
                                                             } catch (IOException | JSONException e) {
                                                                 e.printStackTrace();
@@ -595,6 +604,8 @@ public class HomeFragment extends Fragment {
     private void startSocket() {
         Log.e("MedTek", "SOCOKET START...");
         try {
+//            IO.Options opts = new IO.Options();
+//            opts.transports = new String[] { WebSocket.NAME };
             socket = IO.socket(BASE_SOCKET_URL);
             socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
                 @Override
@@ -631,7 +642,21 @@ public class HomeFragment extends Fragment {
             }).on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-                    Log.e("SOCKETSOCKETAN", "Connect Error!");
+                    Log.e("SOCKETSOCKETAN", "Connect Error!" + args[0].toString());
+                }
+            }).on(Manager.EVENT_TRANSPORT, new Emitter.Listener() {
+                @Override
+                public void call(Object... args) {
+                    Transport transport = (Transport) args[0];
+                    // Adding headers when EVENT_REQUEST_HEADERS is called
+                    transport.on(Transport.EVENT_REQUEST_HEADERS, new Emitter.Listener() {
+                        @Override
+                        public void call(Object... args) {
+                            Log.v(TAG(HomeFragment.class), "Caught EVENT_REQUEST_HEADERS after EVENT_TRANSPORT, adding headers");
+                            Map<String, List<String>> mHeaders = (Map<String, List<String>>)args[0];
+                            mHeaders.put("Authorization", Arrays.asList("Bearer " + access));
+                        }
+                    });
                 }
             }).on("janji-update", new Emitter.Listener() {
                 @Override
@@ -700,6 +725,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void initialize(){
+
         bottomNavigationView = getActivity().findViewById(R.id.bottomBar);
         bottomNavigationView.setVisibility(View.VISIBLE);
         setStatusBar();
@@ -777,7 +803,16 @@ public class HomeFragment extends Fragment {
                         Locale locale = new Locale("in", "ID");
                         Geocoder geocoder = new Geocoder(getActivity(), locale);
                         List<Address> addresses = geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1);
-                        kecamatan = addresses.get(0).getLocality().split(" ",2)[1];
+                        Log.d("errorLoc", valueOf(addresses.size()));
+//                        Log.d("errorLoc", addresses.get(0).getLocality());
+//                        Log.d("errorLoc", addresses.get(0).getSubLocality());
+//                        Log.d("errorLoc", addresses.get(0).getSubAdminArea());
+//                        Log.d("errorLoc", addresses.get(0).getAdminArea());
+//                        Log.d("errorLoc", addresses.get(0).getThoroughfare());
+//                        Log.d("errorLoc", valueOf(addresses.get(0).getLatitude()));
+//                        Log.d("errorLoc", valueOf(addresses.get(0).getLongitude()));
+//                        kecamatan = addresses.get(0).getLocality().split(" ",2)[1];
+                        kecamatan = addresses.get(0).getLocality();
                         kelurahan = addresses.get(0).getSubLocality();
                         kota = addresses.get(0).getSubAdminArea().split(" ",2)[1];
                         provinsi = addresses.get(0).getAdminArea();
@@ -832,5 +867,13 @@ public class HomeFragment extends Fragment {
         FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.frameFragment,fragment).addToBackStack(TAG);
         fragmentTransaction.commit();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_LOC) {
+
+        }
     }
 }

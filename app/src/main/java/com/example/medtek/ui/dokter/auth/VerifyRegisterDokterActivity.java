@@ -124,8 +124,10 @@ public class VerifyRegisterDokterActivity extends AppCompatActivity {
                             if (response.isSuccessful()){
                                 initializeDialogSuccess();
                             }else{
+                                Log.d("errorRegist", response.message());
                                 try {
                                     String s = response.errorBody().string();
+                                    Log.d("errorRegist", s);
                                     JSONObject obj = new JSONObject(s);
                                     JSONObject jsonObject = obj.getJSONObject("errors");
                                     if (jsonObject.getJSONArray("email").getString(0).equals("The email has already been taken.")){

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/PaddedLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bg_rounded_dialog">
+
+    <View
+        android:layout_width="37.0dip"
+        android:layout_height="2.0dip"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/default_small_margin"
+        android:background="@drawable/ic_line_rounded" />
+
+    <View
+        android:layout_width="37.0dip"
+        android:layout_height="2.0dip"
+        android:layout_gravity="center"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="@dimen/default_long_margin"
+        android:background="@drawable/ic_line_rounded" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/default_screen_margin"
+        android:fontFamily="@font/roboto_medium"
+        android:text="@string/give_feedback_title"
+        android:textColor="@color/blackSolid"
+        android:textSize="@dimen/text_24" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/rat"
+        android:textSize="@dimen/text_small"
+        android:textColor="@color/blackSolid"
+        android:fontFamily="@font/roboto_medium"
+        android:layout_marginBottom="@dimen/default_small_margin"/>
+
+    <RatingBar
+        android:id="@+id/rating_bar"
+        style="?android:attr/ratingBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/default_screen_margin"
+        android:isIndicator="false"
+        android:numStars="5"
+        android:stepSize="1.0"
+        tools:rating="3" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/feedback_title"
+        android:textSize="@dimen/text_small"
+        android:textColor="@color/blackSolid"
+        android:fontFamily="@font/roboto_medium"
+        android:layout_marginBottom="@dimen/default_small_margin"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/default_small_margin"
+        android:fontFamily="@font/roboto_light"
+        android:text="@string/feedback_desc_title"
+        android:textColor="@color/blackSolid"
+        android:textSize="@dimen/text_xs_13" />
+
+    <EditText
+        android:id="@+id/et_feedback"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/default_screen_margin"
+        android:padding="@dimen/default_screen_pad"
+        android:inputType="text|textMultiLine"
+        android:lines="4"
+        android:hint="Bagikan pengalamanmu"
+        android:textSize="@dimen/text_xs"
+        android:background="@drawable/bg_textarea"
+        android:gravity="top"/>
+
+    <Button
+        android:id="@+id/btn_chat_now"
+        style="@style/ButtonSolid"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:fontFamily="@font/roboto_medium"
+        android:text="@string/send_feedback"/>
+
+</LinearLayout>

@@ -15,9 +15,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.medtek.App;
 import com.example.medtek.R;
+import com.example.medtek.callback.BaseCallback;
 import com.example.medtek.controller.AppointmentController;
 import com.example.medtek.model.AppointmentModel;
 import com.example.medtek.model.UserModel;
+import com.example.medtek.network.response.GetJanjiSingleResponse;
 
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
@@ -33,6 +35,7 @@ import static com.example.medtek.constant.APPConstant.SEDANG_BERLANSUNG;
 import static com.example.medtek.utils.PropertyUtil.DATA_USER;
 import static com.example.medtek.utils.PropertyUtil.getData;
 import static com.example.medtek.utils.Utils.getTime;
+import static java.lang.String.valueOf;
 
 public class ScheduleDayDoctorAdapter extends RecyclerView.Adapter<ScheduleDayDoctorAdapter.ViewHolder> {
     private static final String TAG = ScheduleDayDoctorAdapter.class.getSimpleName();
@@ -62,6 +65,11 @@ public class ScheduleDayDoctorAdapter extends RecyclerView.Adapter<ScheduleDayDo
     public void addItem(AppointmentModel item) {
         this.appointmentModels.add(item);
         notifyItemInserted(this.appointmentModels.size() - 1);
+    }
+
+    public void updateItem(AppointmentModel item, int position) {
+        this.appointmentModels.set(position, item);
+        notifyItemChanged(position, item);
     }
 
     public void removeItem(int position) {
@@ -105,34 +113,78 @@ public class ScheduleDayDoctorAdapter extends RecyclerView.Adapter<ScheduleDayDo
             holder.tvPatientName.setText(model.getPasien().getName());
             holder.tvDuration.setText("30 Minutes");
 
-            isLoading(false, holder.pbLoading, holder.btnChatNow);
+            isLoading(true, holder.pbLoading, holder.btnChatNow);
 
-            if (model.getTglJanji().equals(LocalDate.now().toString())) {
-                holder.btnChatNow.setEnabled(true);
+            controller.getJanjiSingle(valueOf(model.getIdJanji()), new BaseCallback<GetJanjiSingleResponse>() {
+                @Override
+                public void onSuccess(GetJanjiSingleResponse result) {
+                    int idStatus = result.getData().getIdStatus();
 
-                if (model.getIdStatus() == BELUM_DIMULAI) {
-                    holder.btnChatNow.setText(holder.itemView.getResources().getString(R.string.add_to_queue));
-                } else if (model.getIdStatus() == MENUNGGU_DIANTRIAN) {
-                    if ((getTime(startHour).isBefore(LocalTime.now())) &&
-                            (getTime(endHour).isAfter(LocalTime.now()))) {
-                        holder.btnChatNow.setText(holder.itemView.getResources().getString(R.string.chat_now));
-                        boolean isLiveChat = false;
-                        for (AppointmentModel appointmentModel : appointmentModels) {
-                            if (appointmentModel.getIdStatus() == SEDANG_BERLANSUNG) {
-                                isLiveChat = true;
+                    App.getInstance().runOnUiThread(() -> {
+                        isLoading(false, holder.pbLoading, holder.btnChatNow);
+
+                        boolean isEnabled = true;
+                        String btnText = "";
+
+                        switch (idStatus) {
+                            case BELUM_DIMULAI:
+                                isEnabled = model.getTglJanji().equals(LocalDate.now().toString());
+                                btnText = holder.itemView.getResources().getString(R.string.add_to_queue);
                                 break;
-                            }
+                            case MENUNGGU_DIANTRIAN:
+                                if (model.getTglJanji().equals(LocalDate.now().toString())) {
+                                    if ((getTime(startHour).isBefore(LocalTime.now())) &&
+                                            (getTime(endHour).isAfter(LocalTime.now()))) {
+                                        btnText = holder.itemView.getResources().getString(R.string.chat_now);
+                                        boolean isLiveChat = false;
+                                        for (AppointmentModel appointmentModel : appointmentModels) {
+                                            if (appointmentModel.getIdStatus() == SEDANG_BERLANSUNG) {
+                                                isLiveChat = true;
+                                                break;
+                                            }
+                                        }
+                                        isEnabled = !isLiveChat;
+                                    } else {
+                                        btnText = holder.itemView.getResources().getString(R.string.waiting_for_queue);
+                                    }
+                                } else {
+//                                    btnText = holder.itemView.getResources().getString(R.string.remove_to_queue);
+                                    btnText = holder.itemView.getResources().getString(R.string.chat_now);
+                                    isEnabled = false;
+                                }
+                                break;
+                            case SEDANG_BERLANSUNG:
+                                if (model.getTglJanji().equals(LocalDate.now().toString())) {
+                                    isEnabled = (getTime(startHour).isBefore(LocalTime.now())) &&
+                                            (getTime(endHour).isAfter(LocalTime.now()));
+                                } else {
+                                    isEnabled = false;
+                                }
+
+                                btnText = holder.itemView.getResources().getString(R.string.chat_now);
+                                break;
                         }
-                        holder.btnChatNow.setEnabled(!isLiveChat);
-                    } else {
-                        holder.btnChatNow.setText(holder.itemView.getResources().getString(R.string.remove_to_queue));
-                    }
-                } else if (model.getIdStatus() == SEDANG_BERLANSUNG) {
-                    holder.btnChatNow.setText(holder.itemView.getResources().getString(R.string.chat_now));
+                        holder.btnChatNow.setEnabled(isEnabled);
+                        holder.btnChatNow.setText(btnText);
+                    });
+
                 }
-            } else {
-                holder.btnChatNow.setEnabled(false);
-            }
+
+                @Override
+                public void onError(Throwable t) {
+
+                }
+
+                @Override
+                public void onNoConnection() {
+
+                }
+
+                @Override
+                public void onServerBroken() {
+
+                }
+            });
 
         });
     }
@@ -141,151 +193,6 @@ public class ScheduleDayDoctorAdapter extends RecyclerView.Adapter<ScheduleDayDo
     public int getItemCount() {
         return appointmentModels.size();
     }
-
-//    private void setBtnState(String id, int position, Button view, View itemView, ProgressBar pb) {
-//        controller.getJanjiSingle(id, new BaseCallback<GetJanjiSingleResponse>() {
-//            @Override
-//            public void onSuccess(GetJanjiSingleResponse result) {
-//                App.getInstance().runOnUiThread(() -> {
-//                    isLoading(false, pb, view);
-//
-//                    if (result.getData().getTglJanji().equals(LocalDate.now().toString())) {
-//                        view.setEnabled(true);
-//
-//                        if (result.getData().getIdStatus() == BELUM_DIMULAI) {
-//                            view.setText(itemView.getResources().getString(R.string.add_to_queue));
-//                        } else if (result.getData().getIdStatus() == MENUNGGU_DIANTRIAN) {
-//                            if ((getTime(startHour).isBefore(LocalTime.now())) &&
-//                                    (getTime(endHour).isAfter(LocalTime.now()))) {
-//                                boolean isLiveChat = false;
-//                                for (AppointmentModel model: appointmentModels) {
-//                                    if (model.getIdStatus() == SEDANG_BERLANSUNG) {
-//                                        isLiveChat = true;
-//                                        break;
-//                                    }
-//                                }
-//                                if (!isLiveChat) {
-//                                    view.setText(itemView.getResources().getString(R.string.chat_now));
-//                                } else {
-//                                    view.setText(itemView.getResources().getString(R.string.remove_to_queue));
-//                                }
-//                            } else {
-//                                view.setText(itemView.getResources().getString(R.string.remove_to_queue));
-//                            }
-//                        } else if (result.getData().getIdStatus() == SEDANG_BERLANSUNG) {
-//                            view.setText(itemView.getResources().getString(R.string.chat_now));
-//                        }
-//                    } else {
-//                        view.setEnabled(false);
-//                    }
-//
-//                    view.setOnClickListener(v -> {
-//                        if (result.getData().getTglJanji().equals(LocalDate.now().toString())) {
-//                            switch (result.getData().getIdStatus()) {
-//                                case BELUM_DIMULAI:
-//                                    queueJanji(id, position,view, itemView, pb);
-//                                    isLoading(true, pb, view);
-//                                    break;
-//                                case MENUNGGU_DIANTRIAN:
-//                                    if ((getTime(startHour).isBefore(LocalTime.now())) &&
-//                                            (getTime(endHour).isAfter(LocalTime.now()))) {
-//                                        boolean isLiveChat = false;
-//                                        for (AppointmentModel model: appointmentModels) {
-//                                            if (model.getIdStatus() == SEDANG_BERLANSUNG) {
-//                                                isLiveChat = true;
-//                                                break;
-//                                            }
-//                                        }
-//                                        if (!isLiveChat) {
-//
-//                                        } else {
-//                                            dequeueJanji(id, position, view, itemView, pb);
-//                                            isLoading(true, pb, view);
-//                                        }
-//                                    } else {
-//                                        dequeueJanji(id, position, view, itemView, pb);
-//                                        isLoading(true, pb, view);
-//                                    }
-//                                    break;
-//                                case SEDANG_BERLANSUNG:
-//                                    break;
-//                            }
-//                        }
-//                    });
-//                });
-//            }
-//
-//            @Override
-//            public void onError(Throwable t) {
-//                Log.d(TAG, "Error");
-//                isLoading(false, pb, view);
-//            }
-//
-//            @Override
-//            public void onNoConnection() {
-//                Log.d(TAG, "No Connection");
-//                isLoading(false, pb, view);
-//            }
-//
-//            @Override
-//            public void onServerBroken() {
-//                Log.d(TAG, "Server Broken");
-//                isLoading(false, pb, view);
-//            }
-//        });
-//    }
-
-//    private void queueJanji(String id, int position, Button view, View itemView, ProgressBar pb) {
-//        controller.getJanjiQueue(id, new BaseCallback<BaseResponse>() {
-//            @Override
-//            public void onSuccess(BaseResponse result) {
-//                if (result.getSuccess()) {
-//                    setBtnState(id, position, view, itemView, pb);
-//                }
-//            }
-//
-//            @Override
-//            public void onError(Throwable t) {
-//                Log.d(TAG, "Error");
-//            }
-//
-//            @Override
-//            public void onNoConnection() {
-//                Log.d(TAG, "No Connection");
-//            }
-//
-//            @Override
-//            public void onServerBroken() {
-//                Log.d(TAG, "Server Broken");
-//            }
-//        });
-//    }
-
-//    private void dequeueJanji(String id, int position, Button view, View itemView, ProgressBar pb) {
-//        controller.getJanjiDequeue(id, new BaseCallback<BaseResponse>() {
-//            @Override
-//            public void onSuccess(BaseResponse result) {
-//                if (result.getSuccess()) {
-//                    setBtnState(id, position, view, itemView, pb);
-//                }
-//            }
-//
-//            @Override
-//            public void onError(Throwable t) {
-//                Log.d(TAG, "Error");
-//            }
-//
-//            @Override
-//            public void onNoConnection() {
-//                Log.d(TAG, "No Connection");
-//            }
-//
-//            @Override
-//            public void onServerBroken() {
-//                Log.d(TAG, "Server Broken");
-//            }
-//        });
-//    }
 
     private void searchJadwal() {
         for (UserModel.Jadwal jadwal : ((UserModel) getData(DATA_USER)).getJadwal()) {
@@ -327,6 +234,7 @@ public class ScheduleDayDoctorAdapter extends RecyclerView.Adapter<ScheduleDayDo
     public interface OnItemClickCallback {
         void onItemClick(AppointmentModel model, ProgressBar pb, Button btn, int position);
     }
+
 
 }
 

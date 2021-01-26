@@ -3,6 +3,7 @@ package com.example.medtek.network.response;
 import com.example.medtek.network.base.BaseResponse;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GetConversationResponse extends BaseResponse {
@@ -18,7 +19,7 @@ public class GetConversationResponse extends BaseResponse {
         private final int idConversation = 0;
 
         @SerializedName("chat")
-        private List<ChatModel> chats;
+        private final List<ChatModel> chats = new ArrayList<>();
 
         @SerializedName("created_at")
         private final String createdAt = "";

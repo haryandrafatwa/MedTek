@@ -1,5 +1,10 @@
 package com.example.medtek.network;
 
+import com.example.medtek.BuildConfig;
+import com.example.medtek.constant.APPConstant;
+
+import java.util.concurrent.TimeUnit;
+
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -8,15 +13,15 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient {
 
-    public static final String BASE_URL = "http://10.0.2.2:8000";
-    public static final String BASE_SOCKET_URL = "http://10.0.2.2:6001";
+    public static final String BASE_URL = BuildConfig.BASE_URL;
+    public static final String BASE_SOCKET_URL = BuildConfig.BASE_URL + ":6001";
 
-    private static final String BASE_URL_API = "http://10.0.2.2:8000/api/";
+    private static final String BASE_URL_API = BuildConfig.BASE_URL + "/api/";
     private static RetrofitClient mInstace;
     private final Retrofit retrofit;
 
     private RetrofitClient(){
-        retrofit = new Retrofit.Builder().baseUrl(BASE_URL_API).addConverterFactory(GsonConverterFactory.create()).build();
+        retrofit = new Retrofit.Builder().baseUrl(BASE_URL_API).addConverterFactory(GsonConverterFactory.create()).client(okHttpClient()).build();
     }
 
     private static OkHttpClient okHttpClient() {
@@ -38,8 +43,9 @@ public class RetrofitClient {
 //                    Request request = chain.request().newBuilder().addHeader("Connection", "close").build();
 //                    return chain.proceed(request);
 //                })
-//                .connectTimeout(APPConstant.API_TIMEOUT, TimeUnit.MINUTES)
-//                .readTimeout(APPConstant.API_TIMEOUT, TimeUnit.MINUTES)
+                .connectTimeout(APPConstant.API_TIMEOUT, TimeUnit.MINUTES)
+                .readTimeout(APPConstant.API_TIMEOUT, TimeUnit.MINUTES)
+                .writeTimeout(APPConstant.API_TIMEOUT, TimeUnit.MINUTES)
                 .build();
 
         return httpClient;

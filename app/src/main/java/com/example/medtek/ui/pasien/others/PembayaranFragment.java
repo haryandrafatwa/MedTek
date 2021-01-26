@@ -108,11 +108,20 @@ public class PembayaranFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 String pengirim = et_pengirim.getText().toString().trim();
-                String rekening = et_rekening_pengirim.getText().toString().trim();
+                String rekening_pengirim = et_rekening_pengirim.getText().toString().trim();
+                String penerima = et_penerima.getText().toString().trim();
+                String rekening_penerima = et_rekening_penerima.getText().toString().trim();
                 BuktiTransferFragment buktiTransferFragment = new BuktiTransferFragment();
+
+                Bundle bundle = new Bundle();
+                bundle.putInt("nominal", nominal);
+                bundle.putString("penerima", penerima);
+                bundle.putString("rekPenerima", rekening_penerima);
+                bundle.putString("pengirim", pengirim);
+                bundle.putString("rekPengirim", rekening_pengirim);
+
                 buktiTransferFragment.setArguments(bundle);
                 setFragment(buktiTransferFragment);
-
             }
         });
 

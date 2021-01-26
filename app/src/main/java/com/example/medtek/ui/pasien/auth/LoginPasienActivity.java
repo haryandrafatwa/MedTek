@@ -30,6 +30,7 @@ import com.example.medtek.controller.LoginController;
 import com.example.medtek.model.ImageModel;
 import com.example.medtek.model.state.ApplyStateType;
 import com.example.medtek.network.RetrofitClient;
+import com.example.medtek.network.request.LoginRequest;
 import com.example.medtek.network.response.AuthTokenResponse;
 import com.example.medtek.network.response.GetUserResponse;
 import com.example.medtek.ui.activity.MainActivity;
@@ -98,7 +99,8 @@ public class LoginPasienActivity extends AppCompatActivity {
                         Toasty.error(LoginPasienActivity.this,getResources().getString(R.string.formatemail),Toasty.LENGTH_LONG).show();
                         btn_clone.setVisibility(View.GONE);
                     }else{
-                        Call<ResponseBody> call = RetrofitClient.getInstance().getApi().login(str_em,str_pw);
+                        LoginRequest request = new LoginRequest(str_em, str_pw);
+                        Call<ResponseBody> call = RetrofitClient.getInstance().getApi().login(request);
                         call.enqueue(new Callback<ResponseBody>() {
                             @Override
                             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -132,6 +134,7 @@ public class LoginPasienActivity extends AppCompatActivity {
 
                             @Override
                             public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                Log.d("errorLogin", t.getMessage());
                                 Toasty.error(LoginPasienActivity.this,t.getMessage()).show();
                             }
                         });
@@ -274,6 +277,8 @@ public class LoginPasienActivity extends AppCompatActivity {
         controller.getUser(response.getAccessToken(), loading, new BaseCallback<GetUserResponse>() {
             @Override
             public void onSuccess(GetUserResponse result) {
+                Log.d(TAG(LoginPasienActivity.class), "checkData :" + result.getEmail());
+                Log.d(TAG(LoginPasienActivity.class), "checkData :" + result.getName());
                 setDataLogin(response, LOGIN_PASIEN);
                 List<ImageModel> imageModelList = new ArrayList<>();
                 if (result.getImage().size() > 0) {

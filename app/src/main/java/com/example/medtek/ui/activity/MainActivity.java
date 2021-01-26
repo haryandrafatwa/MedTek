@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentManager;
 import com.example.medtek.R;
 import com.example.medtek.callback.BaseCallback;
 import com.example.medtek.controller.AppointmentController;
+import com.example.medtek.controller.ConversationController;
 import com.example.medtek.controller.LoginController;
 import com.example.medtek.controller.UserController;
 import com.example.medtek.model.AppointmentModel;
@@ -22,7 +23,10 @@ import com.example.medtek.model.ImageModel;
 import com.example.medtek.model.ScheduleDoctorModel;
 import com.example.medtek.model.UserModel;
 import com.example.medtek.model.state.ApplyStateType;
+import com.example.medtek.model.state.ChatType;
 import com.example.medtek.network.response.AuthTokenResponse;
+import com.example.medtek.network.response.GetConversationListResponse;
+import com.example.medtek.network.response.GetConversationResponse;
 import com.example.medtek.network.response.GetInfoUserResponse;
 import com.example.medtek.network.response.GetJanjiListResponse;
 import com.example.medtek.ui.fragment.ChatFragment;
@@ -34,6 +38,7 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.example.medtek.constant.APPConstant.ERROR_NULL;
 import static com.example.medtek.constant.APPConstant.IMAGE_AVATAR;
@@ -53,7 +58,9 @@ import static com.example.medtek.utils.PropertyUtil.setData;
 import static com.example.medtek.utils.PropertyUtil.setDataLogin;
 import static com.example.medtek.utils.Utils.TAG;
 import static com.example.medtek.utils.Utils.getDateTime;
+import static com.example.medtek.utils.Utils.getPermissionStorageAndLocationList;
 import static com.example.medtek.utils.Utils.isPatient;
+import static com.example.medtek.utils.Utils.requestPermissionCompat;
 import static com.example.medtek.utils.Utils.showToastyError;
 import static com.orhanobut.hawk.Hawk.deleteAll;
 import static java.lang.String.valueOf;
@@ -61,6 +68,7 @@ import static java.lang.String.valueOf;
 public class MainActivity extends AppCompatActivity {
 
     public static final String BUNDLE_ALREADY_LOGIN = "bundle_has_login";
+    private static final int PERMISSION_STORAGE = 7669;
 
     ChipNavigationBar chipNavigationBar;
     FragmentManager fragmentManager;
@@ -71,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
     LoginController loginController;
     public AppointmentController appointmentController;
     public UserController userController;
+    public ConversationController conversationController;
     ChatFragment chatFragment;
 
     private final ArrayList<ScheduleDoctorModel> scheduleModels = new ArrayList<>();
@@ -96,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_main);
         chipNavigationBar = findViewById(R.id.bottomBar);
+        requestPermissionCompat(this, getPermissionStorageAndLocationList(), PERMISSION_STORAGE);
         loadData(MainActivity.this);
         initBottomNavBar(savedInstanceState);
         init();
@@ -104,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
     private void init() {
         appointmentController = new AppointmentController();
         userController = new UserController();
+        conversationController = new ConversationController();
     }
 
     private void initBottomNavBar(Bundle savedInstanceState) {
@@ -192,6 +203,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean shouldLogin() {
+        Log.d(TAG(MainActivity.class), valueOf(getApplicationState()));
         if (!searchData(LOGIN_STATUS) || !((boolean) getData(LOGIN_STATUS)) || !searchData(ACCESS_TOKEN)) {
             navigateWelcome();
             return true;
@@ -219,6 +231,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean isTokenExpired() {
+        Log.d(TAG(MainActivity.class),"expired: " + (String) getData(EXPIRED_TOKEN));
         DateTime tokenDateExpired = getDateTime((String) getData(EXPIRED_TOKEN));
         if (tokenDateExpired.isAfterNow()) {
             LocalTime currentTime = LocalTime.now();
@@ -282,10 +295,9 @@ public class MainActivity extends AppCompatActivity {
         appointmentController.getJanjiList(new BaseCallback<GetJanjiListResponse>() {
             @Override
             public void onSuccess(GetJanjiListResponse result) {
-                if (result.getData().size() > 0) {
-                    chatFragment.addDataSchedule(result.getData());
-                }
-//                getDataHistoryChats(result.getData());
+                List<AppointmentModel> appointmentModels = new ArrayList<>(result.getData());
+                getDataHistoryChats(appointmentModels);
+                chatFragment.addDataSchedule(result.getData());
             }
 
             @Override
@@ -306,77 +318,127 @@ public class MainActivity extends AppCompatActivity {
                 showToastyError(MainActivity.this, SERVER_BROKEN);
             }
         });
-
     }
 
-    public void getDataHistoryChats() {
+    public void getDataHistoryChats(List<AppointmentModel> janjiListResponses) {
         if (chatsModels.size() > 0) {
             chatsModels.clear();
         }
-//        if (janjiListResponses.size() > 0) {
-//            for (AppointmentModel model : janjiListResponses) {
-//                for (AppointmentModel.Transaksi transaksi : model.getTransaksi()) {
-//                    if (transaksi.getIdType() == APPConstant.PAYMENT_JANJI && transaksi.isPaid() && model.getIdStatus() > 3) {
-//                        int idSender = isPatient() ? model.getIdDokter() : model.getIdPasien();
-//
-//                        String imagePath = null;
-//                        if (isPatient()) {
-//                            for (ImageModel modelImage : model.getDokter().getImage()) {
-//                                if (modelImage.getTypeId() == IMAGE_AVATAR) {
-//                                    imagePath = modelImage.getPath();
-//                                }
-//                            }
-//                        } else {
-//                            for (ImageModel modelImage : model.getPasien().getImage()) {
-//                                if (modelImage.getTypeId() == IMAGE_AVATAR) {
-//                                    imagePath = modelImage.getPath();
-//                                }
-//                            }
-//                        }
-//
-//                        chatsModels.add(new ChatsModel(
-//                                model.getIdConversation(),
-//                                model.getIdJanji(),
-//                                isPatient() ? model.getDokter().getName() : model.getPasien().getName(),
-//                                idSender,
-//                                model.getUpdatedAt(),
-//                                imagePath));
-//                        break;
-//                    }
-//                }
-//            }
-//            for (ChatsModel model: chatsModels) {
-//                conversationController.getConversation(model.getIdConversation(), new BaseCallback<GetConversationResponse>() {
-//                    @Override
-//                    public void onSuccess(GetConversationResponse result) {
-//                        for (GetConversationResponse.Conversation.ChatModel chatModel : result.getData().getChats()) {
-//                            model.getChats().add(new ChatsModel.Chat(
-//                                    chatModel.getIdChat(),
-//                                    chatModel.getIdSender(),
-//                                    (chatModel.getIdSender() == model.getIdSender()) ? ((UserModel) getData(DATA_USER)).getIdUser() : model.getIdSender(),
-//
-//                            ))
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable t) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onNoConnection() {
-//
-//                    }
-//
-//                    @Override
-//                    public void onServerBroken() {
-//
-//                    }
-//                });
-//            }
-//
-//        }
+        conversationController.getConversationList(new BaseCallback<GetConversationListResponse>() {
+            @Override
+            public void onSuccess(GetConversationListResponse result) {
+                if (result.getData().size() > 0) {
+                    int sizeConversationList = result.getData().size();
+                    final int[] countGetConversation = {0};
+                    for (GetConversationListResponse.ConversationList conversationList : result.getData()) {
+                        conversationController.getConversation(conversationList.getIdConversationList(), new BaseCallback<GetConversationResponse>() {
+                            @Override
+                            public void onSuccess(GetConversationResponse result) {
+                                countGetConversation[0]++;
+                                ArrayList<ChatsModel.Chat> chats = new ArrayList<>();
+
+                                if (result.getData().getChats().size() > 0) {
+                                    int idSender = 0;
+                                    String senderAvatar = "";
+                                    String senderName = "";
+
+                                    for (AppointmentModel janjiList: janjiListResponses) {
+                                        if (janjiList.getIdConversation() == conversationList.getIdConversationList()) {
+                                            if (isPatient()) {
+                                                idSender = janjiList.getIdDokter();
+                                                if (janjiList.getDokter().getImage().size() > 0) {
+                                                    for (ImageModel model : janjiList.getDokter().getImage()) {
+                                                        if (model.getTypeId() == IMAGE_AVATAR) {
+                                                            senderAvatar = model.getPath();
+                                                        }
+                                                    }
+                                                }
+                                                senderName = janjiList.getDokter().getName();
+                                            } else {
+                                                idSender = janjiList.getIdPasien();
+                                                if (janjiList.getPasien().getImage().size() > 0) {
+                                                    for (ImageModel model : janjiList.getPasien().getImage()) {
+                                                        if (model.getTypeId() == IMAGE_AVATAR) {
+                                                            senderAvatar = model.getPath();
+                                                        }
+                                                    }
+                                                }
+                                                senderName = janjiList.getPasien().getName();
+                                            }
+                                        }
+                                    }
+                                    for (GetConversationResponse.Conversation.ChatModel chatModel : result.getData().getChats()) {
+                                        chats.add(new ChatsModel.Chat(
+                                                chatModel.getIdChat(),
+                                                chatModel.getIdSender(),
+                                                (chatModel.getIdSender() == ((UserModel) getData(DATA_USER)).getIdUser()) ? idSender : ((UserModel) getData(DATA_USER)).getIdUser(),
+                                                chatModel.getCreatedAt(),
+                                                chatModel.isRead(),
+                                                getTypeText(chatModel.getAttachment(), chatModel.getMessage()),
+                                                getMessageText(chatModel.getMessage(), chatModel.getAttachment())
+                                        ));
+                                    }
+
+                                    ChatsModel chatsModel = new ChatsModel(conversationList.getIdConversationList(), chats);
+                                    chatsModel.setIdSender(idSender);
+                                    chatsModel.setSenderName(senderName);
+                                    chatsModel.setSenderAvatar(senderAvatar);
+                                    chatsModel.setFinishedAt(conversationList.getUpdatedAt());
+
+                                    chatsModels.add(chatsModel);
+                                }
+                                Log.d(TAG(MainActivity.class), "finalI: " + countGetConversation[0]);
+                                Log.d(TAG(MainActivity.class), "sizeConversationList: " + sizeConversationList);
+                                if (countGetConversation[0] == sizeConversationList) {
+                                    chatFragment.addDataHistoryChats(chatsModels);
+                                }
+                            }
+
+                            @Override
+                            public void onError(Throwable t) {
+                                Log.d(TAG(MainActivity.class), t.getMessage());
+                                showToastyError(MainActivity.this, ERROR_NULL);
+                            }
+
+
+                            @Override
+                            public void onNoConnection() {
+                                Log.d(TAG(MainActivity.class), "No Connection");
+                                showToastyError(MainActivity.this, NO_CONNECTION);
+                            }
+
+                            @Override
+                            public void onServerBroken() {
+                                Log.d(TAG(MainActivity.class), "Server Broken");
+                                showToastyError(MainActivity.this, SERVER_BROKEN);
+                            }
+                        });
+                    }
+                } else {
+                    chatFragment.addDataHistoryChats(chatsModels);
+                }
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                Log.d(TAG(MainActivity.class), t.getMessage());
+                showToastyError(MainActivity.this, ERROR_NULL);
+            }
+
+
+            @Override
+            public void onNoConnection() {
+                Log.d(TAG(MainActivity.class), "No Connection");
+                showToastyError(MainActivity.this, NO_CONNECTION);
+            }
+
+            @Override
+            public void onServerBroken() {
+                Log.d(TAG(MainActivity.class), "Server Broken");
+                showToastyError(MainActivity.this, SERVER_BROKEN);
+            }
+        });
+
 //        Cursor cursorConversation = medtekHelper.queryAll(DatabaseContract.ConversationHistoryColumns.TABLE_NAME,
 //                DatabaseContract.ConversationHistoryColumns._ID);
 //        chatsModels = MappingHelper.mapCursorToListConversation(cursorConversation);
@@ -393,7 +455,30 @@ public class MainActivity extends AppCompatActivity {
 //        chats.add(new ChatsModel.Chat(3, 3, 4, "16:32", false, ChatType.TEXT, "Setiap kapan yah? dan sejak kapan itu terjadi? Apakah anda juga merasa sakit pada bagian dada?"));
 //        chatsModels.add(new ChatsModel(1, chats));
 
-        chatFragment.addDataHistoryChats(chatsModels);
+    }
+
+    private ChatType getTypeText(String attachment, String message) {
+        if (attachment != null) {
+            switch (message) {
+                case "image":
+                default:
+                    return ChatType.IMAGE;
+                case "video":
+                    return ChatType.VIDEO;
+                case "file":
+                    return ChatType.FILE;
+            }
+        } else {
+            return ChatType.TEXT;
+        }
+    }
+
+    private String getMessageText(String message, String attachment) {
+        if (attachment == null) {
+            return message;
+        } else {
+            return attachment;
+        }
     }
 
     public void getDoctorProfileSchedule(ArrayList<AppointmentModel> models) {
@@ -412,7 +497,7 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onError(Throwable t) {
-                    Log.d(TAG(MainActivity.class), "Error");
+                    Log.d(TAG(MainActivity.class), t.getMessage());
                     showToastyError(MainActivity.this, ERROR_NULL);
                 }
 
@@ -434,6 +519,7 @@ public class MainActivity extends AppCompatActivity {
     public void getPatientProfileSchedule(ArrayList<AppointmentModel> models) {
         for (int i = 0; i < models.size(); i++) {
             int position = i;
+            Log.d(TAG(MainActivity.class), "idPasienSchedule: " + models.get(position).getIdPasien());
             userController.getPasien(valueOf(models.get(position).getIdPasien()), new BaseCallback<GetInfoUserResponse>() {
                 @Override
                 public void onSuccess(GetInfoUserResponse result) {
@@ -449,7 +535,7 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onError(Throwable t) {
-                    Log.d(TAG(MainActivity.class), "Error");
+                    Log.d(TAG(MainActivity.class), t.getMessage());
                     showToastyError(MainActivity.this, ERROR_NULL);
                 }
 
@@ -496,7 +582,7 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onError(Throwable t) {
-                    Log.d(TAG(MainActivity.class), "Error");
+                    Log.d(TAG(MainActivity.class), t.getMessage());
                     showToastyError(MainActivity.this, ERROR_NULL);
                 }
 
@@ -524,6 +610,8 @@ public class MainActivity extends AppCompatActivity {
                     idSender = chat.getIdSender();
                 }
             }
+
+            Log.d(TAG(MainActivity.class), "idPasienChat: " + idSender);
             userController.getPasien(valueOf(idSender), new BaseCallback<GetInfoUserResponse>() {
                 @Override
                 public void onSuccess(GetInfoUserResponse result) {
@@ -543,7 +631,7 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onError(Throwable t) {
-                    Log.d(TAG(MainActivity.class), "Error");
+                    Log.d(TAG(MainActivity.class), t.getMessage());
                     showToastyError(MainActivity.this, ERROR_NULL);
                 }
 

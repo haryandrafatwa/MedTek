@@ -1,7 +1,7 @@
 package com.example.medtek.utils;
 
 import android.content.Context;
-import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -21,6 +21,7 @@ import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Response;
 
+import static com.example.medtek.utils.Utils.getFileMimeType;
 import static java.lang.String.valueOf;
 
 public class WorkerUtil extends Worker {
@@ -79,14 +80,29 @@ public class WorkerUtil extends Worker {
 
         File fileOriginal = new File(path);
 
-        final String[] uriType = {""};
-        MediaScannerConnection.scanFile(context, new String[]{fileOriginal.getAbsolutePath()}, null, ((pathUri, uri) -> {
-            Log.i(TAG, uri.toString());
-            uriType[0] = context.getContentResolver().getType(uri);
-        }));
+//        String[] uriType = {""};
+//        MediaScannerConnection.scanFile(context, new String[]{fileOriginal.getAbsolutePath()}, null, ((pathUri, uri) -> {
+//            Log.i(TAG, uri.toString());
+////            uriType[0] = context.getContentResolver().getType(uri);
+//
+//            if (ContentResolver.SCHEME_CONTENT.equals(uri.getScheme())) {
+//                ContentResolver cr = context.getContentResolver();
+//                uriType[0] = cr.getType(uri);
+//            } else {
+//                String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uri
+//                        .toString());
+//                uriType[0] = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+//                        fileExtension.toLowerCase());
+//            }
+//
+//        }));
+
+        String mimeType = getFileMimeType(Uri.fromFile(fileOriginal));
+
+        Log.d(TAG, "uriType: " + mimeType);
 
         RequestBody attachment = RequestBody.create(
-                MediaType.parse(uriType[0]),
+                MediaType.parse(mimeType),
                 fileOriginal);
 
         MultipartBody.Part attachmentSent = MultipartBody.Part.createFormData("attachment", fileOriginal.getName(), attachment);

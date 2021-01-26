@@ -27,6 +27,8 @@ public class APIConstant {
 
     public static final String GET_CONVERSATION = "/api/conversation/{id}";
 
+    public static final String GET_CONVERSATION_LIST = "/api/conversation";
+
     //POST
     public static final String POST_LOGIN = "/api/login";
 

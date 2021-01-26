@@ -139,7 +139,7 @@ dependencies {
     implementation 'com.wdullaer:materialdatetimepicker:4.2.3'
 
     implementation 'com.pusher:pusher-java-client:2.2.1'
-    implementation 'com.github.MrBin99:LaravelEchoAndroid:1.03'
+    implementation 'com.github.MrBin99:LaravelEchoAndroid:1.04'
     implementation 'com.github.ar-android:AndroidSvgLoader:1.0.2'
     implementation ('io.socket:socket.io-client:1.0.0') {
         // excluding org.json which is provided by Android

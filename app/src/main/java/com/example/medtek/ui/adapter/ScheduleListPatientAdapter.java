@@ -2,6 +2,7 @@ package com.example.medtek.ui.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 import static com.example.medtek.BuildConfig.BASE_URL;
 import static com.example.medtek.constant.APPConstant.IMAGE_AVATAR;
+import static com.example.medtek.utils.Utils.TAG;
 import static com.example.medtek.utils.Utils.changeDatePattern;
 import static com.example.medtek.utils.Utils.timeToHour;
 
@@ -101,6 +103,7 @@ public class ScheduleListPatientAdapter extends RecyclerView.Adapter<ScheduleLis
             holder.tvDoctorName.setText(model.getDokter().getName());
             holder.tvDoctorSpecialist.setText(model.getDokter().getSpecialization().getSpecialization());
             holder.tvDateSchedule.setText(changeDatePattern(model.getTglJanji()));
+            Log.d(TAG(ScheduleListPatientAdapter.class), "starthour : " + model.getJadwal().getStartHour());
             holder.tvTimeSchedule.setText(timeToHour(model.getJadwal().getStartHour()) + " - " + timeToHour(model.getJadwal().getEndHour()));
         });
     }

@@ -52,6 +52,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 
 import java.util.ArrayList;
@@ -63,7 +64,6 @@ import java.util.List;
 import static com.example.medtek.App.ID_CHANNEL_MESSAGE;
 import static com.example.medtek.constant.APPConstant.ERROR_NULL;
 import static com.example.medtek.constant.APPConstant.IMAGE_AVATAR;
-import static com.example.medtek.constant.APPConstant.LOGIN_PASIEN;
 import static com.example.medtek.constant.APPConstant.MESSAGE_REQUEST_VIDEO_CALL;
 import static com.example.medtek.constant.APPConstant.MESSAGE_REQUEST_VOICE_CALL;
 import static com.example.medtek.constant.APPConstant.NO_CONNECTION;
@@ -78,6 +78,7 @@ import static com.example.medtek.utils.RecyclerViewUtil.recyclerLinear;
 import static com.example.medtek.utils.Utils.TAG;
 import static com.example.medtek.utils.Utils.dateTimeToStringHour;
 import static com.example.medtek.utils.Utils.getDate;
+import static com.example.medtek.utils.Utils.getDateTime;
 import static com.example.medtek.utils.Utils.isPatient;
 import static com.example.medtek.utils.Utils.showToastyError;
 import static com.example.medtek.utils.WidgetUtil.showNotification;
@@ -131,8 +132,8 @@ public class ChatFragment extends BaseFragment {
     protected void setupView() {
         scheduleListPatientAdapter = new ScheduleListPatientAdapter(getContext());
         scheduleListDoctorAdapter = new ScheduleListDoctorAdapter(getContext());
-        chatsHistoryAdapter = new ChatsListAdapter(getContext());
-        chatsActiveAdapter = new ChatsListAdapter(getContext());
+        chatsHistoryAdapter = new ChatsListAdapter(getContext(), false);
+        chatsActiveAdapter = new ChatsListAdapter(getContext(), true);
         doStart();
         setMakeSchedule();
         binding.rlSearch.setOnClickListener(v -> {
@@ -142,10 +143,30 @@ public class ChatFragment extends BaseFragment {
     }
 
     public void setupDataRVChats(ArrayList<ChatsModel> chatsModels) {
-        sizeOfChatsNow++;
-        if (sizeOfChatsNow >= sizeOfChats) {
-            this.chatsModels = chatsModels;
-            if (binding != null) {
+//        sizeOfChatsNow++;
+//        if (sizeOfChatsNow >= sizeOfChats) {
+//
+//        }
+        Log.d(TAG, "setupDataRVChats");
+        this.chatsModels = chatsModels;
+        if (binding != null) {
+            App.getInstance().runOnUiThread(() -> {
+                if (searchData(ACTIVE_CHAT)) {
+                    ChatsModel activeChatsModel = (ChatsModel) getData(ACTIVE_CHAT);
+                    for (ChatsModel model: chatsModels) {
+                        if (model.getIdConversation() == activeChatsModel.getIdConversation()) {
+                            chatsModels.remove(model);
+                            break;
+                        }
+                    }
+                }
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        chatsModels.sort((o1, o2) -> getDateTime(o2.getFinishedAt(), DateTimeZone.UTC).compareTo(getDateTime(o1.getFinishedAt(), DateTimeZone.UTC)));
+                    } else {
+                        Collections.sort(chatsModels, (o1, o2) -> getDateTime(o2.getFinishedAt(), DateTimeZone.UTC).compareTo(getDateTime(o1.getFinishedAt(), DateTimeZone.UTC)));
+                    }
+
                 chatsHistoryAdapter.setChatsList(chatsModels);
                 if (chatsModels.size() > 0) {
                     recyclerLinear(binding.rvChatHistory, LinearLayoutManager.VERTICAL, chatsHistoryAdapter);
@@ -158,7 +179,7 @@ public class ChatFragment extends BaseFragment {
                 }
                 isChatsDone = true;
                 isLoading();
-            }
+            });
         }
     }
 
@@ -187,6 +208,8 @@ public class ChatFragment extends BaseFragment {
 
     public void setupDataRVSchedulePatient(ArrayList<AppointmentModel> appointmentModels) {
         sizeOfAppointmentNow++;
+        Log.d(TAG, "sizeOfAppointment: " + sizeOfAppointment);
+        Log.d(TAG, "sizeOfAppointmentNow: " + sizeOfAppointmentNow);
         if (sizeOfAppointmentNow >= sizeOfAppointment) {
             this.appointmentModels = appointmentModels;
             if (binding != null) {
@@ -266,46 +289,69 @@ public class ChatFragment extends BaseFragment {
     }
 
     public void addDataSchedule(List<AppointmentModel> janjiListResponses) {
-        for (Iterator<AppointmentModel> iterator = janjiListResponses.iterator(); iterator.hasNext(); ) {
-            AppointmentModel value = iterator.next();
-            if (getDate(value.getTglJanji()).isBeforeNow()) {
-                if (!getDate(value.getTglJanji()).toLocalDate().isEqual(LocalDate.now())) {
-                    iterator.remove();
-                }
-            }
-        }
         if (janjiListResponses.size() > 0) {
-            boolean isNoEmpty = false;
-            for (AppointmentModel model : janjiListResponses) {
-                for (AppointmentModel.Transaksi transaksi : model.getTransaksi()) {
-                    if (transaksi.getIdType() == APPConstant.PAYMENT_JANJI && transaksi.isPaid() && model.getIdStatus() <= 3) {
-                        isNoEmpty = true;
-                        break;
+            for (Iterator<AppointmentModel> iterator = janjiListResponses.iterator(); iterator.hasNext(); ) {
+                AppointmentModel value = iterator.next();
+                if (getDate(value.getTglJanji()).isBeforeNow()) {
+                    if (!getDate(value.getTglJanji()).toLocalDate().isEqual(LocalDate.now())) {
+                        iterator.remove();
                     }
                 }
             }
-            if (isNoEmpty) {
-                ArrayList<AppointmentModel> appointmentModels = new ArrayList<>();
+            if (janjiListResponses.size() > 0) {
+                boolean isNoEmpty = false;
                 for (AppointmentModel model : janjiListResponses) {
                     for (AppointmentModel.Transaksi transaksi : model.getTransaksi()) {
-                        if (transaksi.getIdType() == APPConstant.PAYMENT_JANJI && transaksi.isPaid() && model.getIdStatus() <= 3) {
-                            appointmentModels.add(model);
-                            if (isPatient()) {
-                                if (getDate(model.getTglJanji()).toLocalDate().isEqual(LocalDate.now())) {
-                                    Log.d(TAG, "testSocket");
-                                    SocketUtil.getInstance().listenForEventChat(model.getIdConversation(), model.getIdJanji());
-                                    SocketUtil.getInstance().setChannelVideoChat(model.getIdJanji());
+                        if (transaksi.getIdType() == APPConstant.PAYMENT_JANJI && transaksi.isPaid()) {
+                            if (model.getIdStatus() <= 3) {
+                                if (isPatient()) {
+                                    isNoEmpty = true;
+                                    break;
+                                } else {
+                                    if (model.getIdStatus() > 1) {
+                                        isNoEmpty = true;
+                                        break;
+                                    }
                                 }
                             }
-                            break;
                         }
                     }
                 }
-                sizeOfAppointment = appointmentModels.size();
-                if ((int) getData(USER_TYPE) == LOGIN_PASIEN) {
-                    getDoctorProfileSchedule(appointmentModels);
+                if (isNoEmpty) {
+                    ArrayList<AppointmentModel> appointmentModels = new ArrayList<>();
+                    for (AppointmentModel model : janjiListResponses) {
+                        for (AppointmentModel.Transaksi transaksi : model.getTransaksi()) {
+                            if (transaksi.getIdType() == APPConstant.PAYMENT_JANJI && transaksi.isPaid() && model.getIdStatus() <= 3) {
+                                if (isPatient()) {
+                                    appointmentModels.add(model);
+                                    if (getDate(model.getTglJanji()).toLocalDate().isEqual(LocalDate.now())) {
+                                        Log.d(TAG, "testSocket");
+                                        SocketUtil.getInstance().listenForEventChat(model.getIdConversation(), model.getIdJanji());
+                                        SocketUtil.getInstance().setChannelVideoChat(model.getIdJanji());
+                                    }
+                                } else {
+                                    if (model.getIdStatus() > 1) {
+                                        appointmentModels.add(model);
+                                        if (model.getIdStatus() == 3) {
+                                            SocketUtil.getInstance().listenForEventChat(model.getIdConversation(), model.getIdJanji());
+                                        }
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    sizeOfAppointment = appointmentModels.size();
+                    Log.d(TAG, "sizeOfAppointment: " + sizeOfAppointment);
+                    if (isPatient()) {
+                        getDoctorProfileSchedule(appointmentModels);
+                    } else {
+                        getPatientProfileSchedule(appointmentModels);
+                    }
                 } else {
-                    getPatientProfileSchedule(appointmentModels);
+                    isNoSchedule(true, (int) getData(USER_TYPE));
+                    isAppointmentDone = true;
+                    isLoading();
                 }
             } else {
                 isNoSchedule(true, (int) getData(USER_TYPE));
@@ -321,12 +367,10 @@ public class ChatFragment extends BaseFragment {
 
     public void addDataHistoryChats(ArrayList<ChatsModel> chatsModels) {
         sizeOfChats = chatsModels.size();
+        Log.d(TAG, "sizeOfChats: " + sizeOfChats);
         if (sizeOfChats > 0) {
-            if ((int) getData(USER_TYPE) == LOGIN_PASIEN) {
-                getDoctorProfileChats(chatsModels);
-            } else {
-                getPatientProfileChats(chatsModels);
-            }
+            Log.d(TAG, "sizeOfChats: " + sizeOfChats);
+            setupDataRVChats(chatsModels);
         } else {
             isNoChats(true);
             isChatsDone = true;
@@ -338,24 +382,12 @@ public class ChatFragment extends BaseFragment {
         ((MainActivity) getActivity()).getDataSchedule();
     }
 
-    private void getDataHistoryChats() {
-        ((MainActivity) getActivity()).getDataHistoryChats();
-    }
-
     private void getDoctorProfileSchedule(ArrayList<AppointmentModel> model) {
         ((MainActivity) getActivity()).getDoctorProfileSchedule(model);
     }
 
     private void getPatientProfileSchedule(ArrayList<AppointmentModel> model) {
         ((MainActivity) getActivity()).getPatientProfileSchedule(model);
-    }
-
-    private void getDoctorProfileChats(ArrayList<ChatsModel> model) {
-        ((MainActivity) getActivity()).getDoctorProfileChats(model);
-    }
-
-    private void getPatientProfileChats(ArrayList<ChatsModel> model) {
-        ((MainActivity) getActivity()).getPatientProfileChats(model);
     }
 
     public void navigateToChatRoom(ChatsModel model) {
@@ -610,7 +642,6 @@ public class ChatFragment extends BaseFragment {
         initState();
         isLoading();
         binding.swipeRefresh.setRefreshing(false);
-        getDataHistoryChats();
         getDataSchedule();
         if (searchData(ACTIVE_CHAT)) {
             setupDataRVActiveChats();

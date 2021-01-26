@@ -1,6 +1,7 @@
 package com.example.medtek.ui.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import com.example.medtek.model.ChatsModel;
 import com.example.medtek.model.state.ChatType;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,12 +30,16 @@ import static com.example.medtek.BuildConfig.BASE_URL;
 import static com.example.medtek.constant.APPConstant.LOGIN_PASIEN;
 import static com.example.medtek.utils.PropertyUtil.USER_TYPE;
 import static com.example.medtek.utils.PropertyUtil.getData;
+import static com.example.medtek.utils.Utils.changeDatePatternSlash;
+import static com.example.medtek.utils.Utils.dateTimeToStringDate;
 import static com.example.medtek.utils.Utils.dateTimeToStringHour;
+import static com.example.medtek.utils.Utils.getDateTime;
 
 public class ChatsListAdapter extends RecyclerView.Adapter<ChatsListAdapter.ViewHolder> implements Filterable {
     private static final String TAG = ChatsListAdapter.class.getSimpleName();
 
     private final Context mContext;
+    private final boolean isActive;
     private final ArrayList<ChatsModel> mChatsList;
     private ArrayList<ChatsModel> mChatsListFull;
     private ChatsListAdapter.OnItemClickCallback onItemClickCallback;
@@ -72,9 +78,10 @@ public class ChatsListAdapter extends RecyclerView.Adapter<ChatsListAdapter.View
         }
     };
 
-    public ChatsListAdapter(Context mContext) {
+    public ChatsListAdapter(Context mContext, boolean isActive) {
         this.mContext = mContext;
         mChatsList = new ArrayList<>();
+        this.isActive = isActive;
     }
 
     public void addItem(ChatsModel item) {
@@ -162,7 +169,33 @@ public class ChatsListAdapter extends RecyclerView.Adapter<ChatsListAdapter.View
         }
         if (model.getChats().size() > 0) {
             ChatsModel.Chat chat = model.getChats().get(model.getChats().size() - 1);
-            holder.tvLastUpdate.setText(chat.getTime());
+
+            if (!isActive) {
+            DateTime lastUpdate = getDateTime(chat.getTime(), DateTimeZone.UTC);
+
+                String lastUpdateText = "";
+
+                if (lastUpdate.isBeforeNow()) {
+                    Log.d(TAG, "lastUpdate.toLocalDate(): " + lastUpdate.toLocalDate().toString());
+                    Log.d(TAG, "new DateTime().toLocalDate(): " + new DateTime().toLocalDate().toString());
+
+                    if (lastUpdate.toLocalDate().isEqual(new DateTime().toLocalDate())) {
+                        lastUpdateText = dateTimeToStringHour(lastUpdate);
+                    } else if (lastUpdate.toLocalDate().isEqual(new DateTime().toLocalDate().minusDays(1))) {
+                        lastUpdateText = "KEMARIN";
+                    } else {
+                        lastUpdateText = changeDatePatternSlash(dateTimeToStringDate(lastUpdate));
+                    }
+                } else {
+                    lastUpdateText = dateTimeToStringHour(lastUpdate);
+                }
+                Log.d(TAG, "Last Chat Date String: " + lastUpdateText);
+
+                holder.tvLastUpdate.setText(lastUpdateText);
+            } else {
+                holder.tvLastUpdate.setText(chat.getTime());
+            }
+
             String textLastChat = "";
             if (chat.getType() == ChatType.TEXT) {
                 textLastChat = chat.getMessage();
@@ -170,18 +203,19 @@ public class ChatsListAdapter extends RecyclerView.Adapter<ChatsListAdapter.View
                 textLastChat = chat.getType().toString();
             }
             holder.tvLastChat.setText(textLastChat);
+
+            int unseenChat = getUnseenChat(model);
+
+            if (unseenChat != 0) {
+                holder.rlUnseenChat.setVisibility(View.VISIBLE);
+                holder.tvUnseenChat.setText(String.valueOf(unseenChat));
+            } else {
+                holder.rlUnseenChat.setVisibility(View.GONE);
+            }
+
         } else {
             holder.tvLastUpdate.setText(dateTimeToStringHour(new DateTime()));
             holder.tvLastChat.setText("");
-        }
-
-        int unseenChat = getUnseenChat(model);
-
-        if (unseenChat != 0) {
-            holder.rlUnseenChat.setVisibility(View.VISIBLE);
-            holder.tvUnseenChat.setText(String.valueOf(unseenChat));
-        } else {
-            holder.rlUnseenChat.setVisibility(View.GONE);
         }
 
         if (model.getSenderAvatar().equals("")) {

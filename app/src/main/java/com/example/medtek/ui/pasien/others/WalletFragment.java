@@ -1,7 +1,6 @@
 package com.example.medtek.ui.pasien.others;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
@@ -48,7 +47,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static android.content.Context.MODE_PRIVATE;
+import static com.example.medtek.utils.PropertyUtil.ACCESS_TOKEN;
+import static com.example.medtek.utils.PropertyUtil.REFRESH_TOKEN;
+import static com.example.medtek.utils.PropertyUtil.getData;
 
 public class WalletFragment extends Fragment {
 
@@ -307,9 +308,9 @@ public class WalletFragment extends Fragment {
     }
 
     public void loadData(Context context) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-        this.access = sharedPreferences.getString("token", "");
-        this.refresh = sharedPreferences.getString("refresh_token", "");
+//        SharedPreferences sharedPreferences = context.getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+        this.access = (String) getData(ACCESS_TOKEN);
+        this.refresh = (String) getData(REFRESH_TOKEN);
     }
 
 }

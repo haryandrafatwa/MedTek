@@ -38,10 +38,14 @@ import static com.example.medtek.constant.APPConstant.PAYMENT_JANJI;
 import static com.example.medtek.constant.APPConstant.SEDANG_BERLANSUNG;
 import static com.example.medtek.constant.APPConstant.SERVER_BROKEN;
 import static com.example.medtek.constant.APPConstant.SUDAH_SELESAI;
+import static com.example.medtek.utils.PropertyUtil.ACTIVE_CHAT;
+import static com.example.medtek.utils.PropertyUtil.getData;
+import static com.example.medtek.utils.PropertyUtil.searchData;
 import static com.example.medtek.utils.Utils.TAG;
 import static com.example.medtek.utils.Utils.changeDatePattern;
 import static com.example.medtek.utils.Utils.dateTimeToString;
 import static com.example.medtek.utils.Utils.dateTimeToStringDate;
+import static com.example.medtek.utils.Utils.getDate;
 import static com.example.medtek.utils.Utils.getThousandFormat;
 import static com.example.medtek.utils.Utils.getTime;
 import static com.example.medtek.utils.Utils.showToastyError;
@@ -115,14 +119,22 @@ public class BSDSchedulePatientDetail extends BaseBottomSheetDialog {
             setBtnChatNow();
             String finalPathAvatar = pathAvatar;
             binding.btnChatNow.setOnClickListener(v -> {
-                ((ChatFragment) getParentFragment()).navigateToChatRoomWithResult(new ChatsModel(
+                ChatsModel chatsModel = new ChatsModel(
                         appointmentModel.getIdConversation(),
                         appointmentModel.getIdJanji(),
                         appointmentModel.getDokter().getName(),
                         appointmentModel.getIdDokter(),
                         dateTimeToString(new DateTime()),
-                        finalPathAvatar
-                ), ChatRoomActivity.REQ_ACTIVE_CHAT);
+                        finalPathAvatar);
+
+                if (searchData(ACTIVE_CHAT)) {
+                    ChatsModel tempChatsModel =  (ChatsModel) getData(ACTIVE_CHAT);
+                    if (tempChatsModel.getIdJanji() == appointmentModel.getIdJanji()) {
+                        chatsModel = tempChatsModel;
+                    }
+                }
+
+                ((ChatFragment) getParentFragment()).navigateToChatRoomWithResult(chatsModel, ChatRoomActivity.REQ_ACTIVE_CHAT);
                 dismiss();
             });
         }
@@ -140,11 +152,15 @@ public class BSDSchedulePatientDetail extends BaseBottomSheetDialog {
                         case PASIEN_TIDAK_DATANG:
                         case BELUM_DIMULAI:
                             binding.btnChatNow.setEnabled(false);
-                            binding.btnChatNow.setText(getResources().getString(R.string.chat_now));
+                            binding.btnChatNow.setText(getResources().getString(R.string.waiting_for_confirm));
                             break;
                         case MENUNGGU_DIANTRIAN:
+                            if ((getDate(result.getData().getTglJanji())).toLocalDate().equals(new DateTime().toLocalDate())) {
+                                binding.btnChatNow.setText(getResources().getString(R.string.waiting_for_queue));
+                            } else {
+                                binding.btnChatNow.setText(getResources().getString(R.string.waiting_for_schedule));
+                            }
                             binding.btnChatNow.setEnabled(false);
-                            binding.btnChatNow.setText(getResources().getString(R.string.waiting_for_queue));
                             break;
                         case SEDANG_BERLANSUNG:
                             binding.btnChatNow.setEnabled(true);

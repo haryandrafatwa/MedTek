@@ -20,6 +20,9 @@ import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import java.util.ArrayList;
 
 import static com.example.medtek.App.getContext;
+import static com.example.medtek.utils.PropertyUtil.ACTIVE_CHAT;
+import static com.example.medtek.utils.PropertyUtil.getData;
+import static com.example.medtek.utils.PropertyUtil.searchData;
 import static com.example.medtek.utils.RecyclerViewUtil.recyclerLinear;
 import static java.lang.String.valueOf;
 
@@ -55,7 +58,16 @@ public class SearchChatsActivity extends SingleActivity {
 
     @Override
     protected void setupView() {
-        chatsListAdapter = new ChatsListAdapter(getContext());
+        chatsListAdapter = new ChatsListAdapter(getContext(), false);
+        if (searchData(ACTIVE_CHAT)) {
+            ChatsModel activeChatsModel = (ChatsModel) getData(ACTIVE_CHAT);
+            for (ChatsModel model: chatsModels) {
+                if (model.getIdConversation() == activeChatsModel.getIdConversation()) {
+                    chatsModels.remove(model);
+                    break;
+                }
+            }
+        }
         setupDataRVChats(chatsModels);
         App.getInstance().runOnUiThread(() -> {
             binding.searchView.showSearch();

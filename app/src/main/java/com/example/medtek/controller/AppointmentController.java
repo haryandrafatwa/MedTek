@@ -32,7 +32,11 @@ public class AppointmentController extends APIService {
                 .compose(RxUtils.INSTANCE.applyApiCall())
                 .subscribe(getJanjiListResponse -> {
                     if (!getJanjiListResponse.getError()) {
-                        callback.onSuccess(getJanjiListResponse);
+                        try {
+                            callback.onSuccess(getJanjiListResponse);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     } else {
                         String msg = getJanjiListResponse.getMessage();
                         Log.e(TAG, msg);

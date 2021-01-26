@@ -34,7 +34,7 @@ public class VideoPreviewFragment extends BaseFragment {
 
     private SimpleExoPlayer player;
 
-    private boolean playWhenReady = true;
+    private boolean playWhenReady;
     private int currentWindow = 0;
     private long playbackPosition = 0;
 
@@ -61,7 +61,8 @@ public class VideoPreviewFragment extends BaseFragment {
         showImage();
         binding.tvDurationVideo.setText(getDurationVideo(mediaPath));
         binding.rlVideoPreview.setVisibility(View.VISIBLE);
-        binding.pvVideoPlay.setVisibility(View.INVISIBLE);
+        binding.pvVideoPlay.setVisibility(View.GONE);
+
         binding.rlVideoPreview.setOnClickListener(v -> {
             binding.rlVideoPreview.setVisibility(View.GONE);
             binding.pvVideoPlay.setVisibility(View.VISIBLE);
@@ -69,13 +70,16 @@ public class VideoPreviewFragment extends BaseFragment {
                 initializePlayer();
                 exoBinding.exoPlay.setVisibility(View.INVISIBLE);
                 exoBinding.exoPause.setVisibility(View.VISIBLE);
+                player.setPlayWhenReady(true);
             }
         });
+
         exoBinding.exoPlay.setOnClickListener(v -> {
             exoBinding.exoPlay.setVisibility(View.GONE);
             exoBinding.exoPause.setVisibility(View.VISIBLE);
             player.setPlayWhenReady(true);
         });
+
         exoBinding.exoPause.setOnClickListener(v -> {
             exoBinding.exoPlay.setVisibility(View.VISIBLE);
             exoBinding.exoPause.setVisibility(View.GONE);
@@ -106,14 +110,13 @@ public class VideoPreviewFragment extends BaseFragment {
         Uri uri = Uri.parse(mediaPath);
         MediaSource mediaSource = buildMediaSource(uri);
 
-        player.setPlayWhenReady(playWhenReady);
+        player.setPlayWhenReady(false);
         player.seekTo(currentWindow, playbackPosition);
         player.prepare(mediaSource, false, false);
     }
 
     private void releasePlayer() {
         if (player != null) {
-            playWhenReady = player.getPlayWhenReady();
             playbackPosition = player.getCurrentPosition();
             currentWindow = player.getCurrentWindowIndex();
             player.release();

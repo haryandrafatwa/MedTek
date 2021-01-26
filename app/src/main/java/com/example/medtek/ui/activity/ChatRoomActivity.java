@@ -6,16 +6,20 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.transition.Fade;
 import androidx.transition.Transition;
@@ -60,6 +64,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -89,18 +94,21 @@ import static com.example.medtek.utils.PropertyUtil.DATA_USER;
 import static com.example.medtek.utils.PropertyUtil.USER_TYPE;
 import static com.example.medtek.utils.PropertyUtil.deleteData;
 import static com.example.medtek.utils.PropertyUtil.getData;
+import static com.example.medtek.utils.PropertyUtil.searchData;
 import static com.example.medtek.utils.PropertyUtil.setData;
 import static com.example.medtek.utils.RecyclerViewUtil.recyclerLinear;
 import static com.example.medtek.utils.Utils.TAG;
 import static com.example.medtek.utils.Utils.copyFileDst;
 import static com.example.medtek.utils.Utils.dateTimeToStringHour;
+import static com.example.medtek.utils.Utils.getDateTime;
 import static com.example.medtek.utils.Utils.getDocumentPath;
 import static com.example.medtek.utils.Utils.getFileExt;
+import static com.example.medtek.utils.Utils.getFileInfo;
 import static com.example.medtek.utils.Utils.getFileMimeType;
 import static com.example.medtek.utils.Utils.getFileMimeTypeWithoutDot;
 import static com.example.medtek.utils.Utils.getFileName;
-import static com.example.medtek.utils.Utils.getFileSize;
 import static com.example.medtek.utils.Utils.getImagePath;
+import static com.example.medtek.utils.Utils.getPath;
 import static com.example.medtek.utils.Utils.getPermisionCameraList;
 import static com.example.medtek.utils.Utils.getVideoPath;
 import static com.example.medtek.utils.Utils.hideKeyboard;
@@ -188,7 +196,9 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
             chatsModel = getIntent().getParcelableExtra(BUNDLE_CHATS);
             isActiveChats = getIntent().getBooleanExtra(IS_ACTIVE_CHATS, false);
         }
-        setData(ACTIVE_CHAT, chatsModel);
+//        if (isActiveChats) {
+//            setData(ACTIVE_CHAT, chatsModel);
+//        }
         conversationController = new ConversationController();
         appointmentController = new AppointmentController();
         easyImage = initImagePickerGallery();
@@ -260,7 +270,7 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
             App.getInstance().runOnUiThread(() -> {
                 if (newEvent instanceof MessageModel) {
                     MessageModel newChat = (MessageModel) newEvent;
-                    Log.d(TAG, newChat.getChat().getMessage());
+                    Log.d(TAG, "fromSocket: " + newChat.getChat().getMessage());
                     if (tempIdChat.isEmpty() || newChat.getChat().getIdChat() != tempIdChat.get(tempIdChat.size() - 1)) {
                         if (newChat.getChat().getIdSender() != ((UserModel) getData(DATA_USER)).getIdUser()) {
                             tempIdChat.add(newChat.getChat().getIdChat());
@@ -274,16 +284,16 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
                                 if (newChat.getChat().getMessage().equals(ChatType.IMAGE.canonicalForm())) {
                                     Log.d(TAG, newChat.getChat().getAttachment());
 
-                                    getImageAttachment(newChat);
+                                    getImageAttachment(newChat.getChat().getAttachment(), true, -1);
 
                                 } else if (newChat.getChat().getMessage().equals(ChatType.VIDEO.canonicalForm())) {
                                     ChatType type = ChatType.VIDEO;
 
-                                    getVideoAttachment(newChat);
+                                    getVideoAttachment(newChat.getChat().getAttachment(), true, -1);
                                 } else {
                                     ChatType type = ChatType.FILE;
 
-                                    getFileAttachment(newChat);
+                                    getFileAttachment(newChat.getChat().getAttachment(), true, -1);
                                 }
                             }
                             moveToBottomRV(moveToBottomRv, 0);
@@ -313,13 +323,19 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
     @Override
     protected void setupView() {
         setupToolbar();
-        chatAdapter = new ChatAdapter(App.getContext(), this);
+        chatAdapter = new ChatAdapter(App.getContext(), this, isActiveChats);
         setSenderPict(chatsModel.getSenderAvatar());
         binding.tvSenderName.setText(chatsModel.getSenderName());
         if (chatsModel.getChats().size() > 0) {
             addMediaToDB(chatsModel);
         }
         setupDataRVChat(chatsModel);
+        if (!isActiveChats) {
+            binding.rlFieldChat.setVisibility(View.GONE);
+            binding.rlBtnChat.setVisibility(View.GONE);
+            binding.rlEndChat.setVisibility(View.GONE);
+        }
+
         chatAdapter.setOnItemClickCallback(this);
 
         binding.btnVidvoiceCall.setOnClickListener(this);
@@ -363,17 +379,41 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
     private void addMediaToDB(ChatsModel chatsModel) {
         int idMedia = 0;
         for (ChatsModel.Chat chat : chatsModel.getChats()) {
-            if (chat.getType() != ChatType.TEXT) {
-                String path = chat.getMessage();
-                MediaModel media = new MediaModel(
-                        ++idMedia,
-                        chat.getIdChat(),
-                        getFileName(path),
-                        path,
-                        getFileExt(path),
-                        chat.getType()
-                );
-                mediaModels.add(media);
+            Log.d(TAG, "type: " + chat.getType().canonicalForm());
+            Log.d(TAG, "message: " + chat.getMessage());
+
+            if (chat.getType() != ChatType.TEXT && chat.getType() != ChatType.END) {
+                String path = "";
+                File checkFile = new File(chat.getMessage());
+
+                Log.d(TAG, "checkFileExist: " + checkFile.isFile());
+                if (checkFile.isFile()) {
+                    path = chat.getMessage();
+                } else {
+                    String checkPath = getPath(chat.getType()) +
+                            getFileName(chat.getMessage());
+
+                    Log.d(TAG, "checkFileExist: " + checkPath);
+
+                    File checkFileOnMediaFolder = new File(checkPath);
+
+                    Log.d(TAG, "checkFileExist: " + checkFileOnMediaFolder.isFile());
+                    if (checkFileOnMediaFolder.isFile()) {
+                        path = checkPath;
+                    }
+                }
+
+                if (!path.isEmpty()) {
+                    MediaModel media = new MediaModel(
+                            ++idMedia,
+                            chat.getIdChat(),
+                            getFileName(path),
+                            path,
+                            getFileExt(path),
+                            chat.getType()
+                    );
+                    mediaModels.add(media);
+                }
             }
         }
     }
@@ -470,7 +510,16 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
             );
             mediaModels.add(media);
         }
-        return new ChatsModel.Chat(idNow + 1, idSender, idReceiver, time, false, type, message);
+
+        ChatsModel.Chat chat =  new ChatsModel.Chat(idNow + 1, idSender, idReceiver, time, false, type, message);
+
+        if (searchData(ACTIVE_CHAT)) {
+            ChatsModel activeChatsModel = ((ChatsModel) getData(ACTIVE_CHAT));
+            activeChatsModel.getChats().add(chat);
+            setData(ACTIVE_CHAT, activeChatsModel);
+        }
+
+        return chat;
     }
 
     private ChatsModel.Chat initDataReceiverMessage(String message, ChatType type) {
@@ -494,7 +543,16 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
             );
             mediaModels.add(media);
         }
-        return new ChatsModel.Chat(idNow + 1, idSender, idReceiver, time, false, type, message);
+
+        ChatsModel.Chat chat = new ChatsModel.Chat(idNow + 1, idSender, idReceiver, time, false, type, message);
+
+        if (searchData(ACTIVE_CHAT)) {
+            ChatsModel activeChatsModel = ((ChatsModel) getData(ACTIVE_CHAT));
+            activeChatsModel.getChats().add(chat);
+            setData(ACTIVE_CHAT, activeChatsModel);
+        }
+
+        return chat;
     }
 
     public void moveToBottomRV(Runnable runnable, int timeDelay) {
@@ -517,7 +575,7 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
         new ImagePicker.Builder(ChatRoomActivity.this)
                 .mode(ImagePicker.Mode.CAMERA)
                 .compressLevel(ImagePicker.ComperesLevel.MEDIUM)
-                .directory(Environment.getExternalStorageDirectory() +
+                .directory(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) +
                         File.separator +
                         "Medtek" +
                         File.separator +
@@ -530,7 +588,7 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
     private void initVideoPickerCamera() {
         new VideoPicker.Builder(ChatRoomActivity.this)
                 .mode(VideoPicker.Mode.CAMERA)
-                .directory(Environment.getExternalStorageDirectory() +
+                .directory(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) +
                         File.separator +
                         "Medtek" +
                         File.separator +
@@ -728,11 +786,12 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
     private void loadFilePreview() {
         if (filesPath != null && filesPath.size() > 0) {
             for (ChosenFile file : filesPath) {
+                File getFile = new File(file.getOriginalPath());
                 String fileInfo = file.getDisplayName() + ","
-                        + file.getFileExtensionFromMimeTypeWithoutDot() + ","
+                        + getFileMimeTypeWithoutDot(getFileMimeType(Uri.fromFile(getFile))) + ","
                         + file.getHumanReadableSize(false) + ","
                         + file.getOriginalPath() + ","
-                        + file.getMimeType();
+                        + getFileMimeType(Uri.fromFile(getFile));
                 if (fileInfo.length() > 0) {
                     ChatsModel.Chat chat = initDataSenderMessage(fileInfo, ChatType.FILE);
                     chatsModel.getChats().add(chat);
@@ -831,7 +890,9 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
         if (isActiveChats) {
             Intent resultIntent = new Intent();
             if (!isEndChats) {
-                setData(ACTIVE_CHAT, chatsModel);
+                if (!searchData(ACTIVE_CHAT)) {
+                    setData(ACTIVE_CHAT, chatsModel);
+                }
             }
             resultIntent.putExtra(IS_END_CHATS, isEndChats);
             setResult(Activity.RESULT_OK, resultIntent);
@@ -850,38 +911,6 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
     @Override
     public void onError(String s) {
 
-    }
-
-    @Override
-    public void onItemClick(ChatsModel.Chat model, View view, int position) {
-        switch (model.getType()) {
-            case IMAGE:
-            case VIDEO:
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                    MediaViewerActivity.navigate(ChatRoomActivity.this, mediaModels, getSenderName(model), model.getTime(), model.getIdChat());
-                } else {
-                    MediaViewerActivity.navigate(ChatRoomActivity.this, view, mediaModels, getSenderName(model), model.getTime(), model.getIdChat());
-                }
-                break;
-            case FILE:
-                String[] arrFileInfo = model.getMessage().split(",");
-                Intent intent = new Intent(Intent.ACTION_SEND);
-
-//                File file = new File(arrFileInfo[3]);
-//
-//                MediaScannerConnection.scanFile(this, new String[]{file.getAbsolutePath()}, null, ((path, uri) -> {
-//                    intent.setDataAndType(uri, arrFileInfo[4]);
-//                }));
-                Uri uri = Uri.parse(arrFileInfo[3]);
-                Log.d(TAG, uri.toString());
-                intent.putExtra(Intent.EXTRA_STREAM, uri);
-                intent.setType(arrFileInfo[4]);
-                Intent chooser = Intent.createChooser(intent, "Choose to Open File");
-                if (intent.resolveActivity(getPackageManager()) != null) {
-                    startActivity(chooser);
-                }
-                break;
-        }
     }
 
     public void endSession() {
@@ -932,8 +961,8 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
         });
     }
 
-    private void getImageAttachment(MessageModel newChat) {
-        conversationController.getImageMessage(newChat.getChat().getAttachment(), new BaseCallback<ResponseBody>() {
+    private void getImageAttachment(String attachment, boolean isNewMessage, int position) {
+        conversationController.getImageMessage(attachment, new BaseCallback<ResponseBody>() {
             @Override
             public void onSuccess(ResponseBody result) {
                 try {
@@ -953,15 +982,14 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
 
                     File newFileDst = new File(fileDst.getPath() +
                             File.separator +
-                            setNewFileName(ChatRoomActivity.this) +
-                            getFileExt(newChat.getChat().getAttachment()));
+                            getFileName(attachment));
                     //                                        byte[] fileData = result.bytes();
 //
 //                                        newFileDst.createNewFile();
 //
                     FileOutputStream outputStream = new FileOutputStream(newFileDst);
 
-                    bmp.compress((getFileExt(newChat.getChat().getAttachment()) == ".png") ? Bitmap.CompressFormat.PNG : Bitmap.CompressFormat.JPEG,
+                    bmp.compress((getFileExt(attachment) == ".png") ? Bitmap.CompressFormat.PNG : Bitmap.CompressFormat.JPEG,
                             100, outputStream);
 
                     outputStream.flush();
@@ -970,9 +998,34 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
                     outputStream.close();
 //
 //                                        Log.d(TAG, "new image path: " + fileDst.getPath());
-                    ChatsModel.Chat chat = initDataReceiverMessage(newFileDst.getPath(), ChatType.IMAGE);
-                    chatsModel.getChats().add(chat);
-                    chatAdapter.addItem(chat);
+                    if (isNewMessage) {
+                        ChatsModel.Chat chat = initDataReceiverMessage(newFileDst.getPath(), ChatType.IMAGE);
+                        chatsModel.getChats().add(chat);
+                        chatAdapter.addItem(chat);
+                    } else {
+                        if (position != -1) {
+                            int idChat = chatsModel.getChats().get(position).getIdChat();
+                            int idSender = chatsModel.getChats().get(position).getIdSender();
+                            int idReceiver = chatsModel.getChats().get(position).getIdReceiver();
+                            String time = chatsModel.getChats().get(position).getTime();
+                            boolean isRead = chatsModel.getChats().get(position).isRead();
+                            ChatType type = chatsModel.getChats().get(position).getType();
+
+                            MediaModel media = new MediaModel(
+                                    (mediaModels.size() > 2) ? mediaModels.size() - 1 : 1,
+                                    idChat,
+                                    getFileName(newFileDst.getPath()),
+                                    newFileDst.getPath(),
+                                    getFileExt(newFileDst.getPath()),
+                                    type
+                            );
+                            mediaModels.add(media);
+
+                            ChatsModel.Chat chat = new ChatsModel.Chat(idChat, idSender, idReceiver, time, isRead, type, newFileDst.getPath());
+                            chatsModel.getChats().set(position, chat);
+                            chatAdapter.updateItem(position, chat);
+                        }
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -989,7 +1042,7 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
             public void onNoConnection() {
                 Log.d(TAG(ChatRoomActivity.class), "No Connection");
 //                showToastyError(ChatRoomActivity.this, NO_CONNECTION);
-                getImageAttachment(newChat);
+                getImageAttachment(attachment, isNewMessage, position);
             }
 
             @Override
@@ -1000,8 +1053,8 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
         });
     }
 
-    private void getVideoAttachment(MessageModel newChat) {
-        conversationController.getImageMessage(newChat.getChat().getAttachment(), new BaseCallback<ResponseBody>() {
+    private void getVideoAttachment(String attachment, boolean isNewMessage, int position) {
+        conversationController.getImageMessage(attachment, new BaseCallback<ResponseBody>() {
             @Override
             public void onSuccess(ResponseBody result) {
                 try {
@@ -1018,8 +1071,7 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
 
                     File newFileDst = new File(fileDst.getPath() +
                             File.separator +
-                            setNewFileName(ChatRoomActivity.this) +
-                            getFileExt(newChat.getChat().getAttachment()));
+                            getFileName(attachment));
 
                     InputStream inputStream = null;
                     OutputStream outputStream = null;
@@ -1056,9 +1108,34 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
                         }
                     }
 
-                    ChatsModel.Chat chat = initDataReceiverMessage(newFileDst.getPath(), ChatType.VIDEO);
-                    chatsModel.getChats().add(chat);
-                    chatAdapter.addItem(chat);
+                    if (isNewMessage) {
+                        ChatsModel.Chat chat = initDataReceiverMessage(newFileDst.getPath(), ChatType.VIDEO);
+                        chatsModel.getChats().add(chat);
+                        chatAdapter.addItem(chat);
+                    } else {
+                        if (position != -1) {
+                            int idChat = chatsModel.getChats().get(position).getIdChat();
+                            int idSender = chatsModel.getChats().get(position).getIdSender();
+                            int idReceiver = chatsModel.getChats().get(position).getIdReceiver();
+                            String time = chatsModel.getChats().get(position).getTime();
+                            boolean isRead = chatsModel.getChats().get(position).isRead();
+                            ChatType type = chatsModel.getChats().get(position).getType();
+
+                            MediaModel media = new MediaModel(
+                                    (mediaModels.size() > 2) ? mediaModels.size() - 1 : 1,
+                                    idChat,
+                                    getFileName(newFileDst.getPath()),
+                                    newFileDst.getPath(),
+                                    getFileExt(newFileDst.getPath()),
+                                    type
+                            );
+                            mediaModels.add(media);
+
+                            ChatsModel.Chat chat = new ChatsModel.Chat(idChat, idSender, idReceiver, time, isRead, type, newFileDst.getPath());
+                            chatsModel.getChats().set(position, chat);
+                            chatAdapter.updateItem(position, chat);
+                        }
+                    }
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -1075,7 +1152,7 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
             public void onNoConnection() {
                 Log.d(TAG(ChatRoomActivity.class), "No Connection");
 //                showToastyError(ChatRoomActivity.this, NO_CONNECTION);
-                getVideoAttachment(newChat);
+                getVideoAttachment(attachment, isNewMessage, position);
             }
 
             @Override
@@ -1086,8 +1163,8 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
         });
     }
 
-    private void getFileAttachment(MessageModel newChat) {
-        conversationController.getImageMessage(newChat.getChat().getAttachment(), new BaseCallback<ResponseBody>() {
+    private void getFileAttachment(String attachment, boolean isNewMessage, int position) {
+        conversationController.getImageMessage(attachment, new BaseCallback<ResponseBody>() {
             @Override
             public void onSuccess(ResponseBody result) {
                 try {
@@ -1104,7 +1181,7 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
 
                     File newFileDst = new File(fileDst.getPath() +
                             File.separator +
-                            getFileName(newChat.getChat().getAttachment()));
+                            getFileName(attachment));
 
                     InputStream inputStream = null;
                     OutputStream outputStream = null;
@@ -1141,16 +1218,28 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
                         }
                     }
 
-                    String fileInfo = getFileName(newFileDst.getPath()) + ","
-                            + getFileMimeTypeWithoutDot(getFileMimeType(Uri.fromFile(newFileDst))) + ","
-                            + getFileSize(newFileDst.length()) + ","
-                            + newFileDst.getPath() + ","
-                            + getFileMimeType(Uri.fromFile(newFileDst));
+                    String fileInfo = getFileInfo(newFileDst);
 
+                    Log.d(TAG, "fileInfo: " + fileInfo);
 
-                    ChatsModel.Chat chat = initDataReceiverMessage(fileInfo, ChatType.FILE);
-                    chatsModel.getChats().add(chat);
-                    chatAdapter.addItem(chat);
+                    if (isNewMessage) {
+                        ChatsModel.Chat chat = initDataReceiverMessage(fileInfo, ChatType.FILE);
+                        chatsModel.getChats().add(chat);
+                        chatAdapter.addItem(chat);
+                    } else {
+                        if (position != -1) {
+                            int idChat = chatsModel.getChats().get(position).getIdChat();
+                            int idSender = chatsModel.getChats().get(position).getIdSender();
+                            int idReceiver = chatsModel.getChats().get(position).getIdReceiver();
+                            String time = chatsModel.getChats().get(position).getTime();
+                            boolean isRead = chatsModel.getChats().get(position).isRead();
+                            ChatType type = chatsModel.getChats().get(position).getType();
+
+                            ChatsModel.Chat chat = new ChatsModel.Chat(idChat, idSender, idReceiver, time, isRead, type, newFileDst.getPath());
+                            chatsModel.getChats().set(position, chat);
+                            chatAdapter.updateItem(position, chat);
+                        }
+                    }
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -1167,7 +1256,7 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
             public void onNoConnection() {
                 Log.d(TAG(ChatRoomActivity.class), "No Connection");
 //                showToastyError(ChatRoomActivity.this, NO_CONNECTION);
-                getFileAttachment(newChat);
+                getFileAttachment(attachment, isNewMessage, position);
             }
 
             @Override
@@ -1176,6 +1265,88 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
                 showToastyError(ChatRoomActivity.this, SERVER_BROKEN);
             }
         });
+    }
+
+    @Override
+    public void onItemTextClick(ChatsModel.Chat model, View view, int position, boolean isFileExist) {
+
+    }
+
+    @Override
+    public void onItemImageClick(ChatsModel.Chat model, View view, ProgressBar loading, LinearLayout llDownloadImage, int position, boolean isFileExist) {
+        String time = (isActiveChats) ? model.getTime() : dateTimeToStringHour(getDateTime(model.getTime(), DateTimeZone.UTC));
+        if (isFileExist || isActiveChats) {
+            MediaViewerActivity.navigate(ChatRoomActivity.this, mediaModels, getSenderName(model), time, model.getIdChat());
+        } else {
+            chatAdapter.setImageLoading(loading, llDownloadImage);
+            getImageAttachment(model.getMessage(), false, position);
+        }
+    }
+
+    @Override
+    public void onItemVideoClick(ChatsModel.Chat model, View view, ProgressBar loading, LinearLayout llDownloadVideo, LinearLayout llOpenVid, int position, boolean isFileExist) {
+        String time = (isActiveChats) ? model.getTime() : dateTimeToStringHour(getDateTime(model.getTime(), DateTimeZone.UTC));
+
+        if (isFileExist || isActiveChats) {
+            MediaViewerActivity.navigate(ChatRoomActivity.this, mediaModels, getSenderName(model), time, model.getIdChat());
+        } else {
+            chatAdapter.setVideoLoading(loading, llDownloadVideo, llOpenVid);
+            getVideoAttachment(model.getMessage(), false, position);
+        }
+    }
+
+    @Override
+    public void onItemFileClick(ChatsModel.Chat model, View view, ProgressBar loading, ImageView ivDownloadFile, TextView tvFileExt, int position, boolean isFileExist) {
+        if (isFileExist || isActiveChats) {
+            File file = new File(getPath(model.getType()) +
+                    getFileName(model.getMessage()));
+            String[] arrFileInfo = getFileInfo(file).split(",");
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+
+//            String fileExt = getFileExt(arrFileInfo[3]);
+//            Log.d(TAG, "fileExt: " + fileExt);
+//            String mimeType = "*/*";
+//
+//            if (fileExt.contains("jpg") || fileExt.contains("png") || fileExt.contains("gif")) {
+//                mimeType = "image/*";
+//            } else if (fileExt.contains("mp4") || fileExt.contains("3gp")) {
+//                mimeType = "video/*";
+//            } else if (fileExt.contains("pdf")) {
+//                mimeType = "application/pdf";
+//            } else if (fileExt.contains("doc") || fileExt.contains("docx")) {
+//                mimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+//            } else if (fileExt.contains("ppt") || fileExt.contains("pptx")) {
+//                mimeType = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+//            } else if (fileExt.contains("xls") || fileExt.contains("xslx")) {
+//                mimeType = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+//            }
+
+//            MediaScannerConnection.scanFile(this, new String[]{file.getAbsolutePath()}, null, ((path, uri) -> {
+//                intent.setDataAndType(uri, finalMimeType);
+//            }));
+
+//            Uri uri = Uri.fromFile(file);
+            Uri uri = FileProvider.getUriForFile(this,getApplicationContext().getPackageName()+".fileprovider", file);
+            intent.setDataAndType(uri, arrFileInfo[4]);
+
+            Log.d(TAG, "uri: " +uri.toString());
+            Log.d(TAG, "mimeType: " + arrFileInfo[4]);
+
+            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//            Log.d(TAG, uri.toString());
+
+//            intent.putExtra(Intent.EXTRA_STREAM, uri);
+//            intent.setType(arrFileInfo[4]);
+
+            Intent chooser = Intent.createChooser(intent, "Choose to Open File");
+            if (intent.resolveActivity(getPackageManager()) != null) {
+                startActivity(chooser);
+            }
+        } else {
+            chatAdapter.setFileLoading(loading, ivDownloadFile, tvFileExt);
+            getFileAttachment(model.getMessage(), false, position);
+        }
     }
 
 }
