@@ -17,12 +17,12 @@ public class MediaModel implements Parcelable {
             return new MediaModel[size];
         }
     };
-    private final int idMedia;
-    private final int idChat;
-    private final String filename;
+    private int idMedia;
+    private int idChat;
+    private String filename;
     private String path;
-    private final String extension;
-    private final ChatType type;
+    private String extension;
+    private ChatType type;
 
     public MediaModel(int idMedia, int idChat, String filename, String path, String extension, ChatType type) {
         this.idMedia = idMedia;

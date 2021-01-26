@@ -9,37 +9,37 @@ public class AppointmentModel {
     private int idJanji = 0;
 
     @SerializedName("idPasien")
-    private final int idPasien = 0;
+    private int idPasien = 0;
 
     @SerializedName("idDokter")
-    private final int idDokter = 0;
+    private int idDokter = 0;
 
     @SerializedName("idTransaksi")
-    private final int idTransaksi = 0;
+    private int idTransaksi = 0;
 
     @SerializedName("idConversation")
-    private final int idConversation = 0;
+    private int idConversation = 0;
 
     @SerializedName("idReport")
-    private final int idReport = 0;
+    private int idReport = 0;
 
     @SerializedName("day_id")
-    private final int idDay = 0;
+    private int idDay = 0;
 
     @SerializedName("tglJanji")
-    private final String tglJanji = "";
+    private String tglJanji = "";
 
     @SerializedName("detailJanji")
-    private final String detailJanji = "";
+    private String detailJanji = "";
 
     @SerializedName("idStatus")
     private int idStatus = 0;
 
     @SerializedName("created_at")
-    private final String createdAt = "";
+    private String createdAt = "";
 
     @SerializedName("updated_at")
-    private final String updatedAt = "";
+    private String updatedAt = "";
 
     @SerializedName("transaksi")
     private ArrayList<Transaksi> transaksi;
@@ -153,49 +153,49 @@ public class AppointmentModel {
 
     public class Transaksi {
         @SerializedName("id")
-        private final int idTransaksi = 0;
+        private int idTransaksi = 0;
 
         @SerializedName("janji_id")
-        private final int idJanji = 0;
+        private int idJanji = 0;
 
         @SerializedName("type_id")
-        private final int idType = 0;
+        private int idType = 0;
 
         @SerializedName("wallet_id")
-        private final int idWallet = 0;
+        private int idWallet = 0;
 
         @SerializedName("totalHarga")
-        private final int totalHarga = 0;
+        private int totalHarga = 0;
 
         @SerializedName("harga")
-        private final int harga = 0;
+        private int harga = 0;
 
         @SerializedName("uniqueCode")
-        private final int uniqueCode = 0;
+        private int uniqueCode = 0;
 
         @SerializedName("serviceFee")
-        private final int serviceFee = 0;
+        private int serviceFee = 0;
 
         @SerializedName("penerima")
-        private final String penerima = "";
+        private String penerima = "";
 
         @SerializedName("rekeningPenerima")
-        private final String rekeningPenerima = "";
+        private String rekeningPenerima = "";
 
         @SerializedName("pengirim")
-        private final String pengirim = "";
+        private String pengirim = "";
 
         @SerializedName("rekeningPengirim")
-        private final String rekeningPengirim = "";
+        private String rekeningPengirim = "";
 
         @SerializedName("is_paid")
-        private final boolean isPaid = false;
+        private boolean isPaid = false;
 
         @SerializedName("created_at")
-        private final String createdAt = "";
+        private String createdAt = "";
 
         @SerializedName("updated_at")
-        private final String updatedAt = "";
+        private String updatedAt = "";
 
         public int getIdTransaksi() {
             return idTransaksi;
@@ -260,41 +260,41 @@ public class AppointmentModel {
 
     public class Day {
         @SerializedName("id")
-        private final int idDay = 0;
+        private int idDay = 0;
 
         @SerializedName("day")
-        private final String day = "";
+        private String day = "";
     }
 
     public class Status {
         @SerializedName("id")
-        private final int idDay = 0;
+        private int idDay = 0;
 
         @SerializedName("status")
-        private final String status = "";
+        private String status = "";
     }
 
     public class Report {
         @SerializedName("id")
-        private final int idDay = 0;
+        private int idDay = 0;
 
         @SerializedName("subjective")
-        private final String subjective = "";
+        private String subjective = "";
 
         @SerializedName("objective")
-        private final String objective = "";
+        private String objective = "";
 
         @SerializedName("assessment")
-        private final String assessment = "";
+        private String assessment = "";
 
         @SerializedName("planning")
-        private final String planning = "";
+        private String planning = "";
 
         @SerializedName("created_at")
-        private final String createdAt = "";
+        private String createdAt = "";
 
         @SerializedName("updated_at")
-        private final String updatedAt = "";
+        private String updatedAt = "";
     }
 }
 

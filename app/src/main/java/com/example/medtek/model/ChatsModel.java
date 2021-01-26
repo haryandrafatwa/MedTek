@@ -148,10 +148,10 @@ public class ChatsModel implements Parcelable {
         private int idChat = 0;
         private int idSender = 0;
         private int idReceiver = 0;
-        private final String time;
-        private final boolean isRead;
-        private final ChatType type;
-        private final String message;
+        private String time;
+        private boolean isRead;
+        private ChatType type;
+        private String message;
 
         public Chat(int idChat, int idSender, int idReceiver, String time, boolean isRead, ChatType type, String message) {
             this.idChat = idChat;

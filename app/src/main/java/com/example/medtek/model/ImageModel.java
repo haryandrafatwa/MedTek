@@ -31,7 +31,7 @@ public class ImageModel {
     private String updatedAt = "";
 
     @SerializedName("type")
-    private final Type type;
+    private Type type;
 
     public ImageModel(int id, int articleId, int hopitalId, int userId, int typeId, String filename, String path, String createdAt, String updatedAt, Type type) {
         this.id = id;
@@ -88,10 +88,10 @@ public class ImageModel {
 
     public class Type {
         @SerializedName("id")
-        private final int idImage = 0;
+        private int idImage = 0;
 
         @SerializedName("type")
-        private final String type = "";
+        private String type = "";
 
         public int getIdImage() {
             return idImage;

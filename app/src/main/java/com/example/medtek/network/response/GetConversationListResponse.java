@@ -15,13 +15,13 @@ public class GetConversationListResponse extends BaseResponse {
 
     public static class ConversationList {
         @SerializedName("id")
-        private final int idConversationList = 0;
+        private int idConversationList = 0;
 
         @SerializedName("created_at")
-        private final String createdAt = "";
+        private String createdAt = "";
 
         @SerializedName("updated_at")
-        private final String updatedAt = "";
+        private String updatedAt = "";
 
         public int getIdConversationList() {
             return idConversationList;

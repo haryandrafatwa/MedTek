@@ -13,25 +13,25 @@ public class PostConversationResponse extends BaseResponse {
 
     public static class ConversationModel {
         @SerializedName("idConversation")
-        private final int idConversation = 0;
+        private int idConversation = 0;
 
         @SerializedName("message")
-        private final String message = "";
+        private String message = "";
 
         @SerializedName("sender_id")
-        private final int senderId = 0;
+        private int senderId = 0;
 
         @SerializedName("created_at")
-        private final String createdAt = "";
+        private String createdAt = "";
 
         @SerializedName("updated_at")
-        private final String updatedAt = "";
+        private String updatedAt = "";
 
         @SerializedName("id")
-        private final int idChat = 0;
+        private int idChat = 0;
 
         @SerializedName("attachment")
-        private final String attachment = "";
+        private String attachment = "";
 
         public int getIdConversation() {
             return idConversation;

@@ -4,34 +4,34 @@ import com.google.gson.annotations.SerializedName;
 
 public class JanjiResponse {
     @SerializedName("idPasien")
-    private final int idPasien = 0;
+    private int idPasien = 0;
 
     @SerializedName("idDokter")
-    private final int idDokter = 0;
+    private int idDokter = 0;
 
     @SerializedName("day_id")
-    private final int idDay = 0;
+    private int idDay = 0;
 
     @SerializedName("idConversation")
-    private final int idConversation = 0;
+    private int idConversation = 0;
 
     @SerializedName("idStatus")
-    private final int idStatus = 0;
+    private int idStatus = 0;
 
     @SerializedName("tglJanji")
-    private final String tglJanji = "";
+    private String tglJanji = "";
 
     @SerializedName("detailJanji")
-    private final String detailJanji = "";
+    private String detailJanji = "";
 
     @SerializedName("is_started")
-    private final boolean isStarted = false;
+    private boolean isStarted = false;
 
     @SerializedName("is_completed")
-    private final boolean isCompleted = false;
+    private boolean isCompleted = false;
 
     @SerializedName("endHour")
-    private final String endHour = "";
+    private String endHour = "";
 
     public int getIdPasien() {
         return idPasien;

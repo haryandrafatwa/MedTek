@@ -808,7 +808,7 @@ public class HomeFragment extends Fragment {
 //                        Log.d("errorLoc", addresses.get(0).getSubLocality());
 //                        Log.d("errorLoc", addresses.get(0).getSubAdminArea());
 //                        Log.d("errorLoc", addresses.get(0).getAdminArea());
-//                        Log.d("errorLoc", addresses.get(0).getThoroughfare());
+                        Log.d("errorLoc", valueOf(addresses.get(0).getThoroughfare() == null));
 //                        Log.d("errorLoc", valueOf(addresses.get(0).getLatitude()));
 //                        Log.d("errorLoc", valueOf(addresses.get(0).getLongitude()));
 //                        kecamatan = addresses.get(0).getLocality().split(" ",2)[1];
@@ -816,7 +816,7 @@ public class HomeFragment extends Fragment {
                         kelurahan = addresses.get(0).getSubLocality();
                         kota = addresses.get(0).getSubAdminArea().split(" ",2)[1];
                         provinsi = addresses.get(0).getAdminArea();
-                        jalan = addresses.get(0).getThoroughfare().split(" ",2)[1];
+                        jalan = (addresses.get(0).getThoroughfare() == null) ? "" : addresses.get(0).getThoroughfare().split(" ",2)[1];
                         sLat = addresses.get(0).getLatitude();
                         sLong = addresses.get(0).getLongitude();
 //                        Toasty.info(getActivity(),"Kecamatan: "+kecamatan+", Kelurahan: "+kelurahan).show();

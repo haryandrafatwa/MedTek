@@ -70,6 +70,7 @@ import static com.example.medtek.network.RetrofitClient.BASE_URL;
 import static com.example.medtek.utils.PropertyUtil.ACCESS_TOKEN;
 import static com.example.medtek.utils.PropertyUtil.REFRESH_TOKEN;
 import static com.example.medtek.utils.PropertyUtil.getData;
+import static com.example.medtek.utils.Utils.TAG;
 
 public class MenungguKonfirmasiAdapter extends RecyclerView.Adapter<MenungguKonfirmasiAdapter.ViewHolder> {
 
@@ -161,6 +162,7 @@ public class MenungguKonfirmasiAdapter extends RecyclerView.Adapter<MenungguKonf
                                 @Override
                                 public void onClick(View v) {
                                     try {
+                                        Log.d(TAG(MenungguKonfirmasiAdapter.class), model.getDetailJanji().split(" Pukul")[0]);
                                         String sisa = model.getDetailJanji().split(" Pukul")[1];
 
                                         String s = data.getString("tglLahir");

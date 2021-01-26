@@ -40,13 +40,13 @@ public class UserModel extends BaseResponse {
     private int harga = 0;
 
     @SerializedName("berat_badan")
-    private final int beratBadan = 0;
+    private int beratBadan = 0;
 
     @SerializedName("tinggi_badan")
-    private final int tinggiBadan = 0;
+    private int tinggiBadan = 0;
 
     @SerializedName("lingkar_badan")
-    private final int lingkarBadan = 0;
+    private int lingkarBadan = 0;
 
     @SerializedName("rating")
     private String rating = "";
@@ -245,80 +245,80 @@ public class UserModel extends BaseResponse {
 
     public static class Hospital {
         @SerializedName("id")
-        private final int idHospital = 0;
+        private int idHospital = 0;
 
         @SerializedName("name")
-        private final String nameHospital = "";
+        private String nameHospital = "";
 
         @SerializedName("alamat_id")
-        private final int idAlamat = 0;
+        private int idAlamat = 0;
 
         @SerializedName("alamat")
-        private final String addressHospital = "";
+        private String addressHospital = "";
 
         @SerializedName("notelp")
-        private final String noTelpHospital = "";
+        private String noTelpHospital = "";
 
         @SerializedName("info")
-        private final String infoHospital = "";
+        private String infoHospital = "";
     }
 
     private class Alamat {
         @SerializedName("id")
-        private final int idAlamat = 0;
+        private int idAlamat = 0;
 
         @SerializedName("jalan")
-        private final String jalan = "";
+        private String jalan = "";
 
         @SerializedName("nomor_bangunan")
-        private final String nomorBangunan = "";
+        private String nomorBangunan = "";
 
         @SerializedName("rtrw")
-        private final String rtRw = "";
+        private String rtRw = "";
 
         @SerializedName("kelurahan")
-        private final String kelurahan = "";
+        private String kelurahan = "";
 
         @SerializedName("kecamatan")
-        private final String kecamatan = "";
+        private String kecamatan = "";
 
         @SerializedName("kota")
-        private final String kota = "";
+        private String kota = "";
 
         @SerializedName("lat")
-        private final String latitude = "";
+        private String latitude = "";
 
         @SerializedName("long")
-        private final String longitude = "";
+        private String longitude = "";
 
         @SerializedName("created_at")
-        private final String createdAt = "";
+        private String createdAt = "";
 
         @SerializedName("updated_at")
-        private final String updatedAt = "";
+        private String updatedAt = "";
     }
 
     public class Jadwal {
         @SerializedName("id")
-        private final int idJadwal = 0;
+        private int idJadwal = 0;
 
         @SerializedName("idDokter")
-        private final int idDokter = 0;
+        private int idDokter = 0;
 
         @SerializedName("day_id")
-        private final int idDay = 0;
+        private int idDay = 0;
 
         @SerializedName("startHour")
-        private final String startHour = "";
+        private String startHour = "";
 
         @SerializedName("endHour")
-        private final String endHour = "";
+        private String endHour = "";
 
         @SerializedName("created_at")
-        private final String createdAt = "";
+        private String createdAt = "";
 
         @SerializedName("updated_at")
-        private final String updatedAt = "";
+        private String updatedAt = "";
 
         @SerializedName("day")
         private AppointmentModel.Day day;
@@ -358,19 +358,19 @@ public class UserModel extends BaseResponse {
 
     public class Wallet {
         @SerializedName("id")
-        private final int idJadwal = 0;
+        private int idJadwal = 0;
 
         @SerializedName("idUser")
-        private final int idUser = 0;
+        private int idUser = 0;
 
         @SerializedName("balance")
-        private final int balance = 0;
+        private int balance = 0;
 
         @SerializedName("created_at")
-        private final String createdAt = "";
+        private String createdAt = "";
 
         @SerializedName("updated_at")
-        private final String updatedAt = "";
+        private String updatedAt = "";
     }
 }
 

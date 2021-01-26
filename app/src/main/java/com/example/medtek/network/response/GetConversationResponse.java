@@ -16,16 +16,16 @@ public class GetConversationResponse extends BaseResponse {
 
     public static class Conversation {
         @SerializedName("id")
-        private final int idConversation = 0;
+        private int idConversation = 0;
 
         @SerializedName("chat")
-        private final List<ChatModel> chats = new ArrayList<>();
+        private List<ChatModel> chats = new ArrayList<>();
 
         @SerializedName("created_at")
-        private final String createdAt = "";
+        private String createdAt = "";
 
         @SerializedName("updated_at")
-        private final String updatedAt = "";
+        private String updatedAt = "";
 
         public int getIdConversation() {
             return idConversation;
@@ -37,28 +37,28 @@ public class GetConversationResponse extends BaseResponse {
 
         public class ChatModel {
             @SerializedName("id")
-            private final int idChat = 0;
+            private int idChat = 0;
 
             @SerializedName("idConversation")
-            private final int idConversation = 0;
+            private int idConversation = 0;
 
             @SerializedName("sender_id")
-            private final int idSender = 0;
+            private int idSender = 0;
 
             @SerializedName("message")
-            private final String message = "";
+            private String message = "";
 
             @SerializedName("attachment")
-            private final String attachment = "";
+            private String attachment = "";
 
             @SerializedName("is_read")
-            private final boolean isRead = false;
+            private boolean isRead = false;
 
             @SerializedName("created_at")
-            private final String createdAt = "";
+            private String createdAt = "";
 
             @SerializedName("updated_at")
-            private final String updatedAt = "";
+            private String updatedAt = "";
 
             public int getIdChat() {
                 return idChat;

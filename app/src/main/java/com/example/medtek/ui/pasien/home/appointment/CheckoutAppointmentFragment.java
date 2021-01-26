@@ -284,6 +284,7 @@ public class CheckoutAppointmentFragment extends Fragment {
                             String s = response.body().string();
                             JSONObject object = new JSONObject(s);
                             if (object.has("success")){
+                                JSONObject janjiSuccess = object.getJSONObject("data");
                                 Call<ResponseBody> getJanji = RetrofitClient.getInstance().getApi().getUserJanji("Bearer "+access);
                                 getJanji.enqueue(new Callback<ResponseBody>() {
                                     @Override
@@ -339,7 +340,7 @@ public class CheckoutAppointmentFragment extends Fragment {
                                                                                                                         File fileCopy = copyToTempFile(docUri, outputFile);
                                                                                                                         RequestBody requestBody = RequestBody.create(MediaType.parse(mimeType),fileCopy);
                                                                                                                         MultipartBody.Part part = MultipartBody.Part.createFormData("file",fileName,requestBody);
-                                                                                                                        Call<ResponseBody> uploadFile = RetrofitClient.getInstance().getApi().uploadFile("Bearer "+access,janjiObj.getInt("id"),part);
+                                                                                                                        Call<ResponseBody> uploadFile = RetrofitClient.getInstance().getApi().uploadFile("Bearer "+access, janjiSuccess.getInt("id"), part);
                                                                                                                         uploadFile.enqueue(new Callback<ResponseBody>() {
                                                                                                                             @Override
                                                                                                                             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
