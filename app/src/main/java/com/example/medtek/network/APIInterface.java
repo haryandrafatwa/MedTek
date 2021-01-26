@@ -4,6 +4,7 @@ import androidx.annotation.Nullable;
 
 import com.example.medtek.constant.APIConstant;
 import com.example.medtek.network.base.BaseResponse;
+import com.example.medtek.network.request.JanjiRequest;
 import com.example.medtek.network.request.LoginRequest;
 import com.example.medtek.network.response.AuthTokenResponse;
 import com.example.medtek.network.response.GetConversationListResponse;
@@ -182,7 +183,7 @@ public interface APIInterface {
     );
 
     @Headers({"Accept:application/json"})
-    @POST("edit-ktp/")
+    @POST("edit-ktp")
     @Multipart
     Call<ResponseBody> uploadKTP(
             @Header("Authorization") String token,
@@ -198,21 +199,22 @@ public interface APIInterface {
     );
 
     @Headers({"Accept:application/json","Content-Type:application/json"})
-    @PUT("editprofile/")
+    @PUT("editprofile")
     Call<ResponseBody> updateProfile(
             @Header("Authorization") String token,
             @Body RequestBody body
     );
 
     @Headers({"Accept:application/json"})
-    @POST("janji/")
-    @FormUrlEncoded
+    @POST("janji")
+//    @FormUrlEncoded
     Call<ResponseBody> buatJanji(
             @Header("Authorization") String token,
-            @Query("idDokter") int idDokter,
-            @Query("tglJanji") String tglJanji,
-            @Query("detailJanji") String detailJanji,
-            @Field("day") String day
+            @Body JanjiRequest body
+//            @Query("idDokter") int idDokter,
+//            @Query("tglJanji") String tglJanji,
+//            @Query("detailJanji") String detailJanji,
+//            @Field("day") String day
     );
 
     @Headers({"Accept:application/json"})
@@ -238,7 +240,7 @@ public interface APIInterface {
     );
 
     @Headers({"Accept:application/json"})
-    @POST("payment/")
+    @POST("payment")
     @FormUrlEncoded
     Call<ResponseBody> bayar(
             @Header("Authorization") String token,

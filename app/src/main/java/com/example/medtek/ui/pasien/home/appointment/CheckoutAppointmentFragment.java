@@ -30,6 +30,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.example.medtek.R;
 import com.example.medtek.network.RetrofitClient;
+import com.example.medtek.network.request.JanjiRequest;
 import com.example.medtek.ui.pasien.others.NominalFragment;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
@@ -270,7 +271,10 @@ public class CheckoutAppointmentFragment extends Fragment {
 
         Locale locale = new Locale("in", "ID");
         DateTimeFormatter dayFormat = DateTimeFormatter.ofPattern("EEEE",locale);
-        Call<ResponseBody> buatJanji = RetrofitClient.getInstance().getApi().buatJanji("Bearer "+access,bundle.getInt("id_dokter"),bundle.getString("date"),detailJanji,localDate.format(dayFormat));
+
+        JanjiRequest request = new JanjiRequest(bundle.getInt("id_dokter"), bundle.getString("date"), detailJanji, localDate.format(dayFormat).toLowerCase());
+
+        Call<ResponseBody> buatJanji = RetrofitClient.getInstance().getApi().buatJanji("Bearer "+access, request);
         buatJanji.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -296,7 +300,7 @@ public class CheckoutAppointmentFragment extends Fragment {
                                                         JSONArray transaksiArr = object.getJSONArray("transaksi");
                                                         for (int j = 0; j < transaksiArr.length(); j++) {
                                                             JSONObject transaksi = transaksiArr.getJSONObject(j);
-                                                            if (transaksi.getInt("is_paid") == 0){
+                                                            if (!transaksi.getBoolean("is_paid")){
                                                                 idTransaksi = transaksi.getInt("id");
                                                                 Call<ResponseBody> bayar = RetrofitClient.getInstance().getApi().bayar("Bearer "+access,idTransaksi,idJanji);
                                                                 bayar.enqueue(new Callback<ResponseBody>() {

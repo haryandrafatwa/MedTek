@@ -292,6 +292,7 @@ public class ChatFragment extends BaseFragment {
         if (janjiListResponses.size() > 0) {
             for (Iterator<AppointmentModel> iterator = janjiListResponses.iterator(); iterator.hasNext(); ) {
                 AppointmentModel value = iterator.next();
+                Log.d(TAG, "value.getTglJanji(): " + value.getTglJanji());
                 if (getDate(value.getTglJanji()).isBeforeNow()) {
                     if (!getDate(value.getTglJanji()).toLocalDate().isEqual(LocalDate.now())) {
                         iterator.remove();

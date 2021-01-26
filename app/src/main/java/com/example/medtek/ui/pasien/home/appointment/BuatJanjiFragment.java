@@ -30,6 +30,7 @@ import com.jakewharton.threetenabp.AndroidThreeTen;
 import com.squareup.picasso.Picasso;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
+import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -469,7 +470,7 @@ public class BuatJanjiFragment extends Fragment {
                 Locale locale = new Locale("in", "ID");
                 DateTimeFormatter dayFormat = DateTimeFormatter.ofPattern("dd MMM yyyy",locale).withLocale(locale);
                 DateTimeFormatter fullFormat = DateTimeFormatter.ofPattern("YYYY-MM-dd",locale);
-                LocalDate localDate = LocalDate.parse(date+" 2020",dayFormat);
+                LocalDate localDate = LocalDate.parse(date+" " + new DateTime().toLocalDate().getYear(),dayFormat);
 //                Toasty.success(getActivity(),date+", "+timeString).show();
                 bundle.putString("date",localDate.format(fullFormat));
                 bundle.putString("time",timeString);

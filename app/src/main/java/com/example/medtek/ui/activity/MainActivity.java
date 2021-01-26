@@ -331,6 +331,7 @@ public class MainActivity extends AppCompatActivity {
                     int sizeConversationList = result.getData().size();
                     final int[] countGetConversation = {0};
                     for (GetConversationListResponse.ConversationList conversationList : result.getData()) {
+                        Log.d(TAG, "conversationList: " + conversationList.getIdConversationList());
                         conversationController.getConversation(conversationList.getIdConversationList(), new BaseCallback<GetConversationResponse>() {
                             @Override
                             public void onSuccess(GetConversationResponse result) {

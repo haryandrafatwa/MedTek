@@ -1,5 +1,6 @@
 package com.example.medtek.network;
 
+import com.example.medtek.App;
 import com.example.medtek.constant.APPConstant;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -66,7 +67,7 @@ public class APIService {
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .client(okHttpClient())
+                .client(SelfSigningClientBuilder.createClient(App.getInstance().getApplicationContext()))
                 .build();
 
         return retrofit;

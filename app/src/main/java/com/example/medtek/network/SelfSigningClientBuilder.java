@@ -61,12 +61,15 @@ public class SelfSigningClientBuilder {
 
                         Request request = originalRequest.newBuilder()
                                 .header("Content-type", "application/json")
+                                .header("Accept", "application/json")
+                                .header("Connection", "close")
                                 .build();
 
                         return chain.proceed(request);
                     })
                     .connectTimeout(APPConstant.API_TIMEOUT, TimeUnit.MINUTES)
                     .readTimeout(APPConstant.API_TIMEOUT, TimeUnit.MINUTES)
+                    .writeTimeout(APPConstant.API_TIMEOUT, TimeUnit.MINUTES)
                     .build();
 
         } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException | KeyManagementException e) {
