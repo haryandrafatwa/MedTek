@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class AppointmentModel {
     @SerializedName("id")
-    private final int idJanji = 0;
+    private int idJanji = 0;
 
     @SerializedName("idPasien")
     private final int idPasien = 0;
