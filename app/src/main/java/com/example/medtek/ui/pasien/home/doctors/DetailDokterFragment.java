@@ -1,5 +1,6 @@
 package com.example.medtek.ui.pasien.home.doctors;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -7,6 +8,7 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,18 +38,25 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.threeten.bp.LocalDate;
+import org.threeten.bp.format.DateTimeFormatter;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import es.dmoral.toasty.Toasty;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.example.medtek.network.RetrofitClient.BASE_URL;
+import static com.example.medtek.utils.PropertyUtil.ACCESS_TOKEN;
+import static com.example.medtek.utils.PropertyUtil.REFRESH_TOKEN;
+import static com.example.medtek.utils.PropertyUtil.getData;
 
 public class DetailDokterFragment extends Fragment {
 
@@ -73,6 +82,7 @@ public class DetailDokterFragment extends Fragment {
 
     private RelativeLayout rl_content,rl_loader;
     private ShimmerFrameLayout shimmerFrameLayout;
+    private String access, refresh;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -88,6 +98,7 @@ public class DetailDokterFragment extends Fragment {
     public void onStart() {
         super.onStart();
         initialize();
+        loadData(getActivity());
 
         Bundle bundle = getArguments();
         int id_dokter = bundle.getInt("id_dokter");
@@ -205,11 +216,38 @@ public class DetailDokterFragment extends Fragment {
                     btnBuatJanji.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            BuatJanjiFragment buatJanjiFragment = new BuatJanjiFragment();
-                            Bundle bundle = new Bundle();
-                            bundle.putInt("id_dokter",id_dokter);
-                            buatJanjiFragment.setArguments(bundle);
-                            setFragment(buatJanjiFragment,"FragmentBuatJanji");
+                            Call<ResponseBody> getUser = RetrofitClient.getInstance().getApi().getUser("Bearer "+access);
+                            getUser.enqueue(new Callback<ResponseBody>() {
+                                @Override
+                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                    try{
+                                        if (response.isSuccessful()){
+                                            if (response.body() != null){
+                                                String s = response.body().string();
+                                                JSONObject user = new JSONObject(s);
+                                                Log.e("TAG", "onResponse: "+s );
+                                                if (!user.isNull("email_verified_at")){
+                                                    BuatJanjiFragment buatJanjiFragment = new BuatJanjiFragment();
+                                                    Bundle bundle = new Bundle();
+                                                    bundle.putInt("id_dokter",id_dokter);
+                                                    buatJanjiFragment.setArguments(bundle);
+                                                    setFragment(buatJanjiFragment,"FragmentBuatJanji");
+                                                    Toasty.error(getActivity(),"verifikasi!").show();
+                                                }else{
+                                                    Toasty.error(getActivity(),"Silahkan verifikasi akun terlebih dahulu!").show();
+                                                }
+                                            }
+                                        }
+                                    } catch (IOException | JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                                }
+                            });
                         }
                     });
 
@@ -296,6 +334,14 @@ public class DetailDokterFragment extends Fragment {
         FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.frameFragment,fragment).addToBackStack(TAG);
         fragmentTransaction.commit();
+    }
+
+    public void loadData(Context context) {
+//        SharedPreferences sharedPreferences = context.getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+//        this.access = sharedPreferences.getString("token", "");
+//        this.refresh = sharedPreferences.getString("refresh_token", "");
+        this.access = (String) getData(ACCESS_TOKEN);
+        this.refresh = (String) getData(REFRESH_TOKEN);
     }
 
 }

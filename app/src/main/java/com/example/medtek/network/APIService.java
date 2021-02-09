@@ -67,7 +67,7 @@ public class APIService {
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .client(SelfSigningClientBuilder.createClient(App.getInstance().getApplicationContext()))
+                .client(okHttpClient())
                 .build();
 
         return retrofit;

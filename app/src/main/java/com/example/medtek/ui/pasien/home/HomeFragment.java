@@ -185,13 +185,15 @@ public class HomeFragment extends Fragment {
                         if (response.body() != null){
                             String s = response.body().string();
                             JSONObject janjiObject = new JSONObject(s);
-                            JSONArray janjiArr = janjiObject.getJSONArray("data");
-                            for (int i = 0; i < janjiArr.length(); i++) {
-                                JSONObject janjiObj = janjiArr.getJSONObject(i);
-                                if (janjiObj.getInt("idStatus") == 1){
-                                    idDokter = janjiObj.getInt("id");
-                                    Log.e("TAG", "onResponse: "+idDokter);
-                                    startSocket();
+                            if(!janjiObject.has("error")){
+                                JSONArray janjiArr = janjiObject.getJSONArray("data");
+                                for (int i = 0; i < janjiArr.length(); i++) {
+                                    JSONObject janjiObj = janjiArr.getJSONObject(i);
+                                    if (janjiObj.getInt("idStatus") == 1){
+                                        idDokter = janjiObj.getInt("id");
+                                        Log.e("TAG", "onResponse: "+idDokter);
+                                        startSocket();
+                                    }
                                 }
                             }
                         }
@@ -310,7 +312,7 @@ public class HomeFragment extends Fragment {
                                                                     String name = jo.getString("name");
                                                                     String email = jo.getString("email");
                                                                     int isVerified;
-                                                                    if (!jo.getString("email_verified_at").equals(null)){
+                                                                    if (!jo.isNull("email_verified_at")){
                                                                         isVerified = 1;
                                                                     }else{
                                                                         isVerified = 0;
@@ -382,7 +384,7 @@ public class HomeFragment extends Fragment {
                                                                                     }
                                                                                     mListDokterHospital.clear();
                                                                                     for (int j = 0; j < arrDokter.length(); j++) {
-                                                                                        JSONObject jo = arrDokter.getJSONObject(i);
+                                                                                        JSONObject jo = arrDokter.getJSONObject(j);
                                                                                         String nameDokter = jo.getString("name");
                                                                                         String email = jo.getString("email");
                                                                                         int isVerified;

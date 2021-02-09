@@ -128,7 +128,7 @@ public class OthersFragment extends Fragment {
                         tv_nama.setText(obj.getString("name"));
                         tv_email.setText(obj.getString("email"));
 
-                        if (obj.getString("email_verified_at").equals("null")){
+                        if (obj.isNull("email_verified_at")){
                             ib_cek_verified.setBackground(getActivity().getDrawable(R.drawable.ic_unverified));
                             isVerified = false;
                         }else{
@@ -229,6 +229,18 @@ public class OthersFragment extends Fragment {
                     isverify.setBackgroundTintList(getActivity().getColorStateList(R.color.textColorLightGray));
                     isverify.setTextColor(getResources().getColor(R.color.textColorGray));
                     content.setText(R.string.emailkamu);
+                    bottomSheetView.findViewById(R.id.verify_now).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            try {
+                                Intent intent = new Intent(Intent.ACTION_MAIN);
+                                intent.addCategory(Intent.CATEGORY_APP_EMAIL);
+                                startActivity(intent);
+                            } catch (android.content.ActivityNotFoundException anfe) {
+                                anfe.getMessage();
+                            }
+                        }
+                    });
                 }else{
                     bottomSheetView.findViewById(R.id.verify_now).setVisibility(View.GONE);
                     TextView isverify = bottomSheetView.findViewById(R.id.is_verify);

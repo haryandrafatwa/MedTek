@@ -228,8 +228,13 @@ public class DetailPasienFragment extends Fragment {
                                             lp = object.getInt("lingkar_tubuh");
                                             et_lp.setText(lp+"");
                                         }
-                                        JSONObject walletObj = object.getJSONObject("wallet");
-                                        balance = walletObj.getInt("balance");
+                                        if (!object.isNull("wallet")){
+                                            JSONObject walletObj = object.getJSONObject("wallet");
+                                            balance = walletObj.getInt("balance");
+                                        }else{
+                                            balance = 0;
+                                        }
+
                                         if (!object.getString("tglLahir").equalsIgnoreCase("null")){
                                             Locale locale = new Locale("in", "ID");
                                             DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd MMMM YYYY",locale);

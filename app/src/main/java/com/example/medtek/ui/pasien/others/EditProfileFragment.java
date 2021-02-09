@@ -196,7 +196,7 @@ public class EditProfileFragment extends Fragment {
                             email = user.getString("email");
                             et_nama.setText(user.getString("name"));
                             et_email.setText(user.getString("email"));
-                            if (user.getString("email_verified_at") != ""){
+                            if (!user.isNull("email_verified_at")){
                                 isverify.setText(R.string.terverifikasi);
                                 isverify.setBackground(getResources().getDrawable(R.drawable.bg_button_red));
                                 isverify.setBackgroundTintList(getActivity().getColorStateList(R.color.textColorLightRed));
