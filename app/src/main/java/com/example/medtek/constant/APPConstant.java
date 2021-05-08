@@ -48,6 +48,7 @@ public class APPConstant {
     //Channel
     public static final String CHANNEL_MESSAGES = "App.User.Conversation.";
     public static final String CHANNEL_VIDEO_CHAT = "App.User.Video.";
+    public static final String CHANNEL_VOICE_CHAT = "App.User.Voice.";
     public static final String CHANNEL_JANJI = "App.User.Janji.";
 
     //Event

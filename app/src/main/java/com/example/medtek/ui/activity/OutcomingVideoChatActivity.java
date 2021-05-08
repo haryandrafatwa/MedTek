@@ -32,6 +32,8 @@ import static com.example.medtek.constant.APPConstant.MESSAGE_ACC_RESPONSE_VIDEO
 import static com.example.medtek.constant.APPConstant.MESSAGE_HANGUP_RESPONSE_VIDEO_CALL;
 import static com.example.medtek.constant.APPConstant.MESSAGE_REQUEST_VIDEO_CALL;
 import static com.example.medtek.network.socket.SocketUtil.getMessageFromObject;
+import static com.example.medtek.ui.activity.ChatRoomActivity.IS_AUDIO_ON;
+import static com.example.medtek.ui.activity.ChatRoomActivity.IS_VIDEO_ON;
 import static com.example.medtek.ui.activity.IncomingVideoChatActivity.BUNDLE_CHAT_MODEL;
 import static com.example.medtek.ui.activity.IncomingVideoChatActivity.PERMISSIONS_REQUEST_CODE_VIDEO_CHAT;
 import static com.example.medtek.utils.Utils.getPermissionChatList;
@@ -50,11 +52,11 @@ public class OutcomingVideoChatActivity extends SingleActivity {
     private boolean isAudioOn = true;
     private boolean isVideoOn = true;
 
-    public static void navigate(Activity activity, ChatsModel chatsModel) {
+    public static void navigate(Activity activity, ChatsModel chatsModel, int requestCode) {
         Intent intent = new Intent(activity, OutcomingVideoChatActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra(BUNDLE_CHAT_MODEL, chatsModel);
-        activity.startActivity(intent);
+        activity.startActivityForResult(intent, requestCode);
     }
 
     @Override
@@ -80,10 +82,12 @@ public class OutcomingVideoChatActivity extends SingleActivity {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 startPreview();
             } else {
-                finish();
+                this.setResult(Activity.RESULT_CANCELED);
+                this.finish();
             }
         } else {
-            finish();
+            this.setResult(Activity.RESULT_CANCELED);
+            this.finish();
         }
     }
 
@@ -130,7 +134,8 @@ public class OutcomingVideoChatActivity extends SingleActivity {
         binding.btnHangup.setOnClickListener(v -> {
             sendResponseHangupVideoChat();
             unbindPreview();
-            finish();
+            this.setResult(Activity.RESULT_CANCELED);
+            this.finish();
         });
     }
 
@@ -146,14 +151,34 @@ public class OutcomingVideoChatActivity extends SingleActivity {
 
     private void listenResponseVideoChat() {
         String eventName = EVENT_RESPONSE_CALL + chatsModel.getIdJanji();
-        SocketUtil.getInstance().getChannelVideoChat(chatsModel.getIdJanji()).listenForWhisper(eventName, args -> {
+        SocketUtil.getInstance().getChannelVideoChat(chatsModel.getIdJanji()).listen(eventName, args -> {
             if (getMessageFromObject(args).equalsIgnoreCase(MESSAGE_ACC_RESPONSE_VIDEO_CALL)) {
-                MyJitsiMeetActivity.navigate(this, isVideoOn, isAudioOn, chatsModel.getIdJanji(), true);
+//                MyJitsiMeetActivity.navigate(this, isVideoOn, isAudioOn, chatsModel.getIdJanji(), true);
                 unbindPreview();
-                finish();
+                Intent intent = getIntent();
+                intent.putExtra(IS_VIDEO_ON, isVideoOn);
+                intent.putExtra(IS_AUDIO_ON, isAudioOn);
+                this.setResult(Activity.RESULT_OK, intent);
+                this.finish();
             } else if (getMessageFromObject(args).equalsIgnoreCase(MESSAGE_HANGUP_RESPONSE_VIDEO_CALL)) {
                 unbindPreview();
-                finish();
+                this.setResult(Activity.RESULT_CANCELED);
+                this.finish();
+            }
+        });
+        SocketUtil.getInstance().getChannelVideoChat(chatsModel.getIdJanji()).listenForWhisper(eventName, args -> {
+            if (getMessageFromObject(args).equalsIgnoreCase(MESSAGE_ACC_RESPONSE_VIDEO_CALL)) {
+//                MyJitsiMeetActivity.navigate(this, isVideoOn, isAudioOn, chatsModel.getIdJanji(), true);
+                unbindPreview();
+                Intent intent = getIntent();
+                intent.putExtra(IS_VIDEO_ON, isVideoOn);
+                intent.putExtra(IS_AUDIO_ON, isAudioOn);
+                this.setResult(Activity.RESULT_OK, intent);
+                this.finish();
+            } else if (getMessageFromObject(args).equalsIgnoreCase(MESSAGE_HANGUP_RESPONSE_VIDEO_CALL)) {
+                unbindPreview();
+                this.setResult(Activity.RESULT_CANCELED);
+                this.finish();
             }
         });
     }

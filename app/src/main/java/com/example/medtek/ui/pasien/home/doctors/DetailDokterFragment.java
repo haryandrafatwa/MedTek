@@ -29,6 +29,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.medtek.R;
 import com.example.medtek.model.pasien.FeedbackModel;
 import com.example.medtek.network.RetrofitClient;
+import com.example.medtek.ui.activity.MainActivity;
+import com.example.medtek.ui.activity.WelcomePageActivity;
+import com.example.medtek.ui.pasien.home.HomeFragment;
 import com.example.medtek.ui.pasien.home.appointment.BuatJanjiFragment;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -55,8 +58,11 @@ import retrofit2.Response;
 
 import static com.example.medtek.network.RetrofitClient.BASE_URL;
 import static com.example.medtek.utils.PropertyUtil.ACCESS_TOKEN;
+import static com.example.medtek.utils.PropertyUtil.LOGIN_STATUS;
 import static com.example.medtek.utils.PropertyUtil.REFRESH_TOKEN;
 import static com.example.medtek.utils.PropertyUtil.getData;
+import static com.example.medtek.utils.PropertyUtil.searchData;
+import static com.example.medtek.utils.Utils.TAG;
 
 public class DetailDokterFragment extends Fragment {
 
@@ -82,7 +88,7 @@ public class DetailDokterFragment extends Fragment {
 
     private RelativeLayout rl_content,rl_loader;
     private ShimmerFrameLayout shimmerFrameLayout;
-    private String access, refresh;
+    private String access = "", refresh = "";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -115,7 +121,7 @@ public class DetailDokterFragment extends Fragment {
                     JSONObject specObj = new JSONObject(obj.getString("specialization"));
                     String spec = specObj.getString("specialization");
                     tv_dr_spec.setText(spec);
-                    tv_dr_exp.setText(obj.getString("lama_kerja")+" "+getActivity().getResources().getString(R.string.tahun)+" "+getActivity().getResources().getString(R.string.exp));
+                    tv_dr_exp.setText((obj.isNull("lama_kerja") ? "-" : obj.getString("lama_kerja"))+" "+getActivity().getResources().getString(R.string.tahun)+" "+getActivity().getResources().getString(R.string.exp));
                     JSONObject rsObject = new JSONObject(obj.getString("hospital"));
                     String rs_name = rsObject.getString("name");
                     JSONObject alamatObject = new JSONObject(obj.getString("alamat"));
@@ -126,10 +132,17 @@ public class DetailDokterFragment extends Fragment {
                     tv_dr_rs_loc.setText(rs_loc);
                     tv_dr_grd.setText(obj.getString("lulusan"));
                     String path="";
+
+                    JSONArray jsonArrayImage = new JSONArray(obj.getString("image"));
                     if (new JSONArray(obj.getString("image")).length() !=0){
-                        JSONArray jsonArray = new JSONArray(obj.getString("image"));
-                        path = BASE_URL+jsonArray.getJSONObject(0).getString("path");
-                    }else{
+                        for (int j = 0; j < jsonArrayImage.length(); j++) {
+                            JSONObject imageObj = jsonArrayImage.getJSONObject(j);
+                            if (imageObj.getInt("type_id") == 1) {
+                                path = BASE_URL + imageObj.getString("path");
+                                break;
+                            }
+                        }
+                    } else {
                         path = BASE_URL+"/storage/Dokter.png";
                     }
 
@@ -187,7 +200,7 @@ public class DetailDokterFragment extends Fragment {
 
                         @Override
                         public void onError(Exception e) {
-
+                            e.printStackTrace();
                         }
                     });
 
@@ -216,38 +229,42 @@ public class DetailDokterFragment extends Fragment {
                     btnBuatJanji.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Call<ResponseBody> getUser = RetrofitClient.getInstance().getApi().getUser("Bearer "+access);
-                            getUser.enqueue(new Callback<ResponseBody>() {
-                                @Override
-                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                    try{
-                                        if (response.isSuccessful()){
-                                            if (response.body() != null){
-                                                String s = response.body().string();
-                                                JSONObject user = new JSONObject(s);
-                                                Log.e("TAG", "onResponse: "+s );
-                                                if (!user.isNull("email_verified_at")){
-                                                    BuatJanjiFragment buatJanjiFragment = new BuatJanjiFragment();
-                                                    Bundle bundle = new Bundle();
-                                                    bundle.putInt("id_dokter",id_dokter);
-                                                    buatJanjiFragment.setArguments(bundle);
-                                                    setFragment(buatJanjiFragment,"FragmentBuatJanji");
-                                                    Toasty.error(getActivity(),"verifikasi!").show();
-                                                }else{
-                                                    Toasty.error(getActivity(),"Silahkan verifikasi akun terlebih dahulu!").show();
+                            if (!access.equals("") && !refresh.equals("")) {
+                                Call<ResponseBody> getUser = RetrofitClient.getInstance().getApi().getUser("Bearer "+access);
+                                getUser.enqueue(new Callback<ResponseBody>() {
+                                    @Override
+                                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                        try{
+                                            if (response.isSuccessful()){
+                                                if (response.body() != null){
+                                                    String s = response.body().string();
+                                                    JSONObject user = new JSONObject(s);
+                                                    Log.e("TAG", "onResponse: "+s );
+                                                    if (!user.isNull("email_verified_at")){
+                                                        BuatJanjiFragment buatJanjiFragment = new BuatJanjiFragment();
+                                                        Bundle bundle = new Bundle();
+                                                        bundle.putInt("id_dokter",id_dokter);
+                                                        buatJanjiFragment.setArguments(bundle);
+                                                        setFragment(buatJanjiFragment,"FragmentBuatJanji");
+                                                        Toasty.error(getActivity(),"verifikasi!").show();
+                                                    }else{
+                                                        Toasty.error(getActivity(),"Silahkan verifikasi akun terlebih dahulu!").show();
+                                                    }
                                                 }
                                             }
+                                        } catch (IOException | JSONException e) {
+                                            e.printStackTrace();
                                         }
-                                    } catch (IOException | JSONException e) {
-                                        e.printStackTrace();
                                     }
-                                }
 
-                                @Override
-                                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                    @Override
+                                    public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-                                }
-                            });
+                                    }
+                                });
+                            } else {
+                                navigateWelcome();
+                            }
                         }
                     });
 
@@ -340,8 +357,17 @@ public class DetailDokterFragment extends Fragment {
 //        SharedPreferences sharedPreferences = context.getSharedPreferences("sharedPrefs", MODE_PRIVATE);
 //        this.access = sharedPreferences.getString("token", "");
 //        this.refresh = sharedPreferences.getString("refresh_token", "");
-        this.access = (String) getData(ACCESS_TOKEN);
-        this.refresh = (String) getData(REFRESH_TOKEN);
+        if (searchData(LOGIN_STATUS) || searchData(ACCESS_TOKEN)) {
+            if ((boolean) getData(LOGIN_STATUS)) {
+                this.access = (String) getData(ACCESS_TOKEN);
+                this.refresh = (String) getData(REFRESH_TOKEN);
+            }
+        }
+    }
+
+    private void navigateWelcome() {
+        Intent home = new Intent(getContext(), WelcomePageActivity.class);
+        startActivity(home);
     }
 
 }

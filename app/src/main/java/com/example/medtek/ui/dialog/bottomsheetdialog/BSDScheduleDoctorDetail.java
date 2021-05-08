@@ -137,7 +137,7 @@ public class BSDScheduleDoctorDetail extends BaseBottomSheetDialog {
                                 }
                             }
                             ((ChatFragment) getParentFragment()).navigateToChatRoomWithResult(chatsModel, ChatRoomActivity.REQ_ACTIVE_CHAT);
-                            ((ChatFragment) getParentFragment()).startChat(model.getIdJanji());
+//                            ((ChatFragment) getParentFragment()).startChat(model.getIdJanji());
                             dismiss();
                         }
                     } else {

@@ -1,13 +1,17 @@
 package com.example.medtek.ui.activity;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -20,6 +24,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.transition.Fade;
 import androidx.transition.Transition;
@@ -37,6 +42,7 @@ import com.example.medtek.callback.BaseCallback;
 import com.example.medtek.controller.AppointmentController;
 import com.example.medtek.controller.ConversationController;
 import com.example.medtek.databinding.ActivityChatRoomBinding;
+import com.example.medtek.model.CallModel;
 import com.example.medtek.model.ChatsModel;
 import com.example.medtek.model.JanjiModel;
 import com.example.medtek.model.MediaModel;
@@ -63,6 +69,11 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
+import org.jitsi.meet.sdk.BroadcastEvent;
+import org.jitsi.meet.sdk.BroadcastIntentHelper;
+import org.jitsi.meet.sdk.JitsiMeetActivity;
+import org.jitsi.meet.sdk.JitsiMeetActivityDelegate;
+import org.jitsi.meet.sdk.JitsiMeetConferenceOptions;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -80,15 +91,20 @@ import pl.aprilapps.easyphotopicker.DefaultCallback;
 import pl.aprilapps.easyphotopicker.EasyImage;
 import pl.aprilapps.easyphotopicker.MediaFile;
 import pl.aprilapps.easyphotopicker.MediaSource;
+import timber.log.Timber;
 
 import static com.example.medtek.BuildConfig.BASE_URL;
 import static com.example.medtek.constant.APPConstant.ERROR_NULL;
+import static com.example.medtek.constant.APPConstant.EVENT_REQUEST_CALL;
+import static com.example.medtek.constant.APPConstant.EVENT_RESPONSE_ON_CALL;
 import static com.example.medtek.constant.APPConstant.LOGIN_PASIEN;
+import static com.example.medtek.constant.APPConstant.MESSAGE_HANGUP_RESPONSE_VOICE_CALL;
 import static com.example.medtek.constant.APPConstant.MESSAGE_REQUEST_VIDEO_CALL;
 import static com.example.medtek.constant.APPConstant.MESSAGE_REQUEST_VOICE_CALL;
 import static com.example.medtek.constant.APPConstant.NO_CONNECTION;
 import static com.example.medtek.constant.APPConstant.SERVER_BROKEN;
 import static com.example.medtek.constant.APPConstant.SUDAH_SELESAI;
+import static com.example.medtek.network.socket.SocketUtil.getMessageFromObject;
 import static com.example.medtek.utils.PropertyUtil.ACTIVE_CHAT;
 import static com.example.medtek.utils.PropertyUtil.DATA_USER;
 import static com.example.medtek.utils.PropertyUtil.USER_TYPE;
@@ -115,6 +131,9 @@ import static com.example.medtek.utils.Utils.hideKeyboard;
 import static com.example.medtek.utils.Utils.isPatient;
 import static com.example.medtek.utils.Utils.requestPermissionCompat;
 import static com.example.medtek.utils.Utils.setNewFileName;
+import static com.example.medtek.utils.Utils.setupJitsi;
+import static com.example.medtek.utils.Utils.setupVideoJitsi;
+import static com.example.medtek.utils.Utils.setupVoiceJitsi;
 import static com.example.medtek.utils.Utils.showToastyError;
 import static java.lang.String.valueOf;
 
@@ -122,6 +141,20 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
     private static final String TAG = ChatRoomActivity.class.getSimpleName();
 
     public static final int REQ_ACTIVE_CHAT = 6661;
+    public static int count = 0;
+
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            onBroadcastReceived(intent);
+        }
+    };
+
+    public static final int REQ_VOICE_CALL = 6662;
+    public static final String IS_VIDEO_ON = "is_video_on";
+    public static final String IS_AUDIO_ON = "is_audio_on";
+    public static final int REQ_VIDEO_CALL = 6663;
+    private JitsiMeetConferenceOptions options;
 
     private static final int CHOOSER_PERMISSIONS_REQUEST_CODE_IMAGE = 7459;
     private static final int CHOOSER_PERMISSIONS_REQUEST_CODE_VIDEO = 7460;
@@ -157,6 +190,7 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
     private int endChat = 0;
 
     private final ArrayList<Integer> tempIdChat = new ArrayList<>();
+    private boolean isTerminatedByResponse = false;
 
     public static void navigate(Activity activity) {
         Intent intent = new Intent(activity, ChatRoomActivity.class);
@@ -205,8 +239,10 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
         mediaModels = new ArrayList<>();
         imagesCount = 0;
         imagesCountNow = 0;
+        count = 0;
         isEndChats = false;
 
+        // FOR TEMP
         SocketUtil.getInstance().setChannelVideoChat(chatsModel.getIdJanji());
     }
 
@@ -270,7 +306,8 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
             App.getInstance().runOnUiThread(() -> {
                 if (newEvent instanceof MessageModel) {
                     MessageModel newChat = (MessageModel) newEvent;
-                    Log.d(TAG, "fromSocket: " + newChat.getChat().getMessage());
+                    Log.d(TAG, "messageFromSocket: " + ((newChat.getChat().getMessage() != null) ? newChat.getChat().getMessage() : "null"));
+                    Log.d(TAG, "attachmentFromSocket: " + ((newChat.getChat().getAttachment() != null) ? newChat.getChat().getAttachment() : "null"));
                     if (tempIdChat.isEmpty() || newChat.getChat().getIdChat() != tempIdChat.get(tempIdChat.size() - 1)) {
                         if (newChat.getChat().getIdSender() != ((UserModel) getData(DATA_USER)).getIdUser()) {
                             tempIdChat.add(newChat.getChat().getIdChat());
@@ -281,19 +318,24 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
                                 chatAdapter.addItem(chat);
 
                             } else {
-                                if (newChat.getChat().getMessage().equals(ChatType.IMAGE.canonicalForm())) {
-                                    Log.d(TAG, newChat.getChat().getAttachment());
-
-                                    getImageAttachment(newChat.getChat().getAttachment(), true, -1);
-
-                                } else if (newChat.getChat().getMessage().equals(ChatType.VIDEO.canonicalForm())) {
-                                    ChatType type = ChatType.VIDEO;
-
-                                    getVideoAttachment(newChat.getChat().getAttachment(), true, -1);
+                                String attachment = newChat.getChat().getAttachment();
+                                String message = newChat.getChat().getMessage();
+                                if (message != null) {
+                                    if (message.equals(ChatType.IMAGE.canonicalForm())) {
+                                        getImageAttachment(attachment, true, -1);
+                                    } else if (message.equals(ChatType.VIDEO.canonicalForm())) {
+                                        getVideoAttachment(attachment, true, -1);
+                                    } else {
+                                        getFileAttachment(attachment, true, -1);
+                                    }
                                 } else {
-                                    ChatType type = ChatType.FILE;
-
-                                    getFileAttachment(newChat.getChat().getAttachment(), true, -1);
+                                    if (getFileExt(attachment).equals(".jpg") | getFileExt(attachment).equals(".jpeg")) {
+                                        getImageAttachment(attachment, true, -1);
+                                    } else if (getFileExt(attachment).equals(".mp4") | getFileExt(attachment).equals(".3gp")) {
+                                        getVideoAttachment(attachment, true, -1);
+                                    } else {
+                                        getFileAttachment(attachment, true, -1);
+                                    }
                                 }
                             }
                             moveToBottomRV(moveToBottomRv, 0);
@@ -304,15 +346,38 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
                     JanjiModel janjiUpdate = (JanjiModel) newEvent;
                     Log.d(TAG, "idStatus: " + janjiUpdate.getJanji().getIdStatus());
                     if (janjiUpdate.getJanji().getIdStatus() == SUDAH_SELESAI) {
-                        endSession();
+                        // FOR TEMP
+//                        endSession();
                     }
                 } else if (newEvent instanceof String) {
                     String newMessage = (String) newEvent;
                     if (newMessage.equals(MESSAGE_REQUEST_VIDEO_CALL)) {
-                        IncomingVideoChatActivity.navigate(this, chatsModel);
+                        isTerminatedByResponse = false;
+//                        options = setupVideoJitsi(true, true, chatsModel.getIdJanji());
+//                        Handler handler = new Handler();
+//                        handler.postDelayed(() -> {
+//                            JitsiMeetActivity.launch(this, options);
+//                        }, 10000);
+                        IncomingVideoChatActivity.navigate(this, chatsModel, REQ_VIDEO_CALL);
                     } else if (newMessage.equals(MESSAGE_REQUEST_VOICE_CALL)) {
-                        IncomingVoiceChatActivity.navigate(this, chatsModel);
+                        isTerminatedByResponse = false;
+//                        setupJitsi();
+//                        options = setupVoiceJitsi(chatsModel.getIdJanji());
+//                        JitsiMeetActivity.launch(this, options);
+                        IncomingVoiceChatActivity.navigate(this, chatsModel, REQ_VOICE_CALL);
                     }
+                } else if (newEvent instanceof CallModel) {
+                    CallModel callModel = (CallModel) newEvent;
+//
+                    Log.d(TAG, "TO_VOICE_CALL");
+                    Log.d(TAG, "Call Model: " + callModel.getState());
+//
+//                    if (callModel.getState() == RESULT_OK) {
+//                        options = setupVoiceJitsi(callModel.getIdJanji());
+//                        registerForBroadcastMessages();
+//                        listenResponse();
+//                        JitsiMeetActivity.launch(this, options);
+//                    }
                 }
             });
         } catch (Exception e) {
@@ -320,9 +385,12 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
         }
     }
 
+
     @Override
     protected void setupView() {
         setupToolbar();
+        registerForBroadcastMessages();
+        listenResponse();
         chatAdapter = new ChatAdapter(App.getContext(), this, isActiveChats);
         setSenderPict(chatsModel.getSenderAvatar());
         binding.tvSenderName.setText(chatsModel.getSenderName());
@@ -709,15 +777,26 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
                 if (binding.rlAccessVideoVoice.getVisibility() == View.VISIBLE) {
                     binding.rlAccessVideoVoice.setVisibility(View.GONE);
                 }
-                OutcomingVoiceChatActivity.navigate(this, chatsModel);
+                isTerminatedByResponse = false;
+                OutcomingVoiceChatActivity.navigate(this, chatsModel, REQ_VOICE_CALL);
+//                setupJitsi();
+//                options = setupVoiceJitsi(chatsModel.getIdJanji());
+//                JitsiMeetActivity.launch(this, options);
+//                sendRequestVoiceChat();
+                Log.d(TAG, "startCall");
 //                VoiceChatActivity.navigate(this, chatsModel);
                 break;
             case R.id.opt_video_call:
                 if (binding.rlAccessVideoVoice.getVisibility() == View.VISIBLE) {
                     binding.rlAccessVideoVoice.setVisibility(View.GONE);
                 }
-                OutcomingVideoChatActivity.navigate(this, chatsModel);
+                isTerminatedByResponse = false;
+                OutcomingVideoChatActivity.navigate(this, chatsModel, REQ_VIDEO_CALL);
 //                VideoChatActivity.navigate(this, chatsModel);
+//                isTerminatedByResponse = false;
+//                options = setupVideoJitsi(true, true, chatsModel.getIdJanji());
+//                JitsiMeetActivity.launch(this, options);
+//                sendRequestVideoChat();
                 break;
             case R.id.rl_end_chat:
                 BSDEndSession fragment = new BSDEndSession();
@@ -851,6 +930,26 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
                     }
                     filePicker.submit(data);
                     break;
+                case REQ_VOICE_CALL:
+                    Log.d(TAG, "TO_VOICE_CALL");
+                    setupJitsi();
+                    options = setupVoiceJitsi(chatsModel.getIdJanji());
+//                    registerForBroadcastMessages();
+//                    listenResponse();
+                    JitsiMeetActivity.launch(this, options);
+                case REQ_VIDEO_CALL:
+                    Log.d(TAG, "TO_VIDEO_CALL");
+                    boolean isVideoOn = false;
+                    boolean isAudioOn = false;
+                    if (data != null) {
+                        isVideoOn = data.getBooleanExtra(ChatRoomActivity.IS_VIDEO_ON, false);
+                        isAudioOn = data.getBooleanExtra(ChatRoomActivity.IS_AUDIO_ON, false);
+                    }
+                    setupJitsi();
+                    options = setupVideoJitsi(isVideoOn, isAudioOn, chatsModel.getIdJanji());
+//                    registerForBroadcastMessages();
+//                    listenResponse();
+                    JitsiMeetActivity.launch(this, options);
             }
         }
 
@@ -1300,6 +1399,7 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
         if (isFileExist || isActiveChats) {
             File file = new File(getPath(model.getType()) +
                     getFileName(model.getMessage()));
+            Log.d(TAG, "filePath: " + file.getPath());
             String[] arrFileInfo = getFileInfo(file).split(",");
             Intent intent = new Intent(Intent.ACTION_VIEW);
 
@@ -1348,6 +1448,95 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
             getFileAttachment(model.getMessage(), false, position);
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        Log.d(TAG, "IS DESTROY");
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+
+        super.onDestroy();
+    }
+
+    private void registerForBroadcastMessages() {
+        IntentFilter intentFilter = new IntentFilter();
+
+        /* This registers for every possible event sent from JitsiMeetSDK
+           If only some of the events are needed, the for loop can be replaced
+           with individual statements:
+           ex:  intentFilter.addAction(BroadcastEvent.Type.AUDIO_MUTED_CHANGED.getAction());
+                intentFilter.addAction(BroadcastEvent.Type.CONFERENCE_TERMINATED.getAction());
+                ... other events
+         */
+//        for (BroadcastEvent.Type type : BroadcastEvent.Type.values()) {
+//            intentFilter.addAction(type.getAction());
+//        }
+
+        intentFilter.addAction(BroadcastEvent.Type.CONFERENCE_TERMINATED.getAction());
+
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, intentFilter);
+    }
+
+    private void onBroadcastReceived(Intent intent) {
+        if (intent != null) {
+            BroadcastEvent event = new BroadcastEvent(intent);
+
+            if (event.getType() == BroadcastEvent.Type.CONFERENCE_TERMINATED) {
+                if (!isTerminatedByResponse) {
+                    sendResponseHangup();
+                }
+            }
+        }
+    }
+
+    private void sendResponseHangup() {
+        Log.d(TAG, "checkSendResponse");
+        if (isPatient()) {
+            Log.d(TAG, "sendResponsebyPatient");
+        } else {
+            Log.d(TAG, "sendResponsebyDoctor");
+        }
+        String eventName = EVENT_RESPONSE_ON_CALL + chatsModel.getIdJanji();
+        SocketUtil.getInstance().whisperMessageChannelVideo(eventName,
+                MESSAGE_HANGUP_RESPONSE_VOICE_CALL, chatsModel.getIdJanji());
+    }
+
+    private void listenResponse() {
+        String eventName = EVENT_RESPONSE_ON_CALL + chatsModel.getIdJanji();
+        Log.d(TAG, "checkListenResponse: " + eventName);
+        SocketUtil.getInstance().getChannelVideoChat(chatsModel.getIdJanji()).listenForWhisper(eventName, args -> {
+            if (args != null) {
+                Log.d(TAG, "getResponse");
+            } else {
+                Log.d(TAG, "noGetResponse");
+            }
+            if (getMessageFromObject(args).equalsIgnoreCase(MESSAGE_HANGUP_RESPONSE_VOICE_CALL)) {
+                isTerminatedByResponse = true;
+                hangUp();
+            }
+        });
+    }
+
+    private void hangUp() {
+        Intent hangupBroadcastIntent = BroadcastIntentHelper.buildHangUpIntent();
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(hangupBroadcastIntent);
+    }
+
+    private void sendRequestVoiceChat() {
+        if (!isPatient()) {
+            String eventName = EVENT_REQUEST_CALL + chatsModel.getIdJanji();
+            SocketUtil.getInstance().whisperMessageChannelVideo(eventName, MESSAGE_REQUEST_VOICE_CALL, chatsModel.getIdJanji());
+        }
+    }
+
+    private void sendRequestVideoChat() {
+        if (!isPatient()) {
+            String eventName = EVENT_REQUEST_CALL + chatsModel.getIdJanji();
+            SocketUtil.getInstance().whisperMessageChannelVideo(eventName, MESSAGE_REQUEST_VIDEO_CALL, chatsModel.getIdJanji());
+        }
+    }
+
+
 
 }
 

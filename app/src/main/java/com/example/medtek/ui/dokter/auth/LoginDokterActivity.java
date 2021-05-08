@@ -3,6 +3,7 @@ package com.example.medtek.ui.dokter.auth;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
@@ -18,6 +19,7 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -34,6 +36,7 @@ import com.example.medtek.network.request.LoginRequest;
 import com.example.medtek.network.response.AuthTokenResponse;
 import com.example.medtek.network.response.GetUserResponse;
 import com.example.medtek.ui.activity.MainActivity;
+import com.example.medtek.ui.pasien.auth.LoginPasienActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,7 +57,9 @@ import static com.example.medtek.utils.PropertyUtil.setApplicationState;
 import static com.example.medtek.utils.PropertyUtil.setData;
 import static com.example.medtek.utils.PropertyUtil.setDataLogin;
 import static com.example.medtek.utils.Utils.TAG;
+import static com.example.medtek.utils.Utils.getPermissionStorageList;
 import static com.example.medtek.utils.Utils.isLoading;
+import static com.example.medtek.utils.Utils.requestPermissionCompat;
 
 public class LoginDokterActivity extends AppCompatActivity {
 
@@ -292,7 +297,7 @@ public class LoginDokterActivity extends AppCompatActivity {
                 App.getInstance().runOnUiThread(() -> {
                     Toasty.success(LoginDokterActivity.this,getString(R.string.masukberhasil)).show();
                 });
-                MainActivity.navigate(LoginDokterActivity.this, true);
+                requestPermissionCompat(LoginDokterActivity.this, getPermissionStorageList(), MainActivity.PERMISSION_STORAGE);
             }
 
             @Override
@@ -310,5 +315,14 @@ public class LoginDokterActivity extends AppCompatActivity {
                 Log.d(TAG(LoginDokterActivity.class), "Server Broken");
             }
         });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == MainActivity.PERMISSION_STORAGE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                MainActivity.navigate(LoginDokterActivity.this, true);
+            }
+        }
     }
 }

@@ -1,15 +1,20 @@
 package com.example.medtek.ui.activity;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.medtek.R;
 import com.example.medtek.callback.BaseCallback;
@@ -29,21 +34,32 @@ import com.example.medtek.network.response.GetConversationListResponse;
 import com.example.medtek.network.response.GetConversationResponse;
 import com.example.medtek.network.response.GetInfoUserResponse;
 import com.example.medtek.network.response.GetJanjiListResponse;
+import com.example.medtek.network.socket.SocketUtil;
 import com.example.medtek.ui.fragment.ChatFragment;
 import com.example.medtek.ui.pasien.home.HomeFragment;
 import com.example.medtek.ui.pasien.others.OthersFragment;
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 
+import org.jitsi.meet.sdk.BroadcastEvent;
+import org.jitsi.meet.sdk.BroadcastIntentHelper;
+import org.jitsi.meet.sdk.JitsiMeetActivity;
+import org.jitsi.meet.sdk.JitsiMeetConferenceOptions;
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
+
 import static com.example.medtek.constant.APPConstant.ERROR_NULL;
+import static com.example.medtek.constant.APPConstant.EVENT_RESPONSE_ON_CALL;
 import static com.example.medtek.constant.APPConstant.IMAGE_AVATAR;
+import static com.example.medtek.constant.APPConstant.MESSAGE_HANGUP_RESPONSE_VOICE_CALL;
 import static com.example.medtek.constant.APPConstant.NO_CONNECTION;
 import static com.example.medtek.constant.APPConstant.SERVER_BROKEN;
+import static com.example.medtek.network.socket.SocketUtil.getMessageFromObject;
+import static com.example.medtek.ui.pasien.home.HomeFragment.REQUEST_CODE_LOC;
 import static com.example.medtek.utils.PropertyUtil.ACCESS_TOKEN;
 import static com.example.medtek.utils.PropertyUtil.DATA_USER;
 import static com.example.medtek.utils.PropertyUtil.EXPIRED_TOKEN;
@@ -58,17 +74,23 @@ import static com.example.medtek.utils.PropertyUtil.setData;
 import static com.example.medtek.utils.PropertyUtil.setDataLogin;
 import static com.example.medtek.utils.Utils.TAG;
 import static com.example.medtek.utils.Utils.getDateTime;
-import static com.example.medtek.utils.Utils.getPermissionStorageAndLocationList;
+import static com.example.medtek.utils.Utils.getFileExt;
+import static com.example.medtek.utils.Utils.getTypeText;
 import static com.example.medtek.utils.Utils.isPatient;
 import static com.example.medtek.utils.Utils.requestPermissionCompat;
+import static com.example.medtek.utils.Utils.setupVoiceJitsi;
 import static com.example.medtek.utils.Utils.showToastyError;
 import static com.orhanobut.hawk.Hawk.deleteAll;
 import static java.lang.String.valueOf;
 
 public class MainActivity extends AppCompatActivity {
 
+    private int idJanjiForCall = 0;
+
     public static final String BUNDLE_ALREADY_LOGIN = "bundle_has_login";
-    private static final int PERMISSION_STORAGE = 7669;
+    public static final int PERMISSION_STORAGE = 7669;
+
+    private JitsiMeetConferenceOptions options;
 
     ChipNavigationBar chipNavigationBar;
     FragmentManager fragmentManager;
@@ -98,14 +120,23 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getApplicationState() == ApplyStateType.State_Finish_Login) {
+            SplashScreen.navigate(MainActivity.this);
+        }
         loginController = new LoginController();
-        if (shouldLogin()) {
-            Log.d(TAG, "Not Login");
-            return;
+        if (searchData(LOGIN_STATUS)  ||searchData(ACCESS_TOKEN)) {
+            if ((boolean) getData(LOGIN_STATUS)) {
+                if (shouldLogin()) {
+                    Log.d(TAG, "Not Login");
+                    return;
+                }
+            } else {
+                navigateWelcome();
+                finish();
+            }
         }
         setContentView(R.layout.activity_main);
         chipNavigationBar = findViewById(R.id.bottomBar);
-        requestPermissionCompat(this, getPermissionStorageAndLocationList(), PERMISSION_STORAGE);
         loadData(MainActivity.this);
         initBottomNavBar(savedInstanceState);
         init();
@@ -120,74 +151,55 @@ public class MainActivity extends AppCompatActivity {
     private void initBottomNavBar(Bundle savedInstanceState) {
         chatFragment = new ChatFragment();
 
-        if (isPatient()) {
-            if (savedInstanceState==null){
-                chipNavigationBar.setItemSelected(R.id.homee,true);
-                fragmentManager = getSupportFragmentManager();
+        if (savedInstanceState==null){
+            chipNavigationBar.setItemSelected(R.id.homee,true);
+            fragmentManager = getSupportFragmentManager();
+            if (isPatient() || !searchData(LOGIN_STATUS) || !((boolean) getData(LOGIN_STATUS)) || !searchData(ACCESS_TOKEN)) {
                 HomeFragment homeFragment = new HomeFragment();
                 fragmentManager.beginTransaction().replace(R.id.frameFragment,homeFragment).addToBackStack("FragmentHomePasien").commit();
-            }
-
-            chipNavigationBar.setOnItemSelectedListener(new ChipNavigationBar.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(int i) {
-
-                    Fragment fragment = null;
-                    switch (i){
-                        case R.id.chat:
-                            fragment = chatFragment;
-                            TAG = "FragmentChatPasien";
-                            break;
-                        case R.id.homee:
-                            fragment = new HomeFragment();
-                            TAG = "FragmentHomePasien";
-                            break;
-                        case R.id.others:
-                            fragment = new OthersFragment();
-                            TAG = "FragmentOthersPasien";
-                            break;
-                    }
-
-                    if (fragment!= null){
-                        fragmentManager = getSupportFragmentManager();
-                        fragmentManager.beginTransaction().replace(R.id.frameFragment,fragment).addToBackStack(TAG).commit();
-                    }
-
-                }
-            });
-        } else {
-            if (savedInstanceState==null){
-                chipNavigationBar.setItemSelected(R.id.homee,true);
-                fragmentManager = getSupportFragmentManager();
+            } else {
                 com.example.medtek.ui.dokter.home.HomeFragment homeFragment = new com.example.medtek.ui.dokter.home.HomeFragment();
                 fragmentManager.beginTransaction().replace(R.id.frameFragment,homeFragment,"FragmentHomeDokter").addToBackStack("FragmentHomeDokter").commit();
             }
 
-            chipNavigationBar.setOnItemSelectedListener(new ChipNavigationBar.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(int i) {
+            chipNavigationBar.setOnItemSelectedListener(i -> {
 
-                    Fragment fragment = null;
-                    switch (i){
-                        case R.id.chat:
+                Fragment fragment = null;
+                switch (i){
+                    case R.id.chat:
+                        if (!searchData(LOGIN_STATUS) || !((boolean) getData(LOGIN_STATUS)) || !searchData(ACCESS_TOKEN)) {
+                            navigateWelcome();
+                            chipNavigationBar.setItemSelected(R.id.homee, true);
+                        } else {
                             fragment = chatFragment;
                             TAG = "FragmentChatDokter";
-                            break;
-                        case R.id.homee:
+                        }
+                        break;
+                    case R.id.homee:
+                        if (isPatient() || !searchData(LOGIN_STATUS) || !((boolean) getData(LOGIN_STATUS)) || !searchData(ACCESS_TOKEN)) {
+                            fragment = new HomeFragment();
+                            TAG = "FragmentHomePasien";
+                        } else {
                             fragment = new com.example.medtek.ui.dokter.home.HomeFragment();
                             TAG = "FragmentHomeDokter";
-                            break;
-                        case R.id.others:
+                        }
+                        break;
+                    case R.id.others:
+                        if (!searchData(LOGIN_STATUS) || !((boolean) getData(LOGIN_STATUS)) || !searchData(ACCESS_TOKEN)) {
+                            navigateWelcome();
+                            chipNavigationBar.setItemSelected(R.id.homee, true);
+                        } else {
                             fragment = new OthersFragment();
-                            TAG = "FragmentOthersDokter";
-                            break;
-                    }
+                            TAG = "FragmentOthersPasien";
+                        }
+                        break;
+                }
 
-                    if (fragment!= null){
+                if (searchData(LOGIN_STATUS) || searchData(ACCESS_TOKEN)) {
+                    if (fragment != null){
                         fragmentManager = getSupportFragmentManager();
-                        fragmentManager.beginTransaction().replace(R.id.frameFragment,fragment,TAG).addToBackStack(TAG).commit();
+                        fragmentManager.beginTransaction().replace(R.id.frameFragment, fragment).addToBackStack(TAG).commit();
                     }
-
                 }
             });
         }
@@ -223,7 +235,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void navigateWelcome() {
-        SplashScreen.navigate(MainActivity.this);
+        Intent home = new Intent(MainActivity.this, WelcomePageActivity.class);
+        startActivity(home);
     }
 
     public void navigateToSearchActivity() {
@@ -458,22 +471,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private ChatType getTypeText(String attachment, String message) {
-        if (attachment != null) {
-            switch (message) {
-                case "image":
-                default:
-                    return ChatType.IMAGE;
-                case "video":
-                    return ChatType.VIDEO;
-                case "file":
-                    return ChatType.FILE;
-            }
-        } else {
-            return ChatType.TEXT;
-        }
-    }
-
     private String getMessageText(String message, String attachment) {
         if (attachment == null) {
             return message;
@@ -662,26 +659,43 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, "onActivityResult() called with: requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
         if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == ChatRoomActivity.REQ_ACTIVE_CHAT) {
-                boolean isEndChat = false;
-                if (data != null) {
-                    isEndChat = data.getBooleanExtra(ChatRoomActivity.IS_END_CHATS, false);
+            switch (requestCode) {
+                case ChatRoomActivity.REQ_ACTIVE_CHAT: {
+                    boolean isEndChat = false;
+                    if (data != null) {
+                        isEndChat = data.getBooleanExtra(ChatRoomActivity.IS_END_CHATS, false);
+                    }
+                    if (!isEndChat) {
+                        chatFragment.setupDataRVActiveChats();
+                    } else {
+                        chatFragment.doStart();
+                    }
+                    break;
                 }
-                if (!isEndChat) {
-                    chatFragment.setupDataRVActiveChats();
-                } else {
-                    chatFragment.doStart();
-                }
+                case ChatRoomActivity.REQ_VOICE_CALL:
+//                    if (data != null) {
+//                        idJanjiForCall = data.getIntExtra(ChatRoomActivity.BUNDLE_ID_JANJI, 0);
+//                    }
+//                    options = setupVoiceJitsi(idJanjiForCall);
+//                    registerForBroadcastMessages();
+//                    listenResponse();
+//                    JitsiMeetActivity.launch(this, options);
+//                    break;
             }
+
         }
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-//        if (!App.isActivityVisible()) {
-//            Log.d(TAG, "checkDestroyDB");
-//            medtekHelper.close();
-//        }
+    public void onBackPressed() {
+        int count = getSupportFragmentManager().getBackStackEntryCount();
+
+        if (count == 1) {
+            super.onBackPressed();
+            finish();
+        } else {
+            getSupportFragmentManager().popBackStack();
+        }
+
     }
 }

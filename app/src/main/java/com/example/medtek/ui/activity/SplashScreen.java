@@ -40,7 +40,7 @@ public class SplashScreen extends AppCompatActivity {
 
     public static void navigate(Activity activity) {
         Intent intent = new Intent(activity, SplashScreen.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         activity.startActivity(intent);
     }
 
@@ -57,13 +57,13 @@ public class SplashScreen extends AppCompatActivity {
     private void splashScreenDelayFirst() {
         App.getInstance().runOnUIThreadDelay(() -> {
             Log.d(TAG(SplashScreen.class), "checkLoginStatus: " + (Boolean) getData(LOGIN_STATUS));
-            if (!searchData(LOGIN_STATUS) || !(Boolean) getData(LOGIN_STATUS)) {
-                Intent home=new Intent(SplashScreen.this,WelcomePageActivity.class);
-                startActivity(home);
-                finish();
-            } else {
-                MainActivity.navigate(SplashScreen.this, false);
-            }
+//            if (!searchData(LOGIN_STATUS) || !(Boolean) getData(LOGIN_STATUS)) {
+//                Intent home=new Intent(SplashScreen.this,WelcomePageActivity.class);
+//                startActivity(home);
+//                finish();
+//            } else {
+//                MainActivity.navigate(SplashScreen.this, false);
+//            }
             finish();
         }, 1200);
     }

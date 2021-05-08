@@ -28,6 +28,7 @@ import com.example.medtek.callback.BaseCallback;
 import com.example.medtek.constant.APPConstant;
 import com.example.medtek.databinding.FragmentChatBinding;
 import com.example.medtek.model.AppointmentModel;
+import com.example.medtek.model.CallModel;
 import com.example.medtek.model.ChatsModel;
 import com.example.medtek.model.ImageModel;
 import com.example.medtek.model.MessageModel;
@@ -51,6 +52,7 @@ import com.example.medtek.ui.helper.BaseFragment;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.jitsi.meet.sdk.JitsiMeetActivity;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
@@ -79,7 +81,9 @@ import static com.example.medtek.utils.Utils.TAG;
 import static com.example.medtek.utils.Utils.dateTimeToStringHour;
 import static com.example.medtek.utils.Utils.getDate;
 import static com.example.medtek.utils.Utils.getDateTime;
+import static com.example.medtek.utils.Utils.getTypeText;
 import static com.example.medtek.utils.Utils.isPatient;
+import static com.example.medtek.utils.Utils.setupVoiceJitsi;
 import static com.example.medtek.utils.Utils.showToastyError;
 import static com.example.medtek.utils.WidgetUtil.showNotification;
 import static java.lang.String.valueOf;
@@ -112,6 +116,25 @@ public class ChatFragment extends BaseFragment {
 
     @Override
     protected void setupData(@Nullable Bundle savedInstanceState) {
+        // FOR TEMP
+        if (isPatient()) {
+            ArrayList<ChatsModel.Chat> chats = new ArrayList<>();
+            ChatsModel newActiveChatsModel = new ChatsModel(468, chats);
+            newActiveChatsModel.setIdSender(92);
+            newActiveChatsModel.setSenderName("gabs");
+            newActiveChatsModel.setSenderAvatar("/storage/Dokter.png");
+            newActiveChatsModel.setIdJanji(466);
+            setData(ACTIVE_CHAT, newActiveChatsModel);
+        } else {
+            ArrayList<ChatsModel.Chat> chats = new ArrayList<>();
+            ChatsModel newActiveChatsModel = new ChatsModel(468, chats);
+            newActiveChatsModel.setIdSender(91);
+            newActiveChatsModel.setSenderName("Gabriel");
+            newActiveChatsModel.setSenderAvatar("/storage/avatar/91/1618050914.jpeg");
+            newActiveChatsModel.setIdJanji(466);
+            setData(ACTIVE_CHAT, newActiveChatsModel);
+        }
+
     }
 
     public void initState() {
@@ -119,8 +142,9 @@ public class ChatFragment extends BaseFragment {
         sizeOfChats = 0;
         sizeOfAppointmentNow = 0;
         sizeOfChatsNow = 0;
-        isAppointmentDone = false;
-        isChatsDone = false;
+        // FOR TEMP
+        isAppointmentDone = true /* false */;
+        isChatsDone = true /* false */;
     }
 
     @Override
@@ -152,13 +176,14 @@ public class ChatFragment extends BaseFragment {
         if (binding != null) {
             App.getInstance().runOnUiThread(() -> {
                 if (searchData(ACTIVE_CHAT)) {
-                    ChatsModel activeChatsModel = (ChatsModel) getData(ACTIVE_CHAT);
-                    for (ChatsModel model: chatsModels) {
-                        if (model.getIdConversation() == activeChatsModel.getIdConversation()) {
-                            chatsModels.remove(model);
-                            break;
-                        }
-                    }
+//                    FOR TEMP
+//                    ChatsModel activeChatsModel = (ChatsModel) getData(ACTIVE_CHAT);
+//                    for (ChatsModel model: chatsModels) {
+//                        if (model.getIdConversation() == activeChatsModel.getIdConversation()) {
+//                            chatsModels.remove(model);
+//                            break;
+//                        }
+//                    }
                 }
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -261,7 +286,7 @@ public class ChatFragment extends BaseFragment {
                     }
                 }
             }
-
+            Log.d(TAG, "scheduleDoctorModels.size() " + scheduleDoctorModels.size());
             if (binding != null) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     scheduleDoctorModels.sort((o1, o2) -> getDate(o1.getTglJanji()).compareTo(getDate(o2.getTglJanji())));
@@ -309,7 +334,7 @@ public class ChatFragment extends BaseFragment {
                                     isNoEmpty = true;
                                     break;
                                 } else {
-                                    if (model.getIdStatus() > 1) {
+                                    if (model.getIdStatus() >  1) {
                                         isNoEmpty = true;
                                         break;
                                     }
@@ -543,9 +568,9 @@ public class ChatFragment extends BaseFragment {
         if (newEvent instanceof String) {
             String newMessage = (String) newEvent;
             if (newMessage.equals(MESSAGE_REQUEST_VIDEO_CALL)) {
-                IncomingVideoChatActivity.navigate(getActivity(), activeChatsModel);
+                IncomingVideoChatActivity.navigate(getActivity(), activeChatsModel, ChatRoomActivity.REQ_VIDEO_CALL);
             } else if (newMessage.equals(MESSAGE_REQUEST_VOICE_CALL)) {
-                IncomingVoiceChatActivity.navigate(getActivity(), activeChatsModel);
+                IncomingVoiceChatActivity.navigate(getActivity(), activeChatsModel, ChatRoomActivity.REQ_VOICE_CALL);
             }
         } else if (newEvent instanceof MessageModel) {
             MessageModel newChat = (MessageModel) newEvent;
@@ -553,12 +578,7 @@ public class ChatFragment extends BaseFragment {
                 Log.d(TAG, "IS_ACTIVE_CHAT: YES");
                 if (newChat.getChat().getIdSender() != ((UserModel) getData(DATA_USER)).getIdUser()) {
                     Log.d(TAG, "before: " + ((ChatsModel) getData(ACTIVE_CHAT)).getChats().size());
-                    ChatType type;
-                    if (newChat.getChat().getAttachment() == null) {
-                        type = ChatType.TEXT;
-                    } else {
-                        type = ChatType.IMAGE;
-                    }
+                    ChatType type = getTypeText(newChat.getChat().getAttachment(), newChat.getChat().getMessage());
                     String time = dateTimeToStringHour(new DateTime());
                     activeChatsModel.getChats().add(new ChatsModel.Chat(
                             newChat.getChat().getIdChat(),
@@ -589,13 +609,7 @@ public class ChatFragment extends BaseFragment {
                                     newActiveChatsModel.setSenderAvatar(model.getPath());
                                 }
                             }
-
-                            ChatType type;
-                            if (newChat.getChat().getAttachment() == null) {
-                                type = ChatType.TEXT;
-                            } else {
-                                type = ChatType.IMAGE;
-                            }
+                            ChatType type = getTypeText(newChat.getChat().getAttachment(), newChat.getChat().getMessage());
                             String time = dateTimeToStringHour(new DateTime());
                             newActiveChatsModel.getChats().add(new ChatsModel.Chat(
                                     newChat.getChat().getIdChat(),
@@ -643,7 +657,8 @@ public class ChatFragment extends BaseFragment {
         initState();
         isLoading();
         binding.swipeRefresh.setRefreshing(false);
-        getDataSchedule();
+//        FOR TEMP
+//        getDataSchedule();
         if (searchData(ACTIVE_CHAT)) {
             setupDataRVActiveChats();
         } else {

@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.MimeTypeMap;
@@ -47,7 +48,9 @@ import java.util.concurrent.TimeUnit;
 import es.dmoral.toasty.Toasty;
 
 import static com.example.medtek.BuildConfig.BASE_URL;
+import static com.example.medtek.constant.APPConstant.CHANNEL_JANJI;
 import static com.example.medtek.constant.APPConstant.CHANNEL_VIDEO_CHAT;
+import static com.example.medtek.constant.APPConstant.CHANNEL_VOICE_CHAT;
 import static com.example.medtek.constant.APPConstant.ERROR_NULL;
 import static com.example.medtek.constant.APPConstant.LOGIN_DOKTER;
 import static com.example.medtek.constant.APPConstant.LOGIN_PASIEN;
@@ -56,17 +59,22 @@ import static com.example.medtek.constant.APPConstant.SERVER_BROKEN;
 import static com.example.medtek.utils.PropertyUtil.DATA_USER;
 import static com.example.medtek.utils.PropertyUtil.USER_TYPE;
 import static com.example.medtek.utils.PropertyUtil.getData;
+import static com.example.medtek.utils.PropertyUtil.searchData;
 
 public class Utils {
     public static boolean isPatient() {
-        return (int) getData(USER_TYPE) == LOGIN_PASIEN;
+        if (searchData(USER_TYPE)) {
+            return (int) getData(USER_TYPE) == LOGIN_PASIEN;
+        } else {
+            return false;
+        }
     }
 
     public static boolean isDoctor() {
         return (int) getData(USER_TYPE) == LOGIN_DOKTER;
     }
 
-    public static String[] getPermissionStorageAndLocationList() {
+    public static String[] getPermissionStorageList() {
         return new String[]{
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -215,6 +223,7 @@ public class Utils {
             mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
                     fileExtension.toLowerCase());
         }
+        Log.d(TAG(Utils.class), "mimeType: " + mimeType);
         return mimeType;
     }
 
@@ -346,6 +355,8 @@ public class Utils {
                 .setRoom(CHANNEL_VIDEO_CHAT + idJanji)
                 .setFeatureFlag("invite.enabled", false)
                 .setFeatureFlag("meeting-name.enabled", false)
+                .setFeatureFlag("call-integration.enabled", false)
+                .setFeatureFlag("tile-view.enabled", false)
                 .setVideoMuted(!isVideoOn)
                 .setAudioMuted(!isAudioOn)
                 .build();
@@ -357,7 +368,17 @@ public class Utils {
         JitsiMeetConferenceOptions optionsVideo = new JitsiMeetConferenceOptions.Builder()
                 .setRoom(CHANNEL_VIDEO_CHAT + idJanji)
                 .setFeatureFlag("invite.enabled", false)
-                .setFeatureFlag("meeting-name.enabled", false)
+                .setFeatureFlag("meeting-name.enabled" , false)
+                .setFeatureFlag("call-integration.enabled", false)
+                .setFeatureFlag("close-captions.enabled", false)
+                .setFeatureFlag("chat.enabled", false)
+                .setFeatureFlag("invite.enabled", false)
+                .setFeatureFlag("kick-out.enabled", false)
+                .setFeatureFlag("live-streaming.enabled", false)
+                .setFeatureFlag("raise-hand.enabled", false)
+                .setFeatureFlag("recording.enabled", false)
+                .setFeatureFlag("video-share.enabled", false)
+                .setFeatureFlag("tile-view.enabled", false)
                 .setAudioOnly(true)
                 .build();
 
@@ -416,6 +437,32 @@ public class Utils {
                 + getFileSize(file.length()) + ","
                 + file.getPath() + ","
                 + getFileMimeType(Uri.fromFile(file));
+    }
+
+    public static ChatType getTypeText(String attachment, String message) {
+        if (attachment != null) {
+            if (message != null) {
+                switch (message) {
+                    case "image":
+                        return ChatType.IMAGE;
+                    case "video":
+                        return ChatType.VIDEO;
+                    case "file":
+                    default:
+                        return ChatType.FILE;
+                }
+            } else {
+                if (getFileExt(attachment).equals(".jpg") || getFileExt(attachment).equals(".jpeg") || getFileExt(attachment).equals(".png")) {
+                    return ChatType.IMAGE;
+                } else if (getFileExt(attachment).equals(".mp4") || getFileExt(attachment).equals(".3gp")) {
+                    return ChatType.VIDEO;
+                } else {
+                    return ChatType.FILE;
+                }
+            }
+        } else {
+            return ChatType.TEXT;
+        }
     }
 }
 

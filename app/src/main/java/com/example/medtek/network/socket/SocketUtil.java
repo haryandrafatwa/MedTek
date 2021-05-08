@@ -2,6 +2,7 @@ package com.example.medtek.network.socket;
 
 import android.util.Log;
 
+import com.example.medtek.App;
 import com.example.medtek.model.JanjiModel;
 import com.example.medtek.model.MessageModel;
 
@@ -12,6 +13,8 @@ import net.mrbin99.laravelechoandroid.channel.SocketIOPrivateChannel;
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import es.dmoral.toasty.Toasty;
 
 import static com.example.medtek.constant.APPConstant.BASE_SOCKET_URL;
 import static com.example.medtek.constant.APPConstant.CHANNEL_JANJI;
@@ -25,6 +28,7 @@ import static com.example.medtek.constant.APPConstant.MESSAGE_REQUEST_VOICE_CALL
 import static com.example.medtek.utils.PropertyUtil.ACCESS_TOKEN;
 import static com.example.medtek.utils.PropertyUtil.getData;
 import static com.example.medtek.utils.Utils.isPatient;
+import static com.example.medtek.utils.Utils.setupJitsi;
 
 public class SocketUtil {
     private static final String TAG = SocketUtil.class.getSimpleName();
@@ -33,6 +37,8 @@ public class SocketUtil {
     private static SocketIOPrivateChannel channelVideoChat;
     private SocketIOPrivateChannel channelMessage;
     private SocketIOPrivateChannel channelJanji;
+
+    private boolean isJitsiSetup = false;
 
     public static SocketUtil getInstance() {
         if (instance == null) {
@@ -53,7 +59,12 @@ public class SocketUtil {
         echo = new Echo(echoOptions);
         echo.connect(args -> {
             Log.d(TAG, "successConnectSocket");
-        }, args -> Log.e(TAG, "errConnectSocket: " + args[0].toString()));
+        }, args -> {
+            Log.e(TAG, "errConnectSocket: " + args[0].toString());
+            App.getInstance().runOnUiThread(() -> {
+                Toasty.error(App.getContext(), "errConnectSocket: " + args[0].toString());
+            });
+        });
     }
 
     public static String getMessageFromObject(Object... args) {
@@ -91,7 +102,7 @@ public class SocketUtil {
         Log.d(TAG, "channel: " + CHANNEL_MESSAGES + idConversation);
         channelMessage.listen(EVENT_MESSAGE_CREATED, args -> {
             MessageModel NewChat = MessageModel.Companion.parseFrom(args);
-            Log.d(TAG, NewChat.getChat().getMessage());
+            Log.d(TAG, (NewChat.getChat().getMessage() != null) ? NewChat.getChat().getMessage() : "null");
             EventBus.getDefault().post(NewChat);
         });
         channelJanji.listen(EVENT_JANJI, args -> {
@@ -127,6 +138,9 @@ public class SocketUtil {
     }
 
     public void setChannelVideoChat(int idJanji) {
+//        if (!isJitsiSetup) {
+//            setupJitsi();
+//        }
         channelVideoChat = echo.privateChannel(CHANNEL_VIDEO_CHAT + idJanji);
         if (isPatient()) {
             Log.d(TAG, "listenForStart: " + EVENT_REQUEST_CALL + idJanji);

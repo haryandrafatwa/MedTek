@@ -52,6 +52,7 @@ import static com.example.medtek.network.RetrofitClient.BASE_SOCKET_URL;
 import static com.example.medtek.network.RetrofitClient.BASE_URL;
 import static com.example.medtek.utils.PropertyUtil.ACCESS_TOKEN;
 import static com.example.medtek.utils.PropertyUtil.REFRESH_TOKEN;
+import static com.example.medtek.utils.PropertyUtil.deleteAllData;
 import static com.example.medtek.utils.PropertyUtil.getData;
 
 public class OthersFragment extends Fragment {
@@ -100,8 +101,9 @@ public class OthersFragment extends Fragment {
                 call.enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                        clearData(getActivity());
+//                        clearData(getActivity());
                         Intent intent = new Intent(getActivity(), WelcomePageActivity.class);
+                        deleteAllData();
                         startActivity(intent);
                         getActivity().finish();
                     }

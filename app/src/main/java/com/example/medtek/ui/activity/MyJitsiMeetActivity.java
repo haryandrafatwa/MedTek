@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
+import com.example.medtek.App;
 import com.example.medtek.network.socket.SocketUtil;
 import com.facebook.react.modules.core.PermissionListener;
 
@@ -49,6 +50,7 @@ public class MyJitsiMeetActivity extends FragmentActivity implements JitsiMeetAc
         intent.putExtra(STATE_AUDIO_STATUS, isAudioOn);
         intent.putExtra(ID_JANJI, idJanji);
         intent.putExtra(IS_VIDEO_CALL, isVideoCall);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         activity.startActivity(intent);
     }
 
@@ -56,6 +58,7 @@ public class MyJitsiMeetActivity extends FragmentActivity implements JitsiMeetAc
         Intent intent = new Intent(activity, MyJitsiMeetActivity.class);
         intent.putExtra(ID_JANJI, idJanji);
         intent.putExtra(IS_VIDEO_CALL, isVideoCall);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         activity.startActivity(intent);
     }
 
@@ -91,7 +94,7 @@ public class MyJitsiMeetActivity extends FragmentActivity implements JitsiMeetAc
         view = new JitsiMeetView(this);
         view.join(options);
 
-        setContentView(view);
+        setContentView(view); 
         view.setListener(this);
     }
 
@@ -106,7 +109,7 @@ public class MyJitsiMeetActivity extends FragmentActivity implements JitsiMeetAc
             }
             if (getMessageFromObject(args).equalsIgnoreCase(MESSAGE_HANGUP_RESPONSE_VIDEO_CALL) ||
                     getMessageFromObject(args).equalsIgnoreCase(MESSAGE_HANGUP_RESPONSE_VOICE_CALL)) {
-                finish();
+                onCloseHost();
             }
         });
     }
@@ -117,15 +120,33 @@ public class MyJitsiMeetActivity extends FragmentActivity implements JitsiMeetAc
         SocketUtil.getInstance().whisperMessageChannelVideo(eventName,
                 (isVideoCall) ? MESSAGE_HANGUP_RESPONSE_VIDEO_CALL : MESSAGE_HANGUP_RESPONSE_VOICE_CALL,
                 idJanji);
+        onCloseHost();
+    }
+
+    private void onCloseHost() {
+//        App.getInstance().runOnUiThread(() -> {
+//            if (view != null) {
+//                view.leave();
+//                view.dispose();
+//                view = null;
+//            }
+//            JitsiMeetActivityDelegate.onHostDestroy(this);
+//        });
+//        this.finish();
+        this.finish();
     }
 
     @Override
     protected void onDestroy() {
+        Log.d("SAMPLE", "ONDESTROY");
+
+        if (view != null) {
+            view.leave();
+            view.dispose();
+            view = null;
+        }
+
         super.onDestroy();
-
-        view.dispose();
-        view = null;
-
         JitsiMeetActivityDelegate.onHostDestroy(this);
     }
 
@@ -148,8 +169,9 @@ public class MyJitsiMeetActivity extends FragmentActivity implements JitsiMeetAc
 
     @Override
     protected void onStop() {
+        Log.d("SAMPLE", "ONSTOP");
         super.onStop();
-        JitsiMeetActivityDelegate.onHostPause(this);
+        JitsiMeetActivityDelegate.onHostPause(MyJitsiMeetActivity.this);
     }
 
     @Override
@@ -166,7 +188,6 @@ public class MyJitsiMeetActivity extends FragmentActivity implements JitsiMeetAc
     public void onConferenceTerminated(Map<String, Object> map) {
         Log.d("SAMPLE", "TERMINATED");
         sendResponseHangup();
-        finish();
     }
 
     @Override

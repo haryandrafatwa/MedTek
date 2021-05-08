@@ -3,6 +3,7 @@ package com.example.medtek.ui.pasien.auth;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
@@ -18,6 +19,7 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -54,9 +56,11 @@ import static com.example.medtek.utils.PropertyUtil.setApplicationState;
 import static com.example.medtek.utils.PropertyUtil.setData;
 import static com.example.medtek.utils.PropertyUtil.setDataLogin;
 import static com.example.medtek.utils.Utils.TAG;
+import static com.example.medtek.utils.Utils.getPermissionStorageList;
 import static com.example.medtek.utils.Utils.isLoading;
+import static com.example.medtek.utils.Utils.requestPermissionCompat;
 
-public class LoginPasienActivity extends AppCompatActivity {
+public class    LoginPasienActivity extends AppCompatActivity {
 
     private EditText email,password;
     private TextView lupa_password, daftar, formattidakvalid;
@@ -290,8 +294,7 @@ public class LoginPasienActivity extends AppCompatActivity {
                 App.getInstance().runOnUiThread(() -> {
                     Toasty.success(LoginPasienActivity.this,getString(R.string.masukberhasil)).show();
                 });
-
-                MainActivity.navigate(LoginPasienActivity.this, true);
+                requestPermissionCompat(LoginPasienActivity.this, getPermissionStorageList(), MainActivity.PERMISSION_STORAGE);
             }
 
             @Override
@@ -309,5 +312,14 @@ public class LoginPasienActivity extends AppCompatActivity {
                 Log.d(TAG(LoginPasienActivity.class), "Server Broken");
             }
         });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == MainActivity.PERMISSION_STORAGE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                MainActivity.navigate(LoginPasienActivity.this, true);
+            }
+        }
     }
 }

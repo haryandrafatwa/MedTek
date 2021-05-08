@@ -30,6 +30,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.medtek.App;
 import com.example.medtek.R;
 import com.example.medtek.model.pasien.ArtikelModel;
 import com.example.medtek.model.pasien.DokterModel;
@@ -82,8 +83,10 @@ import retrofit2.Response;
 import static com.example.medtek.network.RetrofitClient.BASE_SOCKET_URL;
 import static com.example.medtek.network.RetrofitClient.BASE_URL;
 import static com.example.medtek.utils.PropertyUtil.ACCESS_TOKEN;
+import static com.example.medtek.utils.PropertyUtil.LOGIN_STATUS;
 import static com.example.medtek.utils.PropertyUtil.REFRESH_TOKEN;
 import static com.example.medtek.utils.PropertyUtil.getData;
+import static com.example.medtek.utils.PropertyUtil.searchData;
 import static com.example.medtek.utils.Utils.TAG;
 import static java.lang.String.valueOf;
 
@@ -114,16 +117,16 @@ public class HomeFragment extends Fragment {
 
     private ChipNavigationBar bottomNavigationView;
     private ShimmerFrameLayout shimmerFrameLayout;
-    private String access, refresh,  kelurahan="", kecamatan="", kota="", provinsi="", jalan="";
-    private RelativeLayout rl_content;
-    private LinearLayout ll_loader;
+    private String access="", refresh="",  kelurahan="", kecamatan="", kota="", provinsi="", jalan="";
+    private RelativeLayout rl_content, greetings_shimmer;
+    private LinearLayout ll_loader, ll_wallet_shimmer;
 
     private FusedLocationProviderClient fusedLocationProviderClient;
     public static int REQUEST_CODE_LOC = 46;
     private Location location;
     private double sLat, sLong;
 
-    private RelativeLayout rl_header;
+    private RelativeLayout rl_header, rl_greetings;
     private LinearLayout ll_search;
     private String userName, userImagePath;
     private CircleImageView circleImageView;
@@ -152,6 +155,12 @@ public class HomeFragment extends Fragment {
     private String CHANNEL_MESSAGES="";
     private int idDokter=0;
 
+    private boolean isWalletDone = false;
+    private boolean isUserDone = false;
+    private boolean isDokterDone = false;
+    private boolean isHospitalDone = false;
+    private boolean isArtikelDone = false;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -176,31 +185,185 @@ public class HomeFragment extends Fragment {
         };
 
         loadData(getActivity());
-        Call<ResponseBody> getJanji = RetrofitClient.getInstance().getApi().getUserJanji("Bearer "+access);
-        getJanji.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                try {
-                    if (response.isSuccessful()){
-                        if (response.body() != null){
-                            String s = response.body().string();
-                            JSONObject janjiObject = new JSONObject(s);
-                            if(!janjiObject.has("error")){
-                                JSONArray janjiArr = janjiObject.getJSONArray("data");
-                                for (int i = 0; i < janjiArr.length(); i++) {
-                                    JSONObject janjiObj = janjiArr.getJSONObject(i);
-                                    if (janjiObj.getInt("idStatus") == 1){
-                                        idDokter = janjiObj.getInt("id");
-                                        Log.e("TAG", "onResponse: "+idDokter);
-                                        startSocket();
+        if (!access.equals("") && !refresh.equals("")) {
+            ll_wallet_shimmer.setVisibility(View.VISIBLE);
+            greetings_shimmer.setVisibility(View.VISIBLE);
+
+            //socket
+            Call<ResponseBody> getJanji = RetrofitClient.getInstance().getApi().getUserJanji("Bearer " + access);
+            getJanji.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    try {
+                        if (response.isSuccessful()){
+                            if (response.body() != null){
+                                String s = response.body().string();
+                                JSONObject janjiObject = new JSONObject(s);
+                                if(!janjiObject.has("error")){
+                                    JSONArray janjiArr = janjiObject.getJSONArray("data");
+                                    for (int i = 0; i < janjiArr.length(); i++) {
+                                        JSONObject janjiObj = janjiArr.getJSONObject(i);
+                                        if (janjiObj.getInt("idStatus") == 1){
+                                            idDokter = janjiObj.getInt("id");
+                                            Log.e("TAG", "onResponse: "+ idDokter);
+                                            startSocket();
+                                        }
                                     }
                                 }
                             }
                         }
+                    } catch (IOException | JSONException e) {
+                        e.printStackTrace();
+                        getJanji.clone().enqueue(this);
                     }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                }
+            });
+
+            //wallet
+            ll_wallet.setVisibility(View.VISIBLE);
+            Call<ResponseBody> callWallet = RetrofitClient.getInstance().getApi().getUserWallet("Bearer "+access);
+            callWallet.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    if (response.isSuccessful()){
+                        try {
+                            String s = response.body().string();
+                            JSONObject obj = new JSONObject(s);
+                            if (!obj.has("message")){
+                                JSONObject jsonObject = new JSONObject(obj.getString("data"));
+                                mySaldo = NumberFormat.getInstance(Locale.ITALIAN).format(Integer.valueOf(jsonObject.getString("balance")));
+                            } else {
+                                mySaldo = "-";
+                            }
+                            isWalletDone = true;
+                            disabledShimmer();
+
+                        } catch (JSONException | IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Toasty.info(getActivity(), t.getMessage());
+                }
+            });
+
+            //user
+            rl_greetings.setVisibility(View.VISIBLE);
+            Call<ResponseBody> callUser = RetrofitClient.getInstance().getApi().getUser("Bearer "+access);
+            callUser.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    if (response.isSuccessful()){
+                        try {
+                            String s = response.body().string();
+                            JSONObject obj = new JSONObject(s);
+                            userName = obj.getString("name");
+                            JSONArray jsonArray = new JSONArray(obj.getString("image"));
+                            if (jsonArray.length() == 0){
+                                userImagePath = "/storage/Pasien.png";
+                            }else{
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    JSONObject imageObj = jsonArray.getJSONObject(i);
+                                    if (imageObj.getInt("type_id") == 1){
+                                        if (imageObj.getString("path").equalsIgnoreCase("/storage/Pasien.png")){
+                                            userImagePath = "/storage/Pasien.png";
+                                        }else{
+                                            userImagePath = jsonArray.getJSONObject(0).getString("path");
+                                            break;
+                                        }
+                                    }else{
+                                        userImagePath = "/storage/Pasien.png";
+                                    }
+                                }
+                            }
+                            isUserDone = true;
+                            disabledShimmer();
+                        } catch (JSONException | IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Toasty.info(getActivity(), t.getMessage());
+                }
+            });
+        }
+
+
+        Call<ResponseBody> callDokter = RetrofitClient.getInstance().getApi().getDokterRated();
+        callDokter.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    String dokterResult = response.body().string();
+                    JSONObject object = new JSONObject(dokterResult);
+                    JSONArray array = new JSONArray(object.getString("data"));
+                    mListDokter.clear();
+                    for (int i = 0; i < array.length(); i++) {
+                        JSONObject jo = array.getJSONObject(i);
+                        String name = jo.getString("name");
+                        String email = jo.getString("email");
+                        int isVerified;
+                        if (!jo.isNull("email_verified_at")){
+                            isVerified = 1;
+                        }else{
+                            isVerified = 0;
+                        }
+                        String path = "";
+
+                        JSONArray jsonArrayImage = new JSONArray(jo.getString("image"));
+                        for (int j = 0; j < jsonArrayImage.length(); j++) {
+                            JSONObject imageObj = jsonArrayImage.getJSONObject(j);
+                            if (imageObj.getInt("type_id") == 1) {
+                                path = BASE_URL + imageObj.getString("path");
+                                break;
+                            }
+                            Log.d(TAG(HomeFragment.class), "pathImage:" + path);
+                        }
+                        JSONObject rsObject = new JSONObject(jo.getString("hospital"));
+                        String rs_name = rsObject.getString("name");
+                        JSONObject alamatObject = new JSONObject(jo.getString("alamat"));
+                        String kelurahan = alamatObject.getString("kelurahan");
+                        String kota = alamatObject.getString("kota");
+                        String rs_loc = kelurahan+", "+kota;
+
+                        JSONObject specObj = new JSONObject(jo.getString("specialization"));
+                        String spec = specObj.getString("specialization");
+                        int harga = jo.getInt("harga");
+                        int id = jo.getInt("id");
+                        int lamakerja =  (jo.isNull("lama_kerja")) ? 0 : Integer.valueOf(jo.getString("lama_kerja"));
+                        float rating = Float.valueOf(jo.getString("rating"));
+                        if (isVerified == 1){
+                            mListDokter.add(new DokterModel(id,name,email,spec,rs_name,rs_loc,path,harga,rating,isVerified,lamakerja));
+                            mAdapterADokter.notifyDataSetChanged();
+                        }
+                        rv_dokter.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                            @Override
+                            public void onGlobalLayout() {
+                                if(recyclerViewReadyCallback != null){
+                                    recyclerViewReadyCallback.onLayoutReady();
+                                }
+                                rv_dokter.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                            }
+                        });
+                    }
+                    isDokterDone = true;
+                    disabledShimmer();
+
+
                 } catch (IOException | JSONException e) {
                     e.printStackTrace();
-                    getJanji.clone().enqueue(this);
+                    callDokter.clone().enqueue(this);
                 }
             }
 
@@ -209,6 +372,15 @@ public class HomeFragment extends Fragment {
 
             }
         });
+
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+            getAllHospital();
+        } else {
+            requestPermissions(new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION
+            }, REQUEST_CODE_LOC);
+        }
+
 
         Call<ResponseBody> callArticles = RetrofitClient.getInstance().getApi().getAllArticles();
         callArticles.enqueue(new Callback<ResponseBody>() {
@@ -254,301 +426,8 @@ public class HomeFragment extends Fragment {
                     for (int i = 0; i < 5; i++) {
                         mListArtikelReverse.add(mListArtikel.get(i));
                     }
-
-                    Call<ResponseBody> callUser = RetrofitClient.getInstance().getApi().getUser("Bearer "+access);
-                    callUser.enqueue(new Callback<ResponseBody>() {
-                        @Override
-                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                            if (response.isSuccessful()){
-                                try {
-                                    String s = response.body().string();
-                                    JSONObject obj = new JSONObject(s);
-                                    userName = obj.getString("name");
-                                    JSONArray jsonArray = new JSONArray(obj.getString("image"));
-                                    if (jsonArray.length() == 0){
-                                        userImagePath = "/storage/Pasien.png";
-                                    }else{
-                                        for (int i = 0; i < jsonArray.length(); i++) {
-                                            JSONObject imageObj = jsonArray.getJSONObject(i);
-                                            if (imageObj.getInt("type_id") == 1){
-                                                if (imageObj.getString("path").equalsIgnoreCase("/storage/Pasien.png")){
-                                                    userImagePath = "/storage/Pasien.png";
-                                                }else{
-                                                    userImagePath = jsonArray.getJSONObject(0).getString("path");
-                                                    break;
-                                                }
-                                            }else{
-                                                userImagePath = "/storage/Pasien.png";
-                                            }
-                                        }
-                                    }
-
-                                    Call<ResponseBody> callWallet = RetrofitClient.getInstance().getApi().getUserWallet("Bearer "+access);
-                                    callWallet.enqueue(new Callback<ResponseBody>() {
-                                        @Override
-                                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                            if (response.isSuccessful()){
-                                                try {
-                                                    String s = response.body().string();
-                                                    JSONObject obj = new JSONObject(s);
-                                                    if (!obj.has("message")){
-                                                        JSONObject jsonObject = new JSONObject(obj.getString("data"));
-                                                        mySaldo = NumberFormat.getInstance(Locale.ITALIAN).format(Integer.valueOf(jsonObject.getString("balance")));
-                                                    }else{
-                                                        mySaldo = "-";
-                                                    }
-
-                                                    Call<ResponseBody> callDokter = RetrofitClient.getInstance().getApi().getDokterRated();
-                                                    callDokter.enqueue(new Callback<ResponseBody>() {
-                                                        @Override
-                                                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                                            try {
-                                                                String dokterResult = response.body().string();
-                                                                JSONObject object = new JSONObject(dokterResult);
-                                                                JSONArray array = new JSONArray(object.getString("data"));
-                                                                mListDokter.clear();
-                                                                for (int i = 0; i < array.length(); i++) {
-                                                                    JSONObject jo = array.getJSONObject(i);
-                                                                    String name = jo.getString("name");
-                                                                    String email = jo.getString("email");
-                                                                    int isVerified;
-                                                                    if (!jo.isNull("email_verified_at")){
-                                                                        isVerified = 1;
-                                                                    }else{
-                                                                        isVerified = 0;
-                                                                    }
-                                                                    String path = "";
-                                                                    if (new JSONArray(jo.getString("image")).length() !=0){
-                                                                        JSONArray jsonArray = new JSONArray(jo.getString("image"));
-                                                                        path = BASE_URL+jsonArray.getJSONObject(0).getString("path");
-                                                                    }
-                                                                    JSONObject rsObject = new JSONObject(jo.getString("hospital"));
-                                                                    String rs_name = rsObject.getString("name");
-                                                                    JSONObject alamatObject = new JSONObject(jo.getString("alamat"));
-                                                                    String kelurahan = alamatObject.getString("kelurahan");
-                                                                    String kota = alamatObject.getString("kota");
-                                                                    String rs_loc = kelurahan+", "+kota;
-
-                                                                    JSONObject specObj = new JSONObject(jo.getString("specialization"));
-                                                                    String spec = specObj.getString("specialization");
-                                                                    int harga = jo.getInt("harga");
-                                                                    int id = jo.getInt("id");
-                                                                    int lamakerja = Integer.valueOf(jo.getInt("lama_kerja"));
-                                                                    float rating = Float.valueOf(jo.getString("rating"));
-                                                                    if (isVerified == 1){
-                                                                        mListDokter.add(new DokterModel(id,name,email,spec,rs_name,rs_loc,path,harga,rating,isVerified,lamakerja));
-                                                                        mAdapterADokter.notifyDataSetChanged();
-                                                                    }
-                                                                    rv_dokter.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                                                                        @Override
-                                                                        public void onGlobalLayout() {
-                                                                            if(recyclerViewReadyCallback != null){
-                                                                                recyclerViewReadyCallback.onLayoutReady();
-                                                                            }
-                                                                            rv_dokter.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                                                                        }
-                                                                    });
-                                                                }
-
-                                                                if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-                                                                    getLocation();
-                                                                    Call<ResponseBody> callHospital = RetrofitClient.getInstance().getApi().getAllHospital();
-                                                                    callHospital.enqueue(new Callback<ResponseBody>() {
-                                                                        @Override
-                                                                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                                                            try {
-                                                                                String s = response.body().string();
-                                                                                JSONObject object = new JSONObject(s);
-                                                                                JSONArray array = new JSONArray(object.getString("data"));
-                                                                                mListHospital.clear();
-                                                                                for (int i = 0; i < array.length(); i++) {
-                                                                                    JSONObject obj = array.getJSONObject(i);
-                                                                                    int id = obj.getInt("id");
-                                                                                    String name = obj.getString("name");
-                                                                                    String no_telp = obj.getString("notelp");
-                                                                                    JSONObject alamat = obj.getJSONObject("alamat");
-                                                                                    String jalanRs = alamat.getString("jalan");
-                                                                                    String no_bangunanRs = alamat.getString("nomor_bangunan");
-                                                                                    String rtrwRs = alamat.getString("rtrw");
-                                                                                    String kelurahanRs = alamat.getString("kelurahan");
-                                                                                    String kecamatanRs = alamat.getString("kecamatan");
-                                                                                    String kotaRs = alamat.getString("kota");
-                                                                                    String infoRs = obj.getString("info");
-                                                                                    JSONArray arrDokter = obj.getJSONArray("dokter");
-                                                                                    String location = "Jl. "+jalanRs+", No. "+no_bangunanRs+", Rt/Rw. "+rtrwRs+", Kelurahan "+kelurahanRs+", Kecamatan "+kecamatanRs+", Kota "+kotaRs;
-                                                                                    String hospitalImage="";
-                                                                                    if (!obj.getString("image").equals("null")){
-                                                                                        hospitalImage = BASE_URL+obj.getString("image");
-                                                                                    }else{
-                                                                                        hospitalImage = BASE_URL+"/storage/Hospital.png";
-                                                                                    }
-                                                                                    mListDokterHospital.clear();
-                                                                                    for (int j = 0; j < arrDokter.length(); j++) {
-                                                                                        JSONObject jo = arrDokter.getJSONObject(j);
-                                                                                        String nameDokter = jo.getString("name");
-                                                                                        String email = jo.getString("email");
-                                                                                        int isVerified;
-                                                                                        if (!jo.getString("email_verified_at").equals(null)){
-                                                                                            isVerified = 1;
-                                                                                        }else{
-                                                                                            isVerified = 0;
-                                                                                        }
-                                                                                        String path = "";
-                                                                                        if (jo.has("image")){
-                                                                                            path = BASE_URL+jo.getString("image");
-                                                                                        }else{
-                                                                                            path = BASE_URL+"/storage/Hospital.png";
-                                                                                        }
-                                                                                        int harga = jo.getInt("harga");
-                                                                                        int idDokter = jo.getInt("id");
-                                                                                        int lamakerja = Integer.valueOf(jo.getInt("lama_kerja"));
-                                                                                        float rating = Float.valueOf(jo.getString("rating"));
-                                                                                        String spec = "Interventional Cardiology";
-                                                                                        if (isVerified == 1) {
-                                                                                            mListDokterHospital.add(new DokterModel(idDokter, nameDokter, email, spec, name, location, path, harga, rating, isVerified, lamakerja));
-                                                                                        }
-                                                                                    }
-                                                                                    if (!kota.isEmpty() && mListHospital.size() < 5){
-                                                                                        double distance = -1.0;
-                                                                                        Locale locale = new Locale("in", "ID");
-                                                                                        Geocoder geocoder = new Geocoder(getActivity(), locale);
-
-                                                                                        List<Address> addressesD = geocoder.getFromLocationName(name,1);
-                                                                                        if (addressesD.size() > 0) {
-                                                                                            double dLat = addressesD.get(0).getLatitude();
-                                                                                            double dLong = addressesD.get(0).getLongitude();
-                                                                                            double longDiff = sLong - dLong;
-                                                                                            distance = Math.sin(sLat*Math.PI/180.0)*Math.sin(dLat*Math.PI/180.0) + Math.cos(sLat*Math.PI/180.0)*Math.cos(dLat*Math.PI/180.0)*Math.cos(longDiff*Math.PI/180.0);
-                                                                                            distance = Math.acos(distance);
-                                                                                            distance = distance*180.0/Math.PI;
-                                                                                            distance = distance*60*1.1515;
-                                                                                            distance = distance*1.609344;
-                                                                                        }
-                                                                                        String jenis="";
-                                                                                        if (obj.getString("jenis").equalsIgnoreCase("umum")){
-                                                                                            jenis = getActivity().getString(R.string.rsumum);
-                                                                                        }else if (obj.getString("jenis").equalsIgnoreCase("spesialisasi")){
-                                                                                            jenis = getActivity().getString(R.string.rsspesial);
-                                                                                        }
-                                                                                        if (distance < 20 && distance >= 0){
-                                                                                            mListHospital.add(new HospitalModel(name, no_telp, jalanRs, no_bangunanRs, rtrwRs, kelurahanRs, kecamatanRs, kotaRs, "Provinsi", infoRs,jenis,hospitalImage,id,distance, mListDokterHospital));
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                                Collections.sort(mListHospital, Comparator.comparing(HospitalModel::getDistance));
-                                                                                if(location==null){
-                                                                                    rl_hospital_empty.setVisibility(View.VISIBLE);
-                                                                                    tv_rs_empty.setText(getActivity().getString(R.string.locationNotFound));
-                                                                                }else if (mListHospital.isEmpty()){
-                                                                                    Picasso.get().load(getActivity().getString(R.string.hospitalURL)).fit().centerCrop().into(civ_rs_empty);
-                                                                                    rl_hospital_empty.setVisibility(View.VISIBLE);
-                                                                                    tv_rs_empty.setText(getActivity().getString(R.string.emptyHospital));
-                                                                                }
-                                                                                if (mListDokter.size() >= 5){
-                                                                                    tv_seedr.setVisibility(View.VISIBLE);
-                                                                                }
-                                                                                if (mListArtikelReverse.size() >= 5){
-                                                                                    tv_seeartikel.setVisibility(View.VISIBLE);
-                                                                                }
-                                                                                if (mListHospital.size() >= 3){
-                                                                                    tv_seers.setVisibility(View.VISIBLE);
-                                                                                }
-                                                                                rl_content.setVisibility(View.VISIBLE);
-                                                                                ll_loader.setVisibility(View.GONE);
-
-                                                                                rv_dokter.setVisibility(View.VISIBLE);
-                                                                                rv_artikel.setVisibility(View.VISIBLE);
-                                                                                rv_hospital.setVisibility(View.VISIBLE);
-
-                                                                                rl_header.setBackground(getActivity().getDrawable(R.drawable.bg_home_bottom_rounded));
-                                                                                tv_welcome.setBackground(null);
-                                                                                tv_welcome.setText(getString(R.string.welcomeback));
-                                                                                tv_name.setBackground(null);
-                                                                                tv_name.setText(userName);
-                                                                                circleImageView.setBackground(null);
-                                                                                Picasso.get().load(BASE_URL+userImagePath).into(circleImageView);
-                                                                                ll_search.setBackground(getActivity().getDrawable(R.drawable.bg_search));
-                                                                                placeholderSearch.setVisibility(View.VISIBLE);
-                                                                                iv_search.setVisibility(View.VISIBLE);
-
-                                                                                ll_wallet.setBackground(getActivity().getDrawable(R.drawable.bg_home_all_rounded));
-                                                                                ll_wallet_title.setBackground(getActivity().getDrawable(R.drawable.bg_home_top_rounded));
-                                                                                tv_saldo.setBackground(null);
-                                                                                tv_saldo_user.setBackground(null);
-                                                                                tv_saldo.setText(getString(R.string.saldo));
-                                                                                tv_saldo_user.setText("Rp"+mySaldo);
-                                                                                ib_topup.setBackground(getActivity().getDrawable(R.drawable.ic_top_up));
-                                                                                tv_topup.setBackground(null);
-                                                                                tv_topup.setText(getString(R.string.topup));
-                                                                                ib_withdraw.setBackground(getActivity().getDrawable(R.drawable.ic_withdraw));
-                                                                                tv_withdraw.setBackground(null);
-                                                                                tv_withdraw.setText(getString(R.string.withdraw));
-                                                                                ib_history.setBackground(getActivity().getDrawable(R.drawable.ic_history_wallet));
-                                                                                tv_history.setBackground(null);
-                                                                                tv_history.setText(getString(R.string.history));
-
-                                                                                tv_rs_rekomendasi.setBackground(null);
-                                                                                tv_rs_rekomendasi.setText(R.string.rsrekomendasi);
-                                                                                ll_rekrs.setVisibility(View.GONE);
-
-                                                                                tv_dr_rekomendasi.setBackground(null);
-                                                                                tv_dr_rekomendasi.setText(R.string.drpopuler);
-                                                                                ll_popdok.setVisibility(View.GONE);
-
-                                                                                tv_artikel.setBackground(null);
-                                                                                tv_artikel.setText(R.string.artikelkesehatan);
-                                                                                ll_artikel.setVisibility(View.GONE);
-
-                                                                                shimmerFrameLayout.stopShimmer();
-                                                                            } catch (IOException | JSONException e) {
-                                                                                e.printStackTrace();
-                                                                                callHospital.clone().enqueue(this);
-                                                                            }
-                                                                        }
-
-                                                                        @Override
-                                                                        public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-                                                                        }
-                                                                    });
-                                                                }else{
-                                                                    ActivityCompat.requestPermissions(getActivity(), new String[]{
-                                                                            Manifest.permission.ACCESS_FINE_LOCATION
-                                                                    }, REQUEST_CODE_LOC);
-                                                                }
-                                                            } catch (IOException | JSONException e) {
-                                                                e.printStackTrace();
-                                                                callDokter.clone().enqueue(this);
-                                                            }
-                                                        }
-
-                                                        @Override
-                                                        public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-                                                        }
-                                                    });
-                                                } catch (JSONException | IOException e) {
-                                                    e.printStackTrace();
-                                                }
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                            Toasty.info(getActivity(), t.getMessage());
-                                        }
-                                    });
-                                } catch (JSONException | IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<ResponseBody> call, Throwable t) {
-                            Toasty.info(getActivity(), t.getMessage());
-                        }
-                    });
+                    isArtikelDone = true;
+                    disabledShimmer();
 
                 } catch (IOException | JSONException e) {
                     callArticles.clone().enqueue(this);
@@ -603,12 +482,115 @@ public class HomeFragment extends Fragment {
 
     }
 
+    public void getAllHospital() {
+        getLocation();
+        Call<ResponseBody> callHospital = RetrofitClient.getInstance().getApi().getAllHospital();
+        callHospital.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    String s = response.body().string();
+                    JSONObject object = new JSONObject(s);
+                    JSONArray array = new JSONArray(object.getString("data"));
+                    mListHospital.clear();
+                    for (int i = 0; i < array.length(); i++) {
+                        JSONObject obj = array.getJSONObject(i);
+                        int id = obj.getInt("id");
+                        String name = obj.getString("name");
+                        String no_telp = obj.getString("notelp");
+                        JSONObject alamat = obj.getJSONObject("alamat");
+                        String jalanRs = alamat.getString("jalan");
+                        String no_bangunanRs = alamat.getString("nomor_bangunan");
+                        String rtrwRs = alamat.getString("rtrw");
+                        String kelurahanRs = alamat.getString("kelurahan");
+                        String kecamatanRs = alamat.getString("kecamatan");
+                        String kotaRs = alamat.getString("kota");
+                        String infoRs = obj.getString("info");
+                        JSONArray arrDokter = obj.getJSONArray("dokter");
+                        String location = "Jl. "+jalanRs+", No. "+no_bangunanRs+", Rt/Rw. "+rtrwRs+", Kelurahan "+kelurahanRs+", Kecamatan "+kecamatanRs+", Kota "+kotaRs;
+                        String hospitalImage="";
+                        if (!obj.getString("image").equals("null")){
+                            hospitalImage = BASE_URL+obj.getString("image");
+                        }else{
+                            hospitalImage = BASE_URL+"/storage/Hospital.png";
+                        }
+                        mListDokterHospital.clear();
+                        for (int j = 0; j < arrDokter.length(); j++) {
+                            JSONObject jo = arrDokter.getJSONObject(j);
+                            String nameDokter = jo.getString("name");
+                            String email = jo.getString("email");
+                            int isVerified;
+                            if (!jo.getString("email_verified_at").equals(null)){
+                                isVerified = 1;
+                            }else{
+                                isVerified = 0;
+                            }
+                            String path = "";
+                            if (jo.has("image")){
+                                path = BASE_URL+jo.getString("image");
+                            }else{
+                                path = BASE_URL+"/storage/Hospital.png";
+                            }
+                            int harga = jo.getInt("harga");
+                            int idDokter = jo.getInt("id");
+                            int lamakerja = (jo.isNull("lama_kerja")) ? 0 : Integer.parseInt(jo.getString("lama_kerja"));
+                            float rating = Float.valueOf(jo.getString("rating"));
+                            String spec = "Interventional Cardiology";
+                            if (isVerified == 1) {
+                                mListDokterHospital.add(new DokterModel(idDokter, nameDokter, email, spec, name, location, path, harga, rating, isVerified, lamakerja));
+                            }
+                        }
+                        if (!kota.isEmpty() && mListHospital.size() < 5){
+                            double distance = -1.0;
+                            Locale locale = new Locale("in", "ID");
+                            Geocoder geocoder = new Geocoder(getActivity(), locale);
+
+                            List<Address> addressesD = geocoder.getFromLocationName(name,1);
+                            if (addressesD.size() > 0) {
+                                double dLat = addressesD.get(0).getLatitude();
+                                double dLong = addressesD.get(0).getLongitude();
+                                double longDiff = sLong - dLong;
+                                distance = Math.sin(sLat*Math.PI/180.0)*Math.sin(dLat*Math.PI/180.0) + Math.cos(sLat*Math.PI/180.0)*Math.cos(dLat*Math.PI/180.0)*Math.cos(longDiff*Math.PI/180.0);
+                                distance = Math.acos(distance);
+                                distance = distance*180.0/Math.PI;
+                                distance = distance*60*1.1515;
+                                distance = distance*1.609344;
+                            }
+                            String jenis="";
+                            if (obj.getString("jenis").equalsIgnoreCase("umum")){
+                                jenis = getActivity().getString(R.string.rsumum);
+                            }else if (obj.getString("jenis").equalsIgnoreCase("spesialisasi")){
+                                jenis = getActivity().getString(R.string.rsspesial);
+                            }
+                            if (distance < 20 && distance >= 0){
+                                mListHospital.add(new HospitalModel(name, no_telp, jalanRs, no_bangunanRs, rtrwRs, kelurahanRs, kecamatanRs, kotaRs, "Provinsi", infoRs,jenis,hospitalImage,id,distance, mListDokterHospital));
+                            }
+                        }
+                    }
+                    Collections.sort(mListHospital, Comparator.comparing(HospitalModel::getDistance));
+                    isHospitalDone = true;
+                    disabledShimmer();
+
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
+                    callHospital.clone().enqueue(this);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+    }
+
     private void startSocket() {
         Log.e("MedTek", "SOCOKET START...");
         try {
 //            IO.Options opts = new IO.Options();
 //            opts.transports = new String[] { WebSocket.NAME };
             socket = IO.socket(BASE_SOCKET_URL);
+            Log.d("TESTSOCKET: ", access);
             socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
@@ -618,7 +600,7 @@ public class HomeFragment extends Fragment {
                     JSONObject headers = new JSONObject();
 
                     try {
-                        object.put("channel", "private-App.User.Janji."+idDokter);
+                        object.put("channel", "private-App.User.Janji."+ idDokter);
                         object.put("name", "subscribe");
 
                         headers.put("Authorization", "Bearer " + access);
@@ -644,7 +626,11 @@ public class HomeFragment extends Fragment {
             }).on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-                    Log.e("SOCKETSOCKETAN", "Connect Error!" + args[0].toString());
+                    Log.e("SOCKETSOCKETAN", "Connect Error! :" + args.length);
+                    Log.e("SOCKETSOCKETAN", "Connect Error! :" + args[0].toString());
+                    App.getInstance().runOnUiThread(() -> {
+                        Toasty.error(App.getContext(), "errConnectSocket: " + args[0].toString());
+                    });
                 }
             }).on(Manager.EVENT_TRANSPORT, new Emitter.Listener() {
                 @Override
@@ -738,7 +724,11 @@ public class HomeFragment extends Fragment {
         rl_content = getActivity().findViewById(R.id.layout_visible);
         ll_loader = getActivity().findViewById(R.id.layout_loader);
 
+        greetings_shimmer = getActivity().findViewById(R.id.greetings_shimmer);
+        ll_wallet_shimmer = getActivity().findViewById(R.id.ll_wallet_shimmer);
+
         rl_header = getActivity().findViewById(R.id.header);
+        rl_greetings = getActivity().findViewById(R.id.greetings);
         ll_search = getActivity().findViewById(R.id.layout_search);
         circleImageView = getActivity().findViewById(R.id.civ_user);
         iv_search = getActivity().findViewById(R.id.iv_search);
@@ -808,7 +798,7 @@ public class HomeFragment extends Fragment {
                         Log.d("errorLoc", valueOf(addresses.size()));
 //                        Log.d("errorLoc", addresses.get(0).getLocality());
 //                        Log.d("errorLoc", addresses.get(0).getSubLocality());
-//                        Log.d("errorLoc", addresses.get(0).getSubAdminArea());
+                        Log.d("errorLoc", addresses.get(0).getSubAdminArea());
 //                        Log.d("errorLoc", addresses.get(0).getAdminArea());
                         Log.d("errorLoc", valueOf(addresses.get(0).getThoroughfare() == null));
 //                        Log.d("errorLoc", valueOf(addresses.get(0).getLatitude()));
@@ -816,7 +806,8 @@ public class HomeFragment extends Fragment {
 //                        kecamatan = addresses.get(0).getLocality().split(" ",2)[1];
                         kecamatan = addresses.get(0).getLocality();
                         kelurahan = addresses.get(0).getSubLocality();
-                        kota = addresses.get(0).getSubAdminArea().split(" ",2)[1];
+                        String[] arrKota = addresses.get(0).getSubAdminArea().split(" ",2);
+                        kota = (arrKota.length > 1) ? arrKota[1] : arrKota[0];
                         provinsi = addresses.get(0).getAdminArea();
                         jalan = (addresses.get(0).getThoroughfare() == null) ? "" : addresses.get(0).getThoroughfare().split(" ",2)[1];
                         sLat = addresses.get(0).getLatitude();
@@ -861,8 +852,13 @@ public class HomeFragment extends Fragment {
 //        SharedPreferences sharedPreferences = context.getSharedPreferences("sharedPrefs", MODE_PRIVATE);
 //        this.access = sharedPreferences.getString("token", "");
 //        this.refresh = sharedPreferences.getString("refresh_token", "");
-        this.access = (String) getData(ACCESS_TOKEN);
-        this.refresh = (String) getData(REFRESH_TOKEN);
+        if (searchData(LOGIN_STATUS) || searchData(ACCESS_TOKEN)) {
+            if ((boolean) getData(LOGIN_STATUS)) {
+                this.access = (String) getData(ACCESS_TOKEN);
+                this.refresh = (String) getData(REFRESH_TOKEN);
+            }
+        }
+
     }
 
     private void setFragment(Fragment fragment,String TAG) {
@@ -871,11 +867,123 @@ public class HomeFragment extends Fragment {
         fragmentTransaction.commit();
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_LOC) {
+    private void disabledShimmer() {
+        if (!access.equals("") && !refresh.equals("")) {
+            if (isWalletDone && isUserDone && isDokterDone && isHospitalDone && isArtikelDone) {
+                rl_content.setVisibility(View.VISIBLE);
+                ll_loader.setVisibility(View.GONE);
 
+                showUser();
+                showSearch();
+                showWallet();
+                showDokter();
+                showHospital();
+                showArtikel();
+
+                shimmerFrameLayout.stopShimmer();
+            }
+        } else {
+            if (isDokterDone && isHospitalDone && isArtikelDone) {
+                rl_content.setVisibility(View.VISIBLE);
+                ll_loader.setVisibility(View.GONE);
+
+                showSearch();
+                showDokter();
+                showHospital();
+                showArtikel();
+
+                shimmerFrameLayout.stopShimmer();
+            }
+        }
+    }
+
+    private void showWallet() {
+        // wallet
+        ll_wallet.setBackground(getActivity().getDrawable(R.drawable.bg_home_all_rounded));
+        ll_wallet_title.setBackground(getActivity().getDrawable(R.drawable.bg_home_top_rounded));
+        tv_saldo.setBackground(null);
+        tv_saldo_user.setBackground(null);
+        tv_saldo.setText(getString(R.string.saldo));
+        tv_saldo_user.setText("Rp"+mySaldo);
+        ib_topup.setBackground(getActivity().getDrawable(R.drawable.ic_top_up));
+        tv_topup.setBackground(null);
+        tv_topup.setText(getString(R.string.topup));
+        ib_withdraw.setBackground(getActivity().getDrawable(R.drawable.ic_withdraw));
+        tv_withdraw.setBackground(null);
+        tv_withdraw.setText(getString(R.string.withdraw));
+        ib_history.setBackground(getActivity().getDrawable(R.drawable.ic_history_wallet));
+        tv_history.setBackground(null);
+        tv_history.setText(getString(R.string.history));
+    }
+
+    private void showUser() {
+        // user
+        rl_header.setBackground(getActivity().getDrawable(R.drawable.bg_home_bottom_rounded));
+        tv_welcome.setBackground(null);
+        tv_welcome.setText(getString(R.string.welcomeback));
+        tv_name.setBackground(null);
+        tv_name.setText(userName);
+        circleImageView.setBackground(null);
+        Picasso.get().load(BASE_URL+userImagePath).into(circleImageView);
+    }
+
+    private void showSearch() {
+        // search
+        ll_search.setBackground(getActivity().getDrawable(R.drawable.bg_search));
+        placeholderSearch.setVisibility(View.VISIBLE);
+        iv_search.setVisibility(View.VISIBLE);
+    }
+
+    private void showDokter() {
+        // dokter
+        if (mListDokter.size() >= 5){
+            tv_seedr.setVisibility(View.VISIBLE);
+        }
+        rv_dokter.setVisibility(View.VISIBLE);
+        tv_dr_rekomendasi.setBackground(null);
+        tv_dr_rekomendasi.setText(R.string.drpopuler);
+        ll_popdok.setVisibility(View.GONE);
+    }
+
+    private void showHospital() {
+        // hospital
+        if(location==null){
+            rl_hospital_empty.setVisibility(View.VISIBLE);
+            tv_rs_empty.setText(getActivity().getString(R.string.locationNotFound));
+
+        } else if (mListHospital.isEmpty()){
+            Picasso.get().load(BASE_URL+"/storage/Hospital.png").fit().centerCrop().into(civ_rs_empty);
+            rl_hospital_empty.setVisibility(View.VISIBLE);
+            tv_rs_empty.setText(getActivity().getString(R.string.emptyHospital));
+        }
+
+        if (mListHospital.size() >= 3){
+            tv_seers.setVisibility(View.VISIBLE);
+        }
+        rv_hospital.setVisibility(View.VISIBLE);
+        tv_rs_rekomendasi.setBackground(null);
+        tv_rs_rekomendasi.setText(R.string.rsrekomendasi);
+        ll_rekrs.setVisibility(View.GONE);
+    }
+
+    private void showArtikel() {
+        // Artikel
+        if (mListArtikelReverse.size() >= 5){
+            tv_seeartikel.setVisibility(View.VISIBLE);
+        }
+        rv_artikel.setVisibility(View.VISIBLE);
+
+        tv_artikel.setBackground(null);
+        tv_artikel.setText(R.string.artikelkesehatan);
+        ll_artikel.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_CODE_LOC) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getAllHospital();
+            }
         }
     }
 }

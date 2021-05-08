@@ -429,15 +429,17 @@ public class HomeFragment extends Fragment {
                         }
                     });
                 }
-            }).on(Socket.EVENT_ERROR, new Emitter.Listener() {
+            })
+//                    .on(Socket.EVENT_ERROR, new Emitter.Listener() {
+//                @Override
+//                public void call(Object... args) {
+//                    Log.e("SOCKETSOCKETAN", "Error!");
+//                }
+//            })
+                    .on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-                    Log.e("SOCKETSOCKETAN", "Error!");
-                }
-            }).on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
-                @Override
-                public void call(Object... args) {
-                    Log.e("SOCKETSOCKETAN", "Connect Error!");
+                    Log.e("SOCKETSOCKETAN", "Connect Error! :"  + args[0].toString());
                 }
             }).on("new-janji", new Emitter.Listener() {
                 @Override

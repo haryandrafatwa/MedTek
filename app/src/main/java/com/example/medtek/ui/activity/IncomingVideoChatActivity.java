@@ -30,10 +30,11 @@ import static com.example.medtek.constant.APPConstant.EVENT_RESPONSE_CALL;
 import static com.example.medtek.constant.APPConstant.MESSAGE_ACC_RESPONSE_VIDEO_CALL;
 import static com.example.medtek.constant.APPConstant.MESSAGE_HANGUP_RESPONSE_VIDEO_CALL;
 import static com.example.medtek.network.socket.SocketUtil.getMessageFromObject;
+import static com.example.medtek.ui.activity.ChatRoomActivity.IS_AUDIO_ON;
+import static com.example.medtek.ui.activity.ChatRoomActivity.IS_VIDEO_ON;
 import static com.example.medtek.utils.Utils.getPermissionChatList;
 import static com.example.medtek.utils.Utils.requestPermissionCompat;
 import static com.example.medtek.utils.Utils.setSenderPict;
-import static com.example.medtek.utils.Utils.setupJitsi;
 
 public class IncomingVideoChatActivity extends SingleActivity {
     public static final String BUNDLE_CHAT_MODEL = "bundle_chat_model";
@@ -49,11 +50,11 @@ public class IncomingVideoChatActivity extends SingleActivity {
     private boolean isAudioOn = true;
     private boolean isVideoOn = true;
 
-    public static void navigate(Activity activity, ChatsModel chatsModel) {
+    public static void navigate(Activity activity, ChatsModel chatsModel, int requestCode) {
         Intent intent = new Intent(activity, IncomingVideoChatActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra(BUNDLE_CHAT_MODEL, chatsModel);
-        activity.startActivity(intent);
+        activity.startActivityForResult(intent, requestCode);
     }
 
     @Override
@@ -79,9 +80,11 @@ public class IncomingVideoChatActivity extends SingleActivity {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 startPreview();
             } else {
+                setResult(Activity.RESULT_CANCELED);
                 finish();
             }
         } else {
+            setResult(Activity.RESULT_CANCELED);
             finish();
         }
     }
@@ -99,7 +102,6 @@ public class IncomingVideoChatActivity extends SingleActivity {
 
     private void startPreview() {
         listenResponseVideoChat();
-        setupJitsi();
         setCameraProvider();
         setSenderPict(this, chatsModel.getSenderAvatar(), binding.ivSenderAvatar);
         binding.tvNameUser.setText(chatsModel.getSenderName());
@@ -128,15 +130,20 @@ public class IncomingVideoChatActivity extends SingleActivity {
 
         binding.btnCall.setOnClickListener(v -> {
             sendResponseVideoChat(true);
-            MyJitsiMeetActivity.navigate(this, isVideoOn, isAudioOn, chatsModel.getIdJanji(), true);
+//            MyJitsiMeetActivity.navigate(this, isVideoOn, isAudioOn, chatsModel.getIdJanji(), true);
             unbindPreview();
 //                VideoChatActivity.navigate(this, chatsModel);
+            Intent intent = getIntent();
+            intent.putExtra(IS_VIDEO_ON, isVideoOn);
+            intent.putExtra(IS_AUDIO_ON, isAudioOn);
+            setResult(Activity.RESULT_OK, intent);
             finish();
         });
 
         binding.btnHangup.setOnClickListener(v -> {
             sendResponseVideoChat(false);
             unbindPreview();
+            setResult(Activity.RESULT_CANCELED);
             finish();
         });
     }
@@ -146,6 +153,7 @@ public class IncomingVideoChatActivity extends SingleActivity {
         SocketUtil.getInstance().getChannelVideoChat(chatsModel.getIdJanji()).listenForWhisper(eventName, args -> {
             if (getMessageFromObject(args).equalsIgnoreCase(MESSAGE_HANGUP_RESPONSE_VIDEO_CALL)) {
                 unbindPreview();
+                setResult(Activity.RESULT_CANCELED);
                 finish();
             }
         });
