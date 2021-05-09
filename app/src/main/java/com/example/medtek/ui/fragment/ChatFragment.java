@@ -112,36 +112,15 @@ public class ChatFragment extends BaseFragment {
     }
 
     @Override
-    protected void setupData(@Nullable Bundle savedInstanceState) {
-        // FOR TEMP
-        if (isPatient()) {
-            ArrayList<ChatsModel.Chat> chats = new ArrayList<>();
-            ChatsModel newActiveChatsModel = new ChatsModel(468, chats);
-            newActiveChatsModel.setIdSender(92);
-            newActiveChatsModel.setSenderName("gabs");
-            newActiveChatsModel.setSenderAvatar("/storage/Dokter.png");
-            newActiveChatsModel.setIdJanji(466);
-            setData(ACTIVE_CHAT, newActiveChatsModel);
-        } else {
-            ArrayList<ChatsModel.Chat> chats = new ArrayList<>();
-            ChatsModel newActiveChatsModel = new ChatsModel(468, chats);
-            newActiveChatsModel.setIdSender(91);
-            newActiveChatsModel.setSenderName("Gabriel");
-            newActiveChatsModel.setSenderAvatar("/storage/avatar/91/1618050914.jpeg");
-            newActiveChatsModel.setIdJanji(466);
-            setData(ACTIVE_CHAT, newActiveChatsModel);
-        }
-
-    }
+    protected void setupData(@Nullable Bundle savedInstanceState) {}
 
     public void initState() {
         sizeOfAppointment = 0;
         sizeOfChats = 0;
         sizeOfAppointmentNow = 0;
         sizeOfChatsNow = 0;
-        // FOR TEMP
-        isAppointmentDone = false /* false */;
-        isChatsDone = true /* false */;
+        isAppointmentDone = false;
+        isChatsDone = false;
     }
 
     @Override
@@ -637,7 +616,6 @@ public class ChatFragment extends BaseFragment {
         initState();
         isLoading();
         binding.swipeRefresh.setRefreshing(false);
-//        FOR TEMP
         getDataSchedule();
         if (searchData(ACTIVE_CHAT)) {
             setupDataRVActiveChats();
