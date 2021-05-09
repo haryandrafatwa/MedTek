@@ -237,7 +237,6 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
         imagesCountNow = 0;
         count = 0;
         isEndChats = false;
-
     }
 
     //Register EventBus

@@ -148,14 +148,13 @@ public class ChatFragment extends BaseFragment {
         if (binding != null) {
             App.getInstance().runOnUiThread(() -> {
                 if (searchData(ACTIVE_CHAT)) {
-//                    FOR TEMP
-//                    ChatsModel activeChatsModel = (ChatsModel) getData(ACTIVE_CHAT);
-//                    for (ChatsModel model: chatsModels) {
-//                        if (model.getIdConversation() == activeChatsModel.getIdConversation()) {
-//                            chatsModels.remove(model);
-//                            break;
-//                        }
-//                    }
+                    ChatsModel activeChatsModel = (ChatsModel) getData(ACTIVE_CHAT);
+                    for (ChatsModel model: chatsModels) {
+                        if (model.getIdConversation() == activeChatsModel.getIdConversation()) {
+                            chatsModels.remove(model);
+                            break;
+                        }
+                    }
                 }
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
