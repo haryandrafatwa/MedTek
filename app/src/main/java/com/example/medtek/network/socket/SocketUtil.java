@@ -28,7 +28,10 @@ import static com.example.medtek.constant.APPConstant.MESSAGE_REQUEST_VOICE_CALL
 import static com.example.medtek.utils.PropertyUtil.ACCESS_TOKEN;
 import static com.example.medtek.utils.PropertyUtil.getData;
 import static com.example.medtek.utils.Utils.isPatient;
-import static com.example.medtek.utils.Utils.setupJitsi;
+
+/**
+ * Class Util Socket
+ */
 
 public class SocketUtil {
     private static final String TAG = SocketUtil.class.getSimpleName();
@@ -67,6 +70,7 @@ public class SocketUtil {
         });
     }
 
+    //Megekstrak message dari objek yangg diterima socket
     public static String getMessageFromObject(Object... args) {
         Log.d(TAG, "getMessageFromObject() called");
         String message = "";
@@ -94,6 +98,7 @@ public class SocketUtil {
         channelJanji = echo.privateChannel(CHANNEL_JANJI + idJanji);
     }
 
+    //listen chat dan janji dari socket
     public void listenForEventChat(int idConversation, int idJanji) {
         if (channelMessage == null || channelJanji == null) {
             setChannelMessage(idConversation);
@@ -137,6 +142,7 @@ public class SocketUtil {
         echo.disconnect();
     }
 
+    //listen Call dari socket
     public void setChannelVideoChat(int idJanji) {
 //        if (!isJitsiSetup) {
 //            setupJitsi();
@@ -157,6 +163,7 @@ public class SocketUtil {
         }
     }
 
+    //Whisper untuk channel Call
     public void whisperMessageChannelVideo(String eventName, String message, int idJanji) {
         try {
             Log.d(TAG, "whisperMessage() called with: message = [" + message + "]");

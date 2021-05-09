@@ -32,6 +32,15 @@ public class AppointmentModel {
     @SerializedName("detailJanji")
     private String detailJanji = "";
 
+    @SerializedName("startHour")
+    private String startHour = "";
+
+    @SerializedName("endHour")
+    private String endHour = "";
+
+    @SerializedName("duration")
+    private int duration = 0;
+
     @SerializedName("idStatus")
     private int idStatus = 0;
 
@@ -149,6 +158,18 @@ public class AppointmentModel {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public String getStartHour() {
+        return startHour;
+    }
+
+    public String getEndHour() {
+        return endHour;
     }
 
     public class Transaksi {

@@ -12,6 +12,10 @@ import com.example.medtek.utils.RxUtils;
 
 import static com.example.medtek.utils.ErrorHandler.handlerError;
 
+/**
+ * Controller untuk FLow User
+ */
+
 public class UserController extends APIService {
     private static final String TAG = UserController.class.getSimpleName();
 

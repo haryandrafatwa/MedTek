@@ -16,6 +16,10 @@ import io.reactivex.Observable;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 
+/**
+ * Class Data Manager untuk APIService
+ */
+
 public class DataManager {
 
     private final APIInterface apiInterface;

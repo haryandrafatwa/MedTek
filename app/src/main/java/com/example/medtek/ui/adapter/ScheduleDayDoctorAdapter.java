@@ -18,7 +18,6 @@ import com.example.medtek.R;
 import com.example.medtek.callback.BaseCallback;
 import com.example.medtek.controller.AppointmentController;
 import com.example.medtek.model.AppointmentModel;
-import com.example.medtek.model.UserModel;
 import com.example.medtek.network.response.GetJanjiSingleResponse;
 
 import org.joda.time.LocalDate;
@@ -32,8 +31,6 @@ import static com.example.medtek.BuildConfig.BASE_URL;
 import static com.example.medtek.constant.APPConstant.BELUM_DIMULAI;
 import static com.example.medtek.constant.APPConstant.MENUNGGU_DIANTRIAN;
 import static com.example.medtek.constant.APPConstant.SEDANG_BERLANSUNG;
-import static com.example.medtek.utils.PropertyUtil.DATA_USER;
-import static com.example.medtek.utils.PropertyUtil.getData;
 import static com.example.medtek.utils.Utils.getTime;
 import static java.lang.String.valueOf;
 
@@ -101,7 +98,6 @@ public class ScheduleDayDoctorAdapter extends RecyclerView.Adapter<ScheduleDayDo
             });
         }
         App.getInstance().runOnUiThread(() -> {
-            searchJadwal();
             isLoading(true, holder.pbLoading, holder.btnChatNow);
             if (model.getImageModel() != null) {
                 Glide.with(holder.itemView.getContext())
@@ -111,7 +107,6 @@ public class ScheduleDayDoctorAdapter extends RecyclerView.Adapter<ScheduleDayDo
                 holder.ivPatientPicture.setImageResource(R.drawable.ic_pasien_square);
             }
             holder.tvPatientName.setText(model.getPasien().getName());
-            holder.tvDuration.setText("30 Minutes");
 
             isLoading(true, holder.pbLoading, holder.btnChatNow);
 
@@ -119,6 +114,10 @@ public class ScheduleDayDoctorAdapter extends RecyclerView.Adapter<ScheduleDayDo
                 @Override
                 public void onSuccess(GetJanjiSingleResponse result) {
                     int idStatus = result.getData().getIdStatus();
+                    App.getInstance().runOnUiThread(() -> holder.tvDuration.setText(result.getData().getDuration() + " Menit"));
+
+                    String[] startDateHour = result.getData().getStartHour().split("\\s+");
+                    String[] endDateHour = result.getData().getEndHour().split("\\s+");
 
                     App.getInstance().runOnUiThread(() -> {
                         isLoading(false, holder.pbLoading, holder.btnChatNow);
@@ -133,8 +132,8 @@ public class ScheduleDayDoctorAdapter extends RecyclerView.Adapter<ScheduleDayDo
                                 break;
                             case MENUNGGU_DIANTRIAN:
                                 if (model.getTglJanji().equals(LocalDate.now().toString())) {
-                                    if ((getTime(startHour).isBefore(LocalTime.now())) &&
-                                            (getTime(endHour).isAfter(LocalTime.now()))) {
+                                    if ((getTime(startDateHour[1]).isBefore(LocalTime.now())) &&
+                                            (getTime(endDateHour[1]).isAfter(LocalTime.now()))) {
                                         btnText = holder.itemView.getResources().getString(R.string.chat_now);
                                         boolean isLiveChat = false;
                                         for (AppointmentModel appointmentModel : appointmentModels) {
@@ -148,15 +147,14 @@ public class ScheduleDayDoctorAdapter extends RecyclerView.Adapter<ScheduleDayDo
                                         btnText = holder.itemView.getResources().getString(R.string.waiting_for_queue);
                                     }
                                 } else {
-//                                    btnText = holder.itemView.getResources().getString(R.string.remove_to_queue);
                                     btnText = holder.itemView.getResources().getString(R.string.chat_now);
                                     isEnabled = false;
                                 }
                                 break;
                             case SEDANG_BERLANSUNG:
                                 if (model.getTglJanji().equals(LocalDate.now().toString())) {
-                                    isEnabled = (getTime(startHour).isBefore(LocalTime.now())) &&
-                                            (getTime(endHour).isAfter(LocalTime.now()));
+                                    isEnabled = (getTime(startDateHour[1]).isBefore(LocalTime.now())) &&
+                                            (getTime(endDateHour[1]).isAfter(LocalTime.now()));
                                 } else {
                                     isEnabled = false;
                                 }
@@ -192,15 +190,6 @@ public class ScheduleDayDoctorAdapter extends RecyclerView.Adapter<ScheduleDayDo
     @Override
     public int getItemCount() {
         return appointmentModels.size();
-    }
-
-    private void searchJadwal() {
-        for (UserModel.Jadwal jadwal : ((UserModel) getData(DATA_USER)).getJadwal()) {
-            if (jadwal.getIdDay() == appointmentModels.get(0).getIdDay()) {
-                startHour = jadwal.getStartHour();
-                endHour = jadwal.getEndHour();
-            }
-        }
     }
 
     public void isLoading(boolean status, ProgressBar pb, Button btn) {

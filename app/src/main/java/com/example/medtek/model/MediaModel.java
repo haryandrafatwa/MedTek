@@ -5,6 +5,10 @@ import android.os.Parcelable;
 
 import com.example.medtek.model.state.ChatType;
 
+/**
+ * Model untuk media (Image, Video, File) pada Chat
+ */
+
 public class MediaModel implements Parcelable {
     public static final Parcelable.Creator<MediaModel> CREATOR = new Parcelable.Creator<MediaModel>() {
         @Override

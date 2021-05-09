@@ -2,6 +2,10 @@ package com.example.medtek.network.request;
 
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Model untuk request Login
+ */
+
 public class LoginRequest {
 
     @SerializedName("email")

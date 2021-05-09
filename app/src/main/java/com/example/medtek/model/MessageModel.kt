@@ -3,6 +3,9 @@ package com.example.medtek.model
 import com.example.medtek.network.response.ChatResponse
 import com.google.gson.Gson
 
+/**
+ * Model untuk get Message dari Socket
+ */
 
 class MessageModel(
         val chat: ChatResponse

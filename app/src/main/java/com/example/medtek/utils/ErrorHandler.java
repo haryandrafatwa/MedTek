@@ -10,6 +10,10 @@ import java.net.SocketTimeoutException;
 
 import retrofit2.HttpException;
 
+/**
+ * Class untuk handling error dari API
+ */
+
 public class ErrorHandler {
     public static String handlerError(@Nullable Throwable throwable) {
         Log.d("zzz", "error handler");

@@ -28,7 +28,6 @@ import com.example.medtek.callback.BaseCallback;
 import com.example.medtek.constant.APPConstant;
 import com.example.medtek.databinding.FragmentChatBinding;
 import com.example.medtek.model.AppointmentModel;
-import com.example.medtek.model.CallModel;
 import com.example.medtek.model.ChatsModel;
 import com.example.medtek.model.ImageModel;
 import com.example.medtek.model.MessageModel;
@@ -52,7 +51,6 @@ import com.example.medtek.ui.helper.BaseFragment;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.jitsi.meet.sdk.JitsiMeetActivity;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
@@ -83,7 +81,6 @@ import static com.example.medtek.utils.Utils.getDate;
 import static com.example.medtek.utils.Utils.getDateTime;
 import static com.example.medtek.utils.Utils.getTypeText;
 import static com.example.medtek.utils.Utils.isPatient;
-import static com.example.medtek.utils.Utils.setupVoiceJitsi;
 import static com.example.medtek.utils.Utils.showToastyError;
 import static com.example.medtek.utils.WidgetUtil.showNotification;
 import static java.lang.String.valueOf;
@@ -143,7 +140,7 @@ public class ChatFragment extends BaseFragment {
         sizeOfAppointmentNow = 0;
         sizeOfChatsNow = 0;
         // FOR TEMP
-        isAppointmentDone = true /* false */;
+        isAppointmentDone = false /* false */;
         isChatsDone = true /* false */;
     }
 
@@ -167,10 +164,6 @@ public class ChatFragment extends BaseFragment {
     }
 
     public void setupDataRVChats(ArrayList<ChatsModel> chatsModels) {
-//        sizeOfChatsNow++;
-//        if (sizeOfChatsNow >= sizeOfChats) {
-//
-//        }
         Log.d(TAG, "setupDataRVChats");
         this.chatsModels = chatsModels;
         if (binding != null) {
@@ -216,7 +209,6 @@ public class ChatFragment extends BaseFragment {
         }
         if (binding != null) {
             Log.d(TAG, "chatsModels.size(): " + chatsModels.size());
-            Log.d(TAG, "chatsModels.size(): " + chatsModels.get(0).getSenderName());
             if (chatsModels.size() > 0) {
                 if (binding.llActiveChat.getVisibility() != View.VISIBLE) {
                     binding.llActiveChat.setVisibility(View.VISIBLE);
@@ -233,8 +225,6 @@ public class ChatFragment extends BaseFragment {
 
     public void setupDataRVSchedulePatient(ArrayList<AppointmentModel> appointmentModels) {
         sizeOfAppointmentNow++;
-        Log.d(TAG, "sizeOfAppointment: " + sizeOfAppointment);
-        Log.d(TAG, "sizeOfAppointmentNow: " + sizeOfAppointmentNow);
         if (sizeOfAppointmentNow >= sizeOfAppointment) {
             this.appointmentModels = appointmentModels;
             if (binding != null) {
@@ -286,7 +276,6 @@ public class ChatFragment extends BaseFragment {
                     }
                 }
             }
-            Log.d(TAG, "scheduleDoctorModels.size() " + scheduleDoctorModels.size());
             if (binding != null) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     scheduleDoctorModels.sort((o1, o2) -> getDate(o1.getTglJanji()).compareTo(getDate(o2.getTglJanji())));
@@ -317,7 +306,6 @@ public class ChatFragment extends BaseFragment {
         if (janjiListResponses.size() > 0) {
             for (Iterator<AppointmentModel> iterator = janjiListResponses.iterator(); iterator.hasNext(); ) {
                 AppointmentModel value = iterator.next();
-                Log.d(TAG, "value.getTglJanji(): " + value.getTglJanji());
                 if (getDate(value.getTglJanji()).isBeforeNow()) {
                     if (!getDate(value.getTglJanji()).toLocalDate().isEqual(LocalDate.now())) {
                         iterator.remove();
@@ -334,7 +322,7 @@ public class ChatFragment extends BaseFragment {
                                     isNoEmpty = true;
                                     break;
                                 } else {
-                                    if (model.getIdStatus() >  1) {
+                                    if (model.getIdStatus() > 1) {
                                         isNoEmpty = true;
                                         break;
                                     }
@@ -351,7 +339,6 @@ public class ChatFragment extends BaseFragment {
                                 if (isPatient()) {
                                     appointmentModels.add(model);
                                     if (getDate(model.getTglJanji()).toLocalDate().isEqual(LocalDate.now())) {
-                                        Log.d(TAG, "testSocket");
                                         SocketUtil.getInstance().listenForEventChat(model.getIdConversation(), model.getIdJanji());
                                         SocketUtil.getInstance().setChannelVideoChat(model.getIdJanji());
                                     }
@@ -368,7 +355,6 @@ public class ChatFragment extends BaseFragment {
                         }
                     }
                     sizeOfAppointment = appointmentModels.size();
-                    Log.d(TAG, "sizeOfAppointment: " + sizeOfAppointment);
                     if (isPatient()) {
                         getDoctorProfileSchedule(appointmentModels);
                     } else {
@@ -393,9 +379,7 @@ public class ChatFragment extends BaseFragment {
 
     public void addDataHistoryChats(ArrayList<ChatsModel> chatsModels) {
         sizeOfChats = chatsModels.size();
-        Log.d(TAG, "sizeOfChats: " + sizeOfChats);
         if (sizeOfChats > 0) {
-            Log.d(TAG, "sizeOfChats: " + sizeOfChats);
             setupDataRVChats(chatsModels);
         } else {
             isNoChats(true);
@@ -575,9 +559,7 @@ public class ChatFragment extends BaseFragment {
         } else if (newEvent instanceof MessageModel) {
             MessageModel newChat = (MessageModel) newEvent;
             if (searchData(ACTIVE_CHAT)) {
-                Log.d(TAG, "IS_ACTIVE_CHAT: YES");
                 if (newChat.getChat().getIdSender() != ((UserModel) getData(DATA_USER)).getIdUser()) {
-                    Log.d(TAG, "before: " + ((ChatsModel) getData(ACTIVE_CHAT)).getChats().size());
                     ChatType type = getTypeText(newChat.getChat().getAttachment(), newChat.getChat().getMessage());
                     String time = dateTimeToStringHour(new DateTime());
                     activeChatsModel.getChats().add(new ChatsModel.Chat(
@@ -590,12 +572,10 @@ public class ChatFragment extends BaseFragment {
                             newChat.getChat().getMessage()
                     ));
                     setData(ACTIVE_CHAT, activeChatsModel);
-                    Log.d(TAG, "after: " + ((ChatsModel) getData(ACTIVE_CHAT)).getChats().size());
                     showNotification(getContext(), ID_CHANNEL_MESSAGE, activeChatsModel.getSenderName(), newChat.getChat().getMessage(), newChat.getChat().getIdChat(), false, null);
                     chatsActiveAdapter.updateItem(((ChatsModel) getData(ACTIVE_CHAT)), 0);
                 }
             } else {
-                Log.d(TAG, "IS_ACTIVE_CHAT: NO");
                 ArrayList<ChatsModel.Chat> chats = new ArrayList<>();
                 ChatsModel newActiveChatsModel = new ChatsModel(newChat.getChat().getIdConversation(), chats);
                 ((MainActivity) getActivity()).userController.getDokter(valueOf(newChat.getChat().getIdSender()), new BaseCallback<GetInfoUserResponse>() {
@@ -658,7 +638,7 @@ public class ChatFragment extends BaseFragment {
         isLoading();
         binding.swipeRefresh.setRefreshing(false);
 //        FOR TEMP
-//        getDataSchedule();
+        getDataSchedule();
         if (searchData(ACTIVE_CHAT)) {
             setupDataRVActiveChats();
         } else {

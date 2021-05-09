@@ -14,12 +14,14 @@ import com.example.medtek.App;
 import com.example.medtek.R;
 import com.example.medtek.callback.BaseCallback;
 import com.example.medtek.controller.AppointmentController;
+import com.example.medtek.controller.UserController;
 import com.example.medtek.databinding.BsdDetailDoctorScheduleBinding;
 import com.example.medtek.model.AppointmentModel;
 import com.example.medtek.model.ChatsModel;
 import com.example.medtek.model.ScheduleDoctorModel;
 import com.example.medtek.model.UserModel;
 import com.example.medtek.network.base.BaseResponse;
+import com.example.medtek.network.response.GetInfoUserResponse;
 import com.example.medtek.network.socket.SocketUtil;
 import com.example.medtek.ui.activity.ChatRoomActivity;
 import com.example.medtek.ui.adapter.ScheduleDayDoctorAdapter;
@@ -58,6 +60,7 @@ public class BSDScheduleDoctorDetail extends BaseBottomSheetDialog {
     private final ScheduleDoctorModel scheduleDoctorModel;
     private ScheduleDayDoctorAdapter scheduleDayDoctorAdapter;
     private AppointmentController controller;
+    private UserController userController;
 
     private String startHour;
     private String endHour;
@@ -77,11 +80,12 @@ public class BSDScheduleDoctorDetail extends BaseBottomSheetDialog {
     @Override
     protected void setupData(@Nullable Bundle savedInstanceState) {
         controller = new AppointmentController();
+        userController = new UserController();
         sizeAppointment = 0;
         sizeAppointmentNow = 0;
+        getJadwalDoctor();
     }
 
-    @SuppressLint("SetTextI18n")
     @Override
     protected void setupView() {
         scheduleDayDoctorAdapter = new ScheduleDayDoctorAdapter(App.getContext());
@@ -90,11 +94,9 @@ public class BSDScheduleDoctorDetail extends BaseBottomSheetDialog {
             binding.tvDateSchedule.setText(changeDatePattern(scheduleDoctorModel.getTglJanji()));
             binding.tvAmountPatient.setText(getResources().getString(R.string.amount_patient)
                     .replace("__amount__", valueOf(scheduleDoctorModel.getAppointmentModelList().size())));
-            binding.tvTimeSchedule.setText(timeToHour(startHour) + " - " + timeToHour(endHour));
             ArrayList<AppointmentModel> models = new ArrayList<>(scheduleDoctorModel.getAppointmentModelList());
             scheduleDayDoctorAdapter.setSchedules(models);
             recyclerLinear(binding.rvSchedulePasien, LinearLayoutManager.HORIZONTAL, scheduleDayDoctorAdapter);
-//            setBtnState();
             binding.btnClose.setOnClickListener(v -> {
                 dismiss();
             });
@@ -102,11 +104,16 @@ public class BSDScheduleDoctorDetail extends BaseBottomSheetDialog {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private void searchJadwal() {
         for (UserModel.Jadwal jadwal : ((UserModel) getData(DATA_USER)).getJadwal()) {
             if (jadwal.getIdDay() == scheduleDoctorModel.getAppointmentModelList().get(0).getIdDay()) {
                 startHour = jadwal.getStartHour();
                 endHour = jadwal.getEndHour();
+                if (binding != null) {
+                    App.getInstance().runOnUiThread(() ->  binding.tvTimeSchedule.setText(timeToHour(startHour) + " - " + timeToHour(endHour)));
+                }
+                break;
             }
         }
     }
@@ -137,7 +144,6 @@ public class BSDScheduleDoctorDetail extends BaseBottomSheetDialog {
                                 }
                             }
                             ((ChatFragment) getParentFragment()).navigateToChatRoomWithResult(chatsModel, ChatRoomActivity.REQ_ACTIVE_CHAT);
-//                            ((ChatFragment) getParentFragment()).startChat(model.getIdJanji());
                             dismiss();
                         }
                     } else {
@@ -169,68 +175,39 @@ public class BSDScheduleDoctorDetail extends BaseBottomSheetDialog {
         });
     }
 
-//    private void setRVScheduleListPasien() {
-//        if (binding != null) {
-//            sizeAppointmentNow++;
-//            if (sizeAppointmentNow >= sizeAppointment) {
-//                App.getInstance().runOnUiThread(() -> {
-//                    ArrayList<AppointmentModel> models = new ArrayList<>(scheduleDoctorModel.getAppointmentModelList());
-//                    scheduleDayDoctorAdapter.setSchedules(models);
-//                    scheduleDayDoctorAdapter.setOnItemClickCallback((model, pb, btn, position) -> {
-//
-//                    });
-//                });
-//            }
-//        }
-//    }
-//
-//    private void setBtnState() {
-//        sizeAppointment = scheduleDoctorModel.getAppointmentModelList().size();
-//        scheduleDayDoctorAdapter.setOnBtnLoadingCallback((pb, btn) -> {
-//            scheduleDayDoctorAdapter.isLoading(true, pb, btn);
-//            for (int i = 0; i < sizeAppointment; i++) {
-//                int position = i;
-//                controller.getJanjiSingle(valueOf(scheduleDoctorModel.getAppointmentModelList().get(position).getIdJanji()),
-//                        new BaseCallback<GetJanjiSingleResponse>() {
-//                            @Override
-//                            public void onSuccess(GetJanjiSingleResponse result) {
-//                                scheduleDoctorModel.getAppointmentModelList().get(position).setIdStatus(
-//                                        result.getData().getIdStatus()
-//                                );
-//                                scheduleDoctorModel.getAppointmentModelList().get(position).setStatus(
-//                                        result.getData().getStatus()
-//                                );
-//                                scheduleDayDoctorAdapter.isLoading(false, pb, btn);
-//                                setRVScheduleListPasien();
-//                            }
-//
-//                            @Override
-//                            public void onError(Throwable t) {
-//                                Log.d(TAG(BSDScheduleDoctorDetail.class), "Error");
-//                                showToastyError(getActivity(), ERROR_NULL);
-//                            }
-//
-//                            @Override
-//                            public void onNoConnection() {
-//                                Log.d(TAG(BSDScheduleDoctorDetail.class), "No Connection");
-//                                showToastyError(getActivity(), NO_CONNECTION);
-//                            }
-//
-//                            @Override
-//                            public void onServerBroken() {
-//                                Log.d(TAG(BSDScheduleDoctorDetail.class), "Server Broken");
-//                                showToastyError(getActivity(), SERVER_BROKEN);
-//                            }
-//                        });
-//            }
-//        });
-//    }
+    private void getJadwalDoctor() {
+        String idDokter = valueOf(((UserModel) getData(DATA_USER)).getIdUser());
+        userController.getDokter(idDokter, new BaseCallback<GetInfoUserResponse>() {
+            @Override
+            public void onSuccess(GetInfoUserResponse result) {
+                ((UserModel) getData(DATA_USER)).setJadwal(result.getData().getJadwal());
+                searchJadwal();
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                Log.d(TAG(BSDScheduleDoctorDetail.class), "Error");
+                showToastyError(getActivity(), ERROR_NULL);
+            }
+
+            @Override
+            public void onNoConnection() {
+                Log.d(TAG(BSDScheduleDoctorDetail.class), "No Connection");
+                showToastyError(getActivity(), NO_CONNECTION);
+            }
+
+            @Override
+            public void onServerBroken() {
+                Log.d(TAG(BSDScheduleDoctorDetail.class), "Server Broken");
+                showToastyError(getActivity(), SERVER_BROKEN);
+            }
+        });
+    }
 
     private void queueJanji(String id, int position) {
         controller.getJanjiQueue(id, new BaseCallback<BaseResponse>() {
             @Override
             public void onSuccess(BaseResponse result) {
-//                setBtnState();
                 scheduleDayDoctorAdapter.notifyItemChanged(position);
             }
 
@@ -258,7 +235,6 @@ public class BSDScheduleDoctorDetail extends BaseBottomSheetDialog {
         controller.getJanjiDequeue(id, new BaseCallback<BaseResponse>() {
             @Override
             public void onSuccess(BaseResponse result) {
-//                setBtnState();
                 scheduleDayDoctorAdapter.removeItem(position);
             }
 
@@ -287,9 +263,5 @@ public class BSDScheduleDoctorDetail extends BaseBottomSheetDialog {
         binding = null;
     }
 
-//    @Override
-//    public void onItemClick(AppointmentModel model, ProgressBar pb, Button btn, int position) {
-//
-//    }
 }
 

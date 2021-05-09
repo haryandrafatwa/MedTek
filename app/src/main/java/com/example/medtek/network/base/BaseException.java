@@ -1,5 +1,9 @@
 package com.example.medtek.network.base;
 
+/**
+ * Base untuk handling Exception dari API
+ */
+
 public class BaseException extends Exception {
     int responseCode;
     //    BaseResponse<JsonElement> response;

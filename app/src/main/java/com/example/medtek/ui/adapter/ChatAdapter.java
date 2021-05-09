@@ -164,22 +164,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>  {
             }
         }
 
-//        if (chat.getType() != ChatType.TEXT && chat.getType() != ChatType.END && !isActiveChat) {
-//            File checkFile = new File(getPath(chat.getType()) +
-//                    getFileName(chat.getMessage()));
-//
-//            if (checkFile.isFile()) {
-//                isFileExist = checkFile.isFile();
-//                pathFile = checkFile.getPath();
-//                // Problem di chat aktif, tambahin if not aktif
-//            }
-//        }
-//
-//        if (!isActiveChat) {
-//            DateTime lastUpdate = getDateTime(chat.getTime(), DateTimeZone.UTC);
-//            time = dateTimeToStringHour(lastUpdate);
-//        }
-
         {
             boolean finalIsFileExist = isFileExist;
             switch (chat.getType()) {

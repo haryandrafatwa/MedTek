@@ -18,6 +18,10 @@ import java.util.TimerTask;
 
 import static com.example.medtek.App.CHANNEL_ID;
 
+/**
+ * Service untuk Notification channel di App Dokter
+ */
+
 public class NotificationService extends Service {
 
     private NotificationManagerCompat notificationManagerCompat;

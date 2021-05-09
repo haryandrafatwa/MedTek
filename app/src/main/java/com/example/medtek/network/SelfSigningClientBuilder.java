@@ -23,6 +23,10 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
 
+/**
+ * Okhttp khusus error SSL
+ */
+
 public class SelfSigningClientBuilder {
     public static OkHttpClient createClient(Context context) {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();

@@ -6,6 +6,10 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+/**
+ * Model untuk collect data response Janji List
+ */
+
 public class GetJanjiListResponse extends BaseResponse {
     @SerializedName("data")
     private List<AppointmentModel> data;

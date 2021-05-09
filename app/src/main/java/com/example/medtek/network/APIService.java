@@ -1,6 +1,5 @@
 package com.example.medtek.network;
 
-import com.example.medtek.App;
 import com.example.medtek.constant.APPConstant;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -18,6 +17,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import static com.example.medtek.BuildConfig.BASE_URL;
 import static com.example.medtek.utils.PropertyUtil.ACCESS_TOKEN;
 import static com.example.medtek.utils.PropertyUtil.getData;
+
+/**
+ * Class Retrofit/Service API untuk Flow Chat
+ */
 
 public class APIService {
 

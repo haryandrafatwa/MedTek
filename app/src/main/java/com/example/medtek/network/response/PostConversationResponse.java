@@ -3,6 +3,10 @@ package com.example.medtek.network.response;
 import com.example.medtek.network.base.BaseResponse;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Model untuk collect data response Post Chat
+ */
+
 public class PostConversationResponse extends BaseResponse {
     @SerializedName("data")
     private ConversationModel data;

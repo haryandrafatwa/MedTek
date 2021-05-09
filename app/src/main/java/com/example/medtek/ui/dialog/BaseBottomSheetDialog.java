@@ -14,7 +14,6 @@ public abstract class BaseBottomSheetDialog extends BottomSheetDialogFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-//        View view = inflater.inflate(setContentView(), container, false);
         return setContentView(inflater, container);
     }
 

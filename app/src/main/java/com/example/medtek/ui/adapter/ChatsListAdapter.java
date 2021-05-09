@@ -1,7 +1,6 @@
 package com.example.medtek.ui.adapter;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -176,9 +175,6 @@ public class ChatsListAdapter extends RecyclerView.Adapter<ChatsListAdapter.View
                 String lastUpdateText = "";
 
                 if (lastUpdate.isBeforeNow()) {
-                    Log.d(TAG, "lastUpdate.toLocalDate(): " + lastUpdate.toLocalDate().toString());
-                    Log.d(TAG, "new DateTime().toLocalDate(): " + new DateTime().toLocalDate().toString());
-
                     if (lastUpdate.toLocalDate().isEqual(new DateTime().toLocalDate())) {
                         lastUpdateText = dateTimeToStringHour(lastUpdate);
                     } else if (lastUpdate.toLocalDate().isEqual(new DateTime().toLocalDate().minusDays(1))) {
@@ -189,7 +185,6 @@ public class ChatsListAdapter extends RecyclerView.Adapter<ChatsListAdapter.View
                 } else {
                     lastUpdateText = dateTimeToStringHour(lastUpdate);
                 }
-                Log.d(TAG, "Last Chat Date String: " + lastUpdateText);
 
                 holder.tvLastUpdate.setText(lastUpdateText);
             } else {

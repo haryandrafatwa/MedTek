@@ -36,6 +36,10 @@ import static com.example.medtek.utils.Utils.getPermissionChatList;
 import static com.example.medtek.utils.Utils.requestPermissionCompat;
 import static com.example.medtek.utils.Utils.setSenderPict;
 
+/**
+ * Activity untuk handling request Video Call
+ */
+
 public class IncomingVideoChatActivity extends SingleActivity {
     public static final String BUNDLE_CHAT_MODEL = "bundle_chat_model";
     public static final int PERMISSIONS_REQUEST_CODE_VIDEO_CHAT = 8459;
@@ -130,9 +134,7 @@ public class IncomingVideoChatActivity extends SingleActivity {
 
         binding.btnCall.setOnClickListener(v -> {
             sendResponseVideoChat(true);
-//            MyJitsiMeetActivity.navigate(this, isVideoOn, isAudioOn, chatsModel.getIdJanji(), true);
             unbindPreview();
-//                VideoChatActivity.navigate(this, chatsModel);
             Intent intent = getIntent();
             intent.putExtra(IS_VIDEO_ON, isVideoOn);
             intent.putExtra(IS_AUDIO_ON, isAudioOn);

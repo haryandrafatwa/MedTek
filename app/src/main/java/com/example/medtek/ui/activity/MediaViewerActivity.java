@@ -17,6 +17,10 @@ import com.example.medtek.ui.helper.SingleActivity;
 
 import java.util.ArrayList;
 
+/**
+ * Activity untuk Preview Image/Video
+ */
+
 public class MediaViewerActivity extends SingleActivity {
     private static final String BUNDLE_MEDIA = "bundle_media";
     private static final String BUNDLE_NAME = "bundle_name";
@@ -38,18 +42,6 @@ public class MediaViewerActivity extends SingleActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         activity.startActivity(intent);
     }
-
-//    public static void navigate(Activity activity, View view, ArrayList<MediaModel> model, String senderName, String senderTime, int idChat) {
-//        Intent intent = new Intent(activity, MediaViewerActivity.class);
-//        intent.putParcelableArrayListExtra(BUNDLE_MEDIA, model);
-//        intent.putExtra(BUNDLE_NAME, senderName);
-//        intent.putExtra(BUNDLE_TIME, senderTime);
-//        intent.putExtra(BUNDLE_ID_CHAT, idChat);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        ActivityOptionsCompat options = ActivityOptionsCompat.
-//                makeSceneTransitionAnimation(activity, view, "zoomTransition");
-//        activity.startActivity(intent, options.toBundle());
-//    }
 
     @Override
     protected View VcontentView() {

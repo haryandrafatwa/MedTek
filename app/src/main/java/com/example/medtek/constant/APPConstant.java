@@ -2,9 +2,15 @@ package com.example.medtek.constant;
 
 import com.example.medtek.BuildConfig;
 
+/**
+ * Variabel konstan yang digunakan aplikasi
+ */
+
 public class APPConstant {
+    // Api timout in okHttp
     public static final int API_TIMEOUT = 5; // in minutes
 
+    // user type
     public static final int LOGIN_DOKTER = 2;
     public static final int LOGIN_PASIEN = 1;
 

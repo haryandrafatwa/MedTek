@@ -2,6 +2,10 @@ package com.example.medtek.network.response;
 
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Model untuk collect data response Chat
+ */
+
 public class ChatResponse {
     @SerializedName("id")
     private int idChat = 0;

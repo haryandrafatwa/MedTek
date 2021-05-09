@@ -2,6 +2,10 @@ package com.example.medtek.network.response;
 
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Model untuk collect data response Janji socket
+ */
+
 public class JanjiResponse {
     @SerializedName("idPasien")
     private int idPasien = 0;

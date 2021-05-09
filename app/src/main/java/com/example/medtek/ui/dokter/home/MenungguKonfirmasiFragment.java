@@ -145,9 +145,6 @@ public class MenungguKonfirmasiFragment extends Fragment {
     }
 
     public void loadData(Context context) {
-//        SharedPreferences sharedPreferences = context.getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-//        this.access = sharedPreferences.getString("token", "");
-//        this.refresh = sharedPreferences.getString("refresh_token", "");
         this.access = (String) getData(ACCESS_TOKEN);
         this.refresh = (String) getData(REFRESH_TOKEN);
     }

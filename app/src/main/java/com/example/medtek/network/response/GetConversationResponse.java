@@ -6,6 +6,10 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Model untuk collect data response Conversation
+ */
+
 public class GetConversationResponse extends BaseResponse {
     @SerializedName("data")
     private Conversation data;

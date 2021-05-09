@@ -3,6 +3,10 @@ package com.example.medtek.network.response;
 import com.example.medtek.network.base.BaseResponse;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Model untuk collect data response Login
+ */
+
 public class AuthTokenResponse extends BaseResponse {
     @SerializedName("token_type")
     private String tokenType = "";

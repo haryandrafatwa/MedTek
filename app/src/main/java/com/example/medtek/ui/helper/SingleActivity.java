@@ -18,6 +18,10 @@ import net.mrbin99.laravelechoandroid.Echo;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Class Base Activity
+ */
+
 public abstract class SingleActivity extends AppCompatActivity {
     private static final String TAG = SingleActivity.class.getSimpleName();
     public static Map<Class<? extends Activity>, Activity> launched = new HashMap<Class<? extends Activity>, Activity>();

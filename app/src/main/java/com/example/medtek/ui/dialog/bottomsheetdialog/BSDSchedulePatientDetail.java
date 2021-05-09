@@ -1,5 +1,6 @@
 package com.example.medtek.ui.dialog.bottomsheetdialog;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -74,6 +75,7 @@ public class BSDSchedulePatientDetail extends BaseBottomSheetDialog {
         controller = new AppointmentController();
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void setupView() {
         if (binding != null) {
@@ -107,7 +109,11 @@ public class BSDSchedulePatientDetail extends BaseBottomSheetDialog {
             binding.tvDoctorName.setText(appointmentModel.getDokter().getName());
             binding.tvDoctorSpecialist.setText(appointmentModel.getDokter().getSpecialization().getSpecialization());
             binding.tvDateSchedule.setText(changeDatePattern(appointmentModel.getTglJanji()));
-            binding.tvTimeSchedule.setText(timeToHour(appointmentModel.getJadwal().getStartHour()) + " - " + timeToHour(appointmentModel.getJadwal().getEndHour()));
+
+            String[] startDateHour = appointmentModel.getStartHour().split("\\s+");
+            String[] endDateHour = appointmentModel.getEndHour().split("\\s+");
+            binding.tvTimeSchedule.setText(timeToHour(startDateHour[1]) + " - " + timeToHour(endDateHour[1]));
+
             for (AppointmentModel.Transaksi transaksi : appointmentModel.getTransaksi()) {
                 if (transaksi.getIdType() == PAYMENT_JANJI) {
                     binding.tvCharge.setText(getResources().getString(R.string.charge_amount)
@@ -115,7 +121,7 @@ public class BSDSchedulePatientDetail extends BaseBottomSheetDialog {
                     break;
                 }
             }
-            binding.tvDuration.setText("30 Menit");
+            binding.tvDuration.setText(appointmentModel.getDuration() + " Menit");
             setBtnChatNow();
             String finalPathAvatar = pathAvatar;
             binding.btnChatNow.setOnClickListener(v -> {

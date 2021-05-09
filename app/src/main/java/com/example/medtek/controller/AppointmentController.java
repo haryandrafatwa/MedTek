@@ -14,6 +14,11 @@ import com.example.medtek.utils.RxUtils;
 
 import static com.example.medtek.utils.ErrorHandler.handlerError;
 
+
+/**
+ * Controller untuk FLow Janji/Appointment
+ */
+
 public class AppointmentController extends APIService {
     private static final String TAG = AppointmentController.class.getSimpleName();
 

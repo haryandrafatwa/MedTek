@@ -41,6 +41,10 @@ import static com.example.medtek.utils.Utils.isPatient;
 import static com.example.medtek.utils.Utils.requestPermissionCompat;
 import static com.example.medtek.utils.Utils.setSenderPict;
 
+/**
+ * Activity untuk start dan handling response request Video Call
+ */
+
 public class OutcomingVideoChatActivity extends SingleActivity {
     private static final String TAG = OutcomingVideoChatActivity.class.getSimpleName();
 
@@ -153,7 +157,6 @@ public class OutcomingVideoChatActivity extends SingleActivity {
         String eventName = EVENT_RESPONSE_CALL + chatsModel.getIdJanji();
         SocketUtil.getInstance().getChannelVideoChat(chatsModel.getIdJanji()).listen(eventName, args -> {
             if (getMessageFromObject(args).equalsIgnoreCase(MESSAGE_ACC_RESPONSE_VIDEO_CALL)) {
-//                MyJitsiMeetActivity.navigate(this, isVideoOn, isAudioOn, chatsModel.getIdJanji(), true);
                 unbindPreview();
                 Intent intent = getIntent();
                 intent.putExtra(IS_VIDEO_ON, isVideoOn);
@@ -168,7 +171,6 @@ public class OutcomingVideoChatActivity extends SingleActivity {
         });
         SocketUtil.getInstance().getChannelVideoChat(chatsModel.getIdJanji()).listenForWhisper(eventName, args -> {
             if (getMessageFromObject(args).equalsIgnoreCase(MESSAGE_ACC_RESPONSE_VIDEO_CALL)) {
-//                MyJitsiMeetActivity.navigate(this, isVideoOn, isAudioOn, chatsModel.getIdJanji(), true);
                 unbindPreview();
                 Intent intent = getIntent();
                 intent.putExtra(IS_VIDEO_ON, isVideoOn);

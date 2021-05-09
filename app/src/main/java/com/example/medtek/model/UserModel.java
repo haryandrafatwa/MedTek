@@ -195,6 +195,10 @@ public class UserModel extends BaseResponse {
         return jadwal;
     }
 
+    public void setJadwal(List<Jadwal> jadwal) {
+        this.jadwal = jadwal;
+    }
+
     public static class Role {
         @SerializedName("id")
         private int id = 0;

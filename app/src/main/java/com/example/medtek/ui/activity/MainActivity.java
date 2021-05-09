@@ -1,20 +1,15 @@
 package com.example.medtek.ui.activity;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.medtek.R;
 import com.example.medtek.callback.BaseCallback;
@@ -28,38 +23,26 @@ import com.example.medtek.model.ImageModel;
 import com.example.medtek.model.ScheduleDoctorModel;
 import com.example.medtek.model.UserModel;
 import com.example.medtek.model.state.ApplyStateType;
-import com.example.medtek.model.state.ChatType;
 import com.example.medtek.network.response.AuthTokenResponse;
 import com.example.medtek.network.response.GetConversationListResponse;
 import com.example.medtek.network.response.GetConversationResponse;
 import com.example.medtek.network.response.GetInfoUserResponse;
 import com.example.medtek.network.response.GetJanjiListResponse;
-import com.example.medtek.network.socket.SocketUtil;
 import com.example.medtek.ui.fragment.ChatFragment;
 import com.example.medtek.ui.pasien.home.HomeFragment;
 import com.example.medtek.ui.pasien.others.OthersFragment;
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 
-import org.jitsi.meet.sdk.BroadcastEvent;
-import org.jitsi.meet.sdk.BroadcastIntentHelper;
-import org.jitsi.meet.sdk.JitsiMeetActivity;
-import org.jitsi.meet.sdk.JitsiMeetConferenceOptions;
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import timber.log.Timber;
-
 import static com.example.medtek.constant.APPConstant.ERROR_NULL;
-import static com.example.medtek.constant.APPConstant.EVENT_RESPONSE_ON_CALL;
 import static com.example.medtek.constant.APPConstant.IMAGE_AVATAR;
-import static com.example.medtek.constant.APPConstant.MESSAGE_HANGUP_RESPONSE_VOICE_CALL;
 import static com.example.medtek.constant.APPConstant.NO_CONNECTION;
 import static com.example.medtek.constant.APPConstant.SERVER_BROKEN;
-import static com.example.medtek.network.socket.SocketUtil.getMessageFromObject;
-import static com.example.medtek.ui.pasien.home.HomeFragment.REQUEST_CODE_LOC;
 import static com.example.medtek.utils.PropertyUtil.ACCESS_TOKEN;
 import static com.example.medtek.utils.PropertyUtil.DATA_USER;
 import static com.example.medtek.utils.PropertyUtil.EXPIRED_TOKEN;
@@ -74,23 +57,15 @@ import static com.example.medtek.utils.PropertyUtil.setData;
 import static com.example.medtek.utils.PropertyUtil.setDataLogin;
 import static com.example.medtek.utils.Utils.TAG;
 import static com.example.medtek.utils.Utils.getDateTime;
-import static com.example.medtek.utils.Utils.getFileExt;
 import static com.example.medtek.utils.Utils.getTypeText;
 import static com.example.medtek.utils.Utils.isPatient;
-import static com.example.medtek.utils.Utils.requestPermissionCompat;
-import static com.example.medtek.utils.Utils.setupVoiceJitsi;
 import static com.example.medtek.utils.Utils.showToastyError;
 import static com.orhanobut.hawk.Hawk.deleteAll;
 import static java.lang.String.valueOf;
 
 public class MainActivity extends AppCompatActivity {
-
-    private int idJanjiForCall = 0;
-
     public static final String BUNDLE_ALREADY_LOGIN = "bundle_has_login";
     public static final int PERMISSION_STORAGE = 7669;
-
-    private JitsiMeetConferenceOptions options;
 
     ChipNavigationBar chipNavigationBar;
     FragmentManager fragmentManager;
@@ -206,14 +181,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadData(Context context) {
-//        SharedPreferences sharedPreferences = context.getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-//        this.access = sharedPreferences.getString("token", "");
-//        this.refresh = sharedPreferences.getString("refresh_token", "");
-
         this.access = (String) getData(ACCESS_TOKEN);
         this.refresh = (String) getData(REFRESH_TOKEN);
     }
 
+    //Handlng login/auth state
     private boolean shouldLogin() {
         Log.d(TAG(MainActivity.class), valueOf(getApplicationState()));
         if (!searchData(LOGIN_STATUS) || !((boolean) getData(LOGIN_STATUS)) || !searchData(ACCESS_TOKEN)) {
@@ -244,14 +216,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean isTokenExpired() {
-        Log.d(TAG(MainActivity.class),"expired: " + (String) getData(EXPIRED_TOKEN));
         DateTime tokenDateExpired = getDateTime((String) getData(EXPIRED_TOKEN));
         if (tokenDateExpired.isAfterNow()) {
             LocalTime currentTime = LocalTime.now();
             if (tokenDateExpired.toLocalDate() == new DateTime().toLocalDate()
                     && currentTime.isAfter(tokenDateExpired.toLocalTime())) {
-//                Log.d(TAG, "testTokenExpired");
-//                setData(LOGIN_STATUS, false);
                 deleteAll();
                 return true;
             } else if (tokenDateExpired.toLocalDate() == new DateTime().toLocalDate()
@@ -261,8 +230,6 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         } else {
-//            Log.d(TAG, "testTokenExpired");
-//            setData(LOGIN_STATUS, false);
             deleteAll();
             return true;
         }
@@ -301,15 +268,12 @@ public class MainActivity extends AppCompatActivity {
             scheduleModels.clear();
         }
 
-//        scheduleModels.add(new ScheduleModel(3, "22 Jul 2020", "10:00 - 12:00"));
-//        scheduleModels.add(new ScheduleModel(5, "23 Jul 2020", "10:00 - 12:00"));
-//        scheduleModels.add(new ScheduleModel(6, "23 Jul 2020", "10:00 - 12:00"));
-
         appointmentController.getJanjiList(new BaseCallback<GetJanjiListResponse>() {
             @Override
             public void onSuccess(GetJanjiListResponse result) {
                 List<AppointmentModel> appointmentModels = new ArrayList<>(result.getData());
-                getDataHistoryChats(appointmentModels);
+                // FOR TEMP
+//                getDataHistoryChats(appointmentModels);
                 chatFragment.addDataSchedule(result.getData());
             }
 
@@ -452,23 +416,6 @@ public class MainActivity extends AppCompatActivity {
                 showToastyError(MainActivity.this, SERVER_BROKEN);
             }
         });
-
-//        Cursor cursorConversation = medtekHelper.queryAll(DatabaseContract.ConversationHistoryColumns.TABLE_NAME,
-//                DatabaseContract.ConversationHistoryColumns._ID);
-//        chatsModels = MappingHelper.mapCursorToListConversation(cursorConversation);
-//        if (chatsModels.size() > 0) {
-//            for (ChatsModel model : chatsModels) {
-//                Cursor chat = medtekHelper.queryByIdConv(valueOf(model.getIdConversation()));
-//                model.getChats().addAll(MappingHelper.mapCursorToListChat(chat));
-//            }
-//        }
-
-//        List<ChatsModel.Chat> chats = new ArrayList<>();
-//        chats.add(new ChatsModel.Chat(1, 3, 4, "16:30", true, ChatType.TEXT, "Halo, saya Caleigh Kirlin, ada yg bisa saya bantu?"));
-//        chats.add(new ChatsModel.Chat(2, 4, 3, "16:31", false, ChatType.TEXT, "Halo Dok, saya ada keluhan jantung selalu berdegup kencang"));
-//        chats.add(new ChatsModel.Chat(3, 3, 4, "16:32", false, ChatType.TEXT, "Setiap kapan yah? dan sejak kapan itu terjadi? Apakah anda juga merasa sakit pada bagian dada?"));
-//        chatsModels.add(new ChatsModel(1, chats));
-
     }
 
     private String getMessageText(String message, String attachment) {
@@ -517,7 +464,6 @@ public class MainActivity extends AppCompatActivity {
     public void getPatientProfileSchedule(ArrayList<AppointmentModel> models) {
         for (int i = 0; i < models.size(); i++) {
             int position = i;
-            Log.d(TAG(MainActivity.class), "idPasienSchedule: " + models.get(position).getIdPasien());
             userController.getPasien(valueOf(models.get(position).getIdPasien()), new BaseCallback<GetInfoUserResponse>() {
                 @Override
                 public void onSuccess(GetInfoUserResponse result) {
@@ -552,108 +498,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void getDoctorProfileChats(ArrayList<ChatsModel> models) {
-        for (int i = 0; i < models.size(); i++) {
-            int position = i;
-            int idSender = 0;
-            for (ChatsModel.Chat chat : models.get(position).getChats()) {
-                if (chat.getIdSender() != ((UserModel) getData(DATA_USER)).getIdUser()) {
-                    idSender = chat.getIdSender();
-                }
-            }
-            userController.getDokter(valueOf(idSender), new BaseCallback<GetInfoUserResponse>() {
-                @Override
-                public void onSuccess(GetInfoUserResponse result) {
-                    if (result.getData().getImage().size() > 0) {
-                        for (ImageModel model : result.getData().getImage()) {
-                            if (model.getTypeId() == IMAGE_AVATAR) {
-                                models.get(position).setSenderAvatar(model.getPath());
-                            }
-                        }
-                    } else {
-                        models.get(position).setSenderAvatar("");
-                    }
-                    models.get(position).setSenderName(result.getData().getName());
-                    models.get(position).setIdSender(result.getData().getIdUser());
-                    chatFragment.setupDataRVChats(models);
-                }
-
-                @Override
-                public void onError(Throwable t) {
-                    Log.d(TAG(MainActivity.class), t.getMessage());
-                    showToastyError(MainActivity.this, ERROR_NULL);
-                }
-
-                @Override
-                public void onNoConnection() {
-                    Log.d(TAG(MainActivity.class), "No Connection");
-                    showToastyError(MainActivity.this, NO_CONNECTION);
-                }
-
-                @Override
-                public void onServerBroken() {
-                    Log.d(TAG(MainActivity.class), "Server Broken");
-                    showToastyError(MainActivity.this, SERVER_BROKEN);
-                }
-            });
-        }
-    }
-
-    public void getPatientProfileChats(ArrayList<ChatsModel> models) {
-        for (int i = 0; i < models.size(); i++) {
-            int position = i;
-            int idSender = 0;
-            for (ChatsModel.Chat chat : models.get(position).getChats()) {
-                if (chat.getIdSender() != ((UserModel) getData(DATA_USER)).getIdUser()) {
-                    idSender = chat.getIdSender();
-                }
-            }
-
-            Log.d(TAG(MainActivity.class), "idPasienChat: " + idSender);
-            userController.getPasien(valueOf(idSender), new BaseCallback<GetInfoUserResponse>() {
-                @Override
-                public void onSuccess(GetInfoUserResponse result) {
-                    if (result.getData().getImage().size() > 0) {
-                        for (ImageModel model : result.getData().getImage()) {
-                            if (model.getTypeId() == IMAGE_AVATAR) {
-                                models.get(position).setSenderAvatar(model.getPath());
-                            }
-                        }
-                    } else {
-                        models.get(position).setSenderAvatar("");
-                    }
-                    models.get(position).setSenderName(result.getData().getName());
-                    models.get(position).setIdSender(result.getData().getIdUser());
-                    chatFragment.setupDataRVChats(models);
-                }
-
-                @Override
-                public void onError(Throwable t) {
-                    Log.d(TAG(MainActivity.class), t.getMessage());
-                    showToastyError(MainActivity.this, ERROR_NULL);
-                }
-
-                @Override
-                public void onNoConnection() {
-                    Log.d(TAG(MainActivity.class), "No Connection");
-                    showToastyError(MainActivity.this, NO_CONNECTION);
-                }
-
-                @Override
-                public void onServerBroken() {
-                    Log.d(TAG(MainActivity.class), "Server Broken");
-                    showToastyError(MainActivity.this, SERVER_BROKEN);
-                }
-            });
-        }
-    }
-
-    public void deleteAllDB() {
-//        medtekHelper.deleteAll(DatabaseContract.ConversationHistoryColumns.TABLE_NAME);
-//        medtekHelper.deleteAll(DatabaseContract.ChatsHistoryColumns.TABLE_NAME);
-//        medtekHelper.deleteAll(DatabaseContract.MediaChatColumns.TABLE_NAME);
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -672,17 +516,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     break;
                 }
-                case ChatRoomActivity.REQ_VOICE_CALL:
-//                    if (data != null) {
-//                        idJanjiForCall = data.getIntExtra(ChatRoomActivity.BUNDLE_ID_JANJI, 0);
-//                    }
-//                    options = setupVoiceJitsi(idJanjiForCall);
-//                    registerForBroadcastMessages();
-//                    listenResponse();
-//                    JitsiMeetActivity.launch(this, options);
-//                    break;
             }
-
         }
     }
 

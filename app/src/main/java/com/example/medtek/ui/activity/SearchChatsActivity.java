@@ -26,6 +26,10 @@ import static com.example.medtek.utils.PropertyUtil.searchData;
 import static com.example.medtek.utils.RecyclerViewUtil.recyclerLinear;
 import static java.lang.String.valueOf;
 
+/**
+ * Activity untuk search conversation
+ */
+
 public class SearchChatsActivity extends SingleActivity {
     private static final String TAG = SearchChatsActivity.class.getSimpleName();
     private static final String CHATS_EXTRA = "chats_extra";

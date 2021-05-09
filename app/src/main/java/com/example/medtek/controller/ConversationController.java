@@ -23,6 +23,10 @@ import retrofit2.Response;
 import static com.example.medtek.utils.ErrorHandler.handlerError;
 import static java.lang.String.valueOf;
 
+/**
+ * Controller untuk FLow Chat
+ */
+
 public class ConversationController extends APIService {
     private static final String TAG = ConversationController.class.getSimpleName();
 

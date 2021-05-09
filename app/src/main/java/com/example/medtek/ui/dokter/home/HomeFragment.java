@@ -84,7 +84,6 @@ public class HomeFragment extends Fragment {
     private RelativeLayout rl_empty_antrian;
 
     private Socket socket;
-//    private String SERVER_URL = "http://192.168.137.1:6001";
     private String CHANNEL_MESSAGES;
 
     private DateTimeFormatter day, dayFormat;
@@ -509,10 +508,6 @@ public class HomeFragment extends Fragment {
     }
 
     public void loadData(Context context) {
-//        SharedPreferences sharedPreferences = context.getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-//        this.access = sharedPreferences.getString("token", "");
-//        this.refresh = sharedPreferences.getString("refresh_token", "");
-
         this.access = (String) getData(ACCESS_TOKEN);
         this.refresh = (String) getData(REFRESH_TOKEN);
     }

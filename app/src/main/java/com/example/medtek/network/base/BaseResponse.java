@@ -2,6 +2,10 @@ package com.example.medtek.network.base;
 
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Base untuk handling Response dari API
+ */
+
 public class BaseResponse {
     @SerializedName("error")
     private final Boolean error = false;

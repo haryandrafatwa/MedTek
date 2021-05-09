@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,20 +26,14 @@ public class WelcomePageActivity extends AppCompatActivity {
         dokter = findViewById(R.id.btn_dokter);
         pasien = findViewById(R.id.btn_pasien);
 
-        dokter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent dokter = new Intent(WelcomePageActivity.this, LoginDokterActivity.class);
-                startActivity(dokter);
-            }
+        dokter.setOnClickListener(v -> {
+            Intent dokter = new Intent(WelcomePageActivity.this, LoginDokterActivity.class);
+            startActivity(dokter);
         });
 
-        pasien.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent pasien = new Intent(WelcomePageActivity.this, LoginPasienActivity.class);
-                startActivity(pasien);
-            }
+        pasien.setOnClickListener(v -> {
+            Intent pasien = new Intent(WelcomePageActivity.this, LoginPasienActivity.class);
+            startActivity(pasien);
         });
 
     }

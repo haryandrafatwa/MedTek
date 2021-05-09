@@ -3,6 +3,10 @@ package com.example.medtek.model
 import com.example.medtek.network.response.JanjiResponse
 import com.google.gson.Gson
 
+/**
+ * Model untuk get Janji dari Socket
+ */
+
 class JanjiModel(
         val janji: JanjiResponse
 ) {

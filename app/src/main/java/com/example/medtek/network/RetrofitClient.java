@@ -11,6 +11,10 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+/**
+ * Class Retrofit untuk Flow Menu Home dan Others
+ */
+
 public class RetrofitClient {
 
     public static final String BASE_URL = BuildConfig.BASE_URL;

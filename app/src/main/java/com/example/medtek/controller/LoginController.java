@@ -19,6 +19,10 @@ import static com.example.medtek.utils.PropertyUtil.REFRESH_TOKEN;
 import static com.example.medtek.utils.PropertyUtil.getData;
 import static com.example.medtek.utils.Utils.isLoading;
 
+/**
+ * Controller untuk FLow Authentication
+ */
+
 public class LoginController extends APIService {
     private static final String TAG = LoginController.class.getSimpleName();
 
