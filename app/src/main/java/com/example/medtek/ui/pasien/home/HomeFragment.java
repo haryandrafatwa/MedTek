@@ -23,7 +23,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -210,7 +209,11 @@ public class HomeFragment extends Fragment {
                                         }
                                     }
                                 }
+                            } else {
+                                getJanji.clone().enqueue(this);
                             }
+                        } else {
+                            getJanji.clone().enqueue(this);
                         }
                     } catch (IOException | JSONException e) {
                         e.printStackTrace();
@@ -220,7 +223,7 @@ public class HomeFragment extends Fragment {
 
                 @Override
                 public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                    Toasty.error(getActivity(), t.getMessage());
                 }
             });
 
@@ -232,26 +235,32 @@ public class HomeFragment extends Fragment {
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                     if (response.isSuccessful()){
                         try {
-                            String s = response.body().string();
-                            JSONObject obj = new JSONObject(s);
-                            if (!obj.has("message")){
-                                JSONObject jsonObject = new JSONObject(obj.getString("data"));
-                                mySaldo = NumberFormat.getInstance(Locale.ITALIAN).format(Integer.valueOf(jsonObject.getString("balance")));
+                            if (response.body() != null) {
+                                String s = response.body().string();
+                                JSONObject obj = new JSONObject(s);
+                                if (!obj.has("message")){
+                                    JSONObject jsonObject = new JSONObject(obj.getString("data"));
+                                    mySaldo = NumberFormat.getInstance(Locale.ITALIAN).format(Integer.valueOf(jsonObject.getString("balance")));
+                                } else {
+                                    mySaldo = "-";
+                                }
+                                isWalletDone = true;
+                                disabledShimmer();
                             } else {
-                                mySaldo = "-";
+                                callWallet.clone().enqueue(this);
                             }
-                            isWalletDone = true;
-                            disabledShimmer();
-
                         } catch (JSONException | IOException e) {
                             e.printStackTrace();
+                            callWallet.clone().enqueue(this);
                         }
+                    } else {
+                        callWallet.clone().enqueue(this);
                     }
                 }
 
                 @Override
                 public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    Toasty.info(getActivity(), t.getMessage());
+                    Toasty.error(getActivity(), t.getMessage());
                 }
             });
 
@@ -263,38 +272,45 @@ public class HomeFragment extends Fragment {
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                     if (response.isSuccessful()){
                         try {
-                            String s = response.body().string();
-                            JSONObject obj = new JSONObject(s);
-                            userName = obj.getString("name");
-                            JSONArray jsonArray = new JSONArray(obj.getString("image"));
-                            if (jsonArray.length() == 0){
-                                userImagePath = "/storage/Pasien.png";
-                            }else{
-                                for (int i = 0; i < jsonArray.length(); i++) {
-                                    JSONObject imageObj = jsonArray.getJSONObject(i);
-                                    if (imageObj.getInt("type_id") == 1){
-                                        if (imageObj.getString("path").equalsIgnoreCase("/storage/Pasien.png")){
-                                            userImagePath = "/storage/Pasien.png";
+                            if (response.body() != null) {
+                                String s = response.body().string();
+                                JSONObject obj = new JSONObject(s);
+                                userName = obj.getString("name");
+                                JSONArray jsonArray = new JSONArray(obj.getString("image"));
+                                if (jsonArray.length() == 0){
+                                    userImagePath = "/storage/Pasien.png";
+                                }else{
+                                    for (int i = 0; i < jsonArray.length(); i++) {
+                                        JSONObject imageObj = jsonArray.getJSONObject(i);
+                                        if (imageObj.getInt("type_id") == 1){
+                                            if (imageObj.getString("path").equalsIgnoreCase("/storage/Pasien.png")){
+                                                userImagePath = "/storage/Pasien.png";
+                                            }else{
+                                                userImagePath = jsonArray.getJSONObject(0).getString("path");
+                                                break;
+                                            }
                                         }else{
-                                            userImagePath = jsonArray.getJSONObject(0).getString("path");
-                                            break;
+                                            userImagePath = "/storage/Pasien.png";
                                         }
-                                    }else{
-                                        userImagePath = "/storage/Pasien.png";
                                     }
                                 }
+                                isUserDone = true;
+                                disabledShimmer();
+                            } else {
+                                callUser.clone().enqueue(this);
                             }
-                            isUserDone = true;
-                            disabledShimmer();
                         } catch (JSONException | IOException e) {
                             e.printStackTrace();
+                            callUser.clone().enqueue(this);
                         }
+                    } else {
+                        callUser.clone().enqueue(this);
                     }
                 }
 
                 @Override
                 public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    Toasty.info(getActivity(), t.getMessage());
+                    Toasty.error(getActivity(), t.getMessage());
                 }
             });
         }
@@ -304,72 +320,78 @@ public class HomeFragment extends Fragment {
         callDokter.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                try {
-                    String dokterResult = response.body().string();
-                    JSONObject object = new JSONObject(dokterResult);
-                    JSONArray array = new JSONArray(object.getString("data"));
-                    mListDokter.clear();
-                    for (int i = 0; i < array.length(); i++) {
-                        JSONObject jo = array.getJSONObject(i);
-                        String name = jo.getString("name");
-                        String email = jo.getString("email");
-                        int isVerified;
-                        if (!jo.isNull("email_verified_at")){
-                            isVerified = 1;
-                        }else{
-                            isVerified = 0;
-                        }
-                        String path = "";
-
-                        JSONArray jsonArrayImage = new JSONArray(jo.getString("image"));
-                        for (int j = 0; j < jsonArrayImage.length(); j++) {
-                            JSONObject imageObj = jsonArrayImage.getJSONObject(j);
-                            if (imageObj.getInt("type_id") == 1) {
-                                path = BASE_URL + imageObj.getString("path");
-                                break;
-                            }
-                            Log.d(TAG(HomeFragment.class), "pathImage:" + path);
-                        }
-                        JSONObject rsObject = new JSONObject(jo.getString("hospital"));
-                        String rs_name = rsObject.getString("name");
-                        JSONObject alamatObject = new JSONObject(jo.getString("alamat"));
-                        String kelurahan = alamatObject.getString("kelurahan");
-                        String kota = alamatObject.getString("kota");
-                        String rs_loc = kelurahan+", "+kota;
-
-                        JSONObject specObj = new JSONObject(jo.getString("specialization"));
-                        String spec = specObj.getString("specialization");
-                        int harga = jo.getInt("harga");
-                        int id = jo.getInt("id");
-                        int lamakerja =  (jo.isNull("lama_kerja")) ? 0 : Integer.valueOf(jo.getString("lama_kerja"));
-                        float rating = Float.valueOf(jo.getString("rating"));
-                        if (isVerified == 1){
-                            mListDokter.add(new DokterModel(id,name,email,spec,rs_name,rs_loc,path,harga,rating,isVerified,lamakerja));
-                            mAdapterADokter.notifyDataSetChanged();
-                        }
-                        rv_dokter.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                            @Override
-                            public void onGlobalLayout() {
-                                if(recyclerViewReadyCallback != null){
-                                    recyclerViewReadyCallback.onLayoutReady();
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        try {
+                            String dokterResult = response.body().string();
+                            JSONObject object = new JSONObject(dokterResult);
+                            JSONArray array = new JSONArray(object.getString("data"));
+                            mListDokter.clear();
+                            for (int i = 0; i < array.length(); i++) {
+                                JSONObject jo = array.getJSONObject(i);
+                                String name = jo.getString("name");
+                                String email = jo.getString("email");
+                                int isVerified;
+                                if (!jo.isNull("email_verified_at")){
+                                    isVerified = 1;
+                                }else{
+                                    isVerified = 0;
                                 }
-                                rv_dokter.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                                String path = "";
+
+                                JSONArray jsonArrayImage = new JSONArray(jo.getString("image"));
+                                for (int j = 0; j < jsonArrayImage.length(); j++) {
+                                    JSONObject imageObj = jsonArrayImage.getJSONObject(j);
+                                    if (imageObj.getInt("type_id") == 1) {
+                                        path = BASE_URL + imageObj.getString("path");
+                                        break;
+                                    }
+                                    Log.d(TAG(HomeFragment.class), "pathImage:" + path);
+                                }
+                                JSONObject rsObject = new JSONObject(jo.getString("hospital"));
+                                String rs_name = rsObject.getString("name");
+                                JSONObject alamatObject = new JSONObject(jo.getString("alamat"));
+                                String kelurahan = alamatObject.getString("kelurahan");
+                                String kota = alamatObject.getString("kota");
+                                String rs_loc = kelurahan+", "+kota;
+
+                                JSONObject specObj = new JSONObject(jo.getString("specialization"));
+                                String spec = specObj.getString("specialization");
+                                int harga = jo.getInt("harga");
+                                int id = jo.getInt("id");
+                                int lamakerja =  (jo.isNull("lama_kerja")) ? 0 : Integer.valueOf(jo.getString("lama_kerja"));
+                                float rating = Float.valueOf(jo.getString("rating"));
+                                if (isVerified == 1){
+                                    mListDokter.add(new DokterModel(id,name,email,spec,rs_name,rs_loc,path,harga,rating,isVerified,lamakerja));
+                                    mAdapterADokter.notifyDataSetChanged();
+                                }
+                                rv_dokter.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                                    @Override
+                                    public void onGlobalLayout() {
+                                        if(recyclerViewReadyCallback != null){
+                                            recyclerViewReadyCallback.onLayoutReady();
+                                        }
+                                        rv_dokter.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                                    }
+                                });
                             }
-                        });
+                            isDokterDone = true;
+                            disabledShimmer();
+                        } catch (IOException | JSONException e) {
+                            e.printStackTrace();
+                            callDokter.clone().enqueue(this);
+                        }
+                    } else {
+                        callDokter.clone().enqueue(this);
                     }
-                    isDokterDone = true;
-                    disabledShimmer();
-
-
-                } catch (IOException | JSONException e) {
-                    e.printStackTrace();
+                } else {
                     callDokter.clone().enqueue(this);
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                Toasty.error(getActivity(), t.getMessage());
             }
         });
 
@@ -386,58 +408,65 @@ public class HomeFragment extends Fragment {
         callArticles.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-
-                try {
-                    String s = response.body().string().trim();
-                    JSONObject object = new JSONObject(s);
-                    JSONArray array = new JSONArray(object.getString("data"));
-                    mListArtikel.clear();
-                    for (int i = 0; i < array.length(); i++) {
-                        JSONObject jo = array.getJSONObject(i);
-                        String author = jo.getString("author");
-                        JSONObject authorObject = new JSONObject(author);
-                        String authorName = authorObject.getString("name");
-                        String topic = jo.getString("topic");
-                        JSONObject topicObject = new JSONObject(topic);
-                        String topicName = topicObject.getString("topic");
-                        int id_artikel = jo.getInt("id");
-                        String judul = jo.getString("judul");
-                        String isi = jo.getString("isi");
-                        String slug = jo.getString("slug");
-                        String image_url = jo.getString("image");
-                        String upload_date = jo.getString("created_at");
-                        boolean isVerified = jo.getBoolean("is_verified");
-                        if (isVerified){
-                            mListArtikel.add(new ArtikelModel(id_artikel,judul,isi,slug,image_url,upload_date,authorName,topicName));
-                            mAdapterArtikel.notifyDataSetChanged();
-                        }
-                        rv_artikel.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                            @Override
-                            public void onGlobalLayout() {
-                                if(recyclerViewReadyCallback != null){
-                                    recyclerViewReadyCallback.onLayoutReady();
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        try {
+                            String s = response.body().string().trim();
+                            JSONObject object = new JSONObject(s);
+                            JSONArray array = new JSONArray(object.getString("data"));
+                            mListArtikel.clear();
+                            for (int i = 0; i < array.length(); i++) {
+                                JSONObject jo = array.getJSONObject(i);
+                                String author = jo.getString("author");
+                                JSONObject authorObject = new JSONObject(author);
+                                String authorName = authorObject.getString("name");
+                                String topic = jo.getString("topic");
+                                JSONObject topicObject = new JSONObject(topic);
+                                String topicName = topicObject.getString("topic");
+                                int id_artikel = jo.getInt("id");
+                                String judul = jo.getString("judul");
+                                String isi = jo.getString("isi");
+                                String slug = jo.getString("slug");
+                                String image_url = jo.getString("image");
+                                String upload_date = jo.getString("created_at");
+                                boolean isVerified = jo.getBoolean("is_verified");
+                                if (isVerified){
+                                    mListArtikel.add(new ArtikelModel(id_artikel,judul,isi,slug,image_url,upload_date,authorName,topicName));
+                                    mAdapterArtikel.notifyDataSetChanged();
                                 }
-                                rv_artikel.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                                rv_artikel.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                                    @Override
+                                    public void onGlobalLayout() {
+                                        if(recyclerViewReadyCallback != null){
+                                            recyclerViewReadyCallback.onLayoutReady();
+                                        }
+                                        rv_artikel.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                                    }
+                                });
                             }
-                        });
-                    }
-                    Collections.reverse(mListArtikel);
-                    mListArtikelReverse.clear();
-                    for (int i = 0; i < 5; i++) {
-                        mListArtikelReverse.add(mListArtikel.get(i));
-                    }
-                    isArtikelDone = true;
-                    disabledShimmer();
+                            Collections.reverse(mListArtikel);
+                            mListArtikelReverse.clear();
+                            for (int i = 0; i < 5; i++) {
+                                mListArtikelReverse.add(mListArtikel.get(i));
+                            }
+                            isArtikelDone = true;
+                            disabledShimmer();
 
-                } catch (IOException | JSONException e) {
+                        } catch (IOException | JSONException e) {
+                            callArticles.clone().enqueue(this);
+                            e.printStackTrace();
+                        }
+                    } else {
+                        callArticles.clone().enqueue(this);
+                    }
+                } else {
                     callArticles.clone().enqueue(this);
-                    e.printStackTrace();
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                Toasty.error(getActivity(), t.getMessage());
             }
         });
 

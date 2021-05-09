@@ -119,8 +119,8 @@ public class ChatFragment extends BaseFragment {
         sizeOfChats = 0;
         sizeOfAppointmentNow = 0;
         sizeOfChatsNow = 0;
-        isAppointmentDone = false;
-        isChatsDone = false;
+        isAppointmentDone = true;
+        isChatsDone = true;
     }
 
     @Override

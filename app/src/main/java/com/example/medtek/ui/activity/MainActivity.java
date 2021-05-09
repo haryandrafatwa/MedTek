@@ -82,6 +82,8 @@ public class MainActivity extends AppCompatActivity {
     private final ArrayList<ScheduleDoctorModel> scheduleModels = new ArrayList<>();
     private final ArrayList<ChatsModel> chatsModels = new ArrayList<>();
 
+    private int countGetConversation;
+
     public static void navigate(Activity activity, boolean clearPrevStack) {
         Intent intent = new Intent(activity, MainActivity.class);
         if (clearPrevStack) {
@@ -305,91 +307,10 @@ public class MainActivity extends AppCompatActivity {
             public void onSuccess(GetConversationListResponse result) {
                 if (result.getData().size() > 0) {
                     int sizeConversationList = result.getData().size();
-                    final int[] countGetConversation = {0};
+                    countGetConversation = 0;
                     for (GetConversationListResponse.ConversationList conversationList : result.getData()) {
                         Log.d(TAG, "conversationList: " + conversationList.getIdConversationList());
-                        conversationController.getConversation(conversationList.getIdConversationList(), new BaseCallback<GetConversationResponse>() {
-                            @Override
-                            public void onSuccess(GetConversationResponse result) {
-                                countGetConversation[0]++;
-                                ArrayList<ChatsModel.Chat> chats = new ArrayList<>();
-
-                                if (result.getData().getChats().size() > 0) {
-                                    int idSender = 0;
-                                    String senderAvatar = "";
-                                    String senderName = "";
-
-                                    for (AppointmentModel janjiList: janjiListResponses) {
-                                        if (janjiList.getIdConversation() == conversationList.getIdConversationList()) {
-                                            if (isPatient()) {
-                                                idSender = janjiList.getIdDokter();
-                                                if (janjiList.getDokter().getImage().size() > 0) {
-                                                    for (ImageModel model : janjiList.getDokter().getImage()) {
-                                                        if (model.getTypeId() == IMAGE_AVATAR) {
-                                                            senderAvatar = model.getPath();
-                                                        }
-                                                    }
-                                                }
-                                                senderName = janjiList.getDokter().getName();
-                                            } else {
-                                                idSender = janjiList.getIdPasien();
-                                                if (janjiList.getPasien().getImage().size() > 0) {
-                                                    for (ImageModel model : janjiList.getPasien().getImage()) {
-                                                        if (model.getTypeId() == IMAGE_AVATAR) {
-                                                            senderAvatar = model.getPath();
-                                                        }
-                                                    }
-                                                }
-                                                senderName = janjiList.getPasien().getName();
-                                            }
-                                        }
-                                    }
-                                    for (GetConversationResponse.Conversation.ChatModel chatModel : result.getData().getChats()) {
-                                        chats.add(new ChatsModel.Chat(
-                                                chatModel.getIdChat(),
-                                                chatModel.getIdSender(),
-                                                (chatModel.getIdSender() == ((UserModel) getData(DATA_USER)).getIdUser()) ? idSender : ((UserModel) getData(DATA_USER)).getIdUser(),
-                                                chatModel.getCreatedAt(),
-                                                chatModel.isRead(),
-                                                getTypeText(chatModel.getAttachment(), chatModel.getMessage()),
-                                                getMessageText(chatModel.getMessage(), chatModel.getAttachment())
-                                        ));
-                                    }
-
-                                    ChatsModel chatsModel = new ChatsModel(conversationList.getIdConversationList(), chats);
-                                    chatsModel.setIdSender(idSender);
-                                    chatsModel.setSenderName(senderName);
-                                    chatsModel.setSenderAvatar(senderAvatar);
-                                    chatsModel.setFinishedAt(conversationList.getUpdatedAt());
-
-                                    chatsModels.add(chatsModel);
-                                }
-                                Log.d(TAG(MainActivity.class), "finalI: " + countGetConversation[0]);
-                                Log.d(TAG(MainActivity.class), "sizeConversationList: " + sizeConversationList);
-                                if (countGetConversation[0] == sizeConversationList) {
-                                    chatFragment.addDataHistoryChats(chatsModels);
-                                }
-                            }
-
-                            @Override
-                            public void onError(Throwable t) {
-                                Log.d(TAG(MainActivity.class), t.getMessage());
-                                showToastyError(MainActivity.this, ERROR_NULL);
-                            }
-
-
-                            @Override
-                            public void onNoConnection() {
-                                Log.d(TAG(MainActivity.class), "No Connection");
-                                showToastyError(MainActivity.this, NO_CONNECTION);
-                            }
-
-                            @Override
-                            public void onServerBroken() {
-                                Log.d(TAG(MainActivity.class), "Server Broken");
-                                showToastyError(MainActivity.this, SERVER_BROKEN);
-                            }
-                        });
+                        getConversationList(janjiListResponses, conversationList, sizeConversationList);
                     }
                 } else {
                     chatFragment.addDataHistoryChats(chatsModels);
@@ -530,5 +451,93 @@ public class MainActivity extends AppCompatActivity {
             getSupportFragmentManager().popBackStack();
         }
 
+    }
+
+    private void getConversationList(List<AppointmentModel> janjiListResponses, GetConversationListResponse.ConversationList conversationList, int sizeConversationList) {
+        conversationController.getConversation(conversationList.getIdConversationList(), new BaseCallback<GetConversationResponse>() {
+            @Override
+            public void onSuccess(GetConversationResponse result) {
+                countGetConversation++;
+                ArrayList<ChatsModel.Chat> chats = new ArrayList<>();
+
+                if (result.getData().getChats().size() > 0) {
+                    int idSender = 0;
+                    String senderAvatar = "";
+                    String senderName = "";
+
+                    for (AppointmentModel janjiList: janjiListResponses) {
+                        if (janjiList.getIdConversation() == conversationList.getIdConversationList()) {
+                            if (isPatient()) {
+                                idSender = janjiList.getIdDokter();
+                                if (janjiList.getDokter().getImage().size() > 0) {
+                                    for (ImageModel model : janjiList.getDokter().getImage()) {
+                                        if (model.getTypeId() == IMAGE_AVATAR) {
+                                            senderAvatar = model.getPath();
+                                        }
+                                    }
+                                }
+                                senderName = janjiList.getDokter().getName();
+                            } else {
+                                idSender = janjiList.getIdPasien();
+                                if (janjiList.getPasien().getImage().size() > 0) {
+                                    for (ImageModel model : janjiList.getPasien().getImage()) {
+                                        if (model.getTypeId() == IMAGE_AVATAR) {
+                                            senderAvatar = model.getPath();
+                                        }
+                                    }
+                                }
+                                senderName = janjiList.getPasien().getName();
+                            }
+                        }
+                    }
+                    for (GetConversationResponse.Conversation.ChatModel chatModel : result.getData().getChats()) {
+                        chats.add(new ChatsModel.Chat(
+                                chatModel.getIdChat(),
+                                chatModel.getIdSender(),
+                                (chatModel.getIdSender() == ((UserModel) getData(DATA_USER)).getIdUser()) ? idSender : ((UserModel) getData(DATA_USER)).getIdUser(),
+                                chatModel.getCreatedAt(),
+                                chatModel.isRead(),
+                                getTypeText(chatModel.getAttachment(), chatModel.getMessage()),
+                                getMessageText(chatModel.getMessage(), chatModel.getAttachment())
+                        ));
+                    }
+
+                    ChatsModel chatsModel = new ChatsModel(conversationList.getIdConversationList(), chats);
+                    chatsModel.setIdSender(idSender);
+                    chatsModel.setSenderName(senderName);
+                    chatsModel.setSenderAvatar(senderAvatar);
+                    chatsModel.setFinishedAt(conversationList.getUpdatedAt());
+
+                    chatsModels.add(chatsModel);
+                }
+                Log.d(TAG(MainActivity.class), "finalI: " + countGetConversation);
+                Log.d(TAG(MainActivity.class), "sizeConversationList: " + sizeConversationList);
+                if (countGetConversation == sizeConversationList) {
+                    chatFragment.addDataHistoryChats(chatsModels);
+                }
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                Log.d(TAG(MainActivity.class), t.getMessage());
+                showToastyError(MainActivity.this, ERROR_NULL);
+                getConversationList(janjiListResponses, conversationList, sizeConversationList);
+            }
+
+
+            @Override
+            public void onNoConnection() {
+                Log.d(TAG(MainActivity.class), "No Connection");
+                showToastyError(MainActivity.this, NO_CONNECTION);
+                getConversationList(janjiListResponses, conversationList, sizeConversationList);
+            }
+
+            @Override
+            public void onServerBroken() {
+                Log.d(TAG(MainActivity.class), "Server Broken");
+                showToastyError(MainActivity.this, SERVER_BROKEN);
+                getConversationList(janjiListResponses, conversationList, sizeConversationList);
+            }
+        });
     }
 }

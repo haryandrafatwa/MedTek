@@ -163,7 +163,16 @@ public class MenungguKonfirmasiAdapter extends RecyclerView.Adapter<MenungguKonf
                                 public void onClick(View v) {
                                     try {
                                         Log.d(TAG(MenungguKonfirmasiAdapter.class), model.getDetailJanji().split(" Pukul")[0]);
-                                        String sisa = model.getDetailJanji().split(" Pukul")[1];
+                                        String tgl = "-";
+                                        String pukul = "-";
+                                        String keluhan = "-";
+                                        String[] arrDetailJanji = model.getDetailJanji().split(" Pukul");
+                                        if (arrDetailJanji.length > 1) {
+                                            String sisa = model.getDetailJanji().split(" Pukul")[1];
+                                            tgl = model.getDetailJanji().split(" Pukul")[0];
+                                            pukul = sisa.split("\n\nKeluhan")[0];
+                                            keluhan = sisa.split("Keluhan:\n")[1];
+                                        }
 
                                         String s = data.getString("tglLahir");
                                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -177,9 +186,9 @@ public class MenungguKonfirmasiAdapter extends RecyclerView.Adapter<MenungguKonf
                                         LocalDate now1 = LocalDate.now();
                                         Period diff1 = Period.between(l1, now1);
 //                                        Log.e("TAG", "onClick: "+ sisa.split("Keluhan")[0]);
-                                        initializeDialogDetail(model.getId(),data.getString("name"), model.getDetailJanji().split(" Pukul")[0], sisa.split("\n\nKeluhan")[0],String.valueOf(diff1.getYears()),
+                                        initializeDialogDetail(model.getId(),data.getString("name"), tgl, pukul,String.valueOf(diff1.getYears()),
                                                String.valueOf( data.getInt("berat_badan")),String.valueOf(data.getInt("tinggi_badan")),String.valueOf(data.getInt("lingkar_tubuh")),
-                                                sisa.split("Keluhan:\n")[1], ktp, model.getFilePath());
+                                                keluhan, ktp, model.getFilePath());
                                     } catch (JSONException | ParseException e) {
                                         e.printStackTrace();
                                     }
