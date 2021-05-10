@@ -517,91 +517,99 @@ public class HomeFragment extends Fragment {
         callHospital.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                try {
-                    String s = response.body().string();
-                    JSONObject object = new JSONObject(s);
-                    JSONArray array = new JSONArray(object.getString("data"));
-                    mListHospital.clear();
-                    for (int i = 0; i < array.length(); i++) {
-                        JSONObject obj = array.getJSONObject(i);
-                        int id = obj.getInt("id");
-                        String name = obj.getString("name");
-                        String no_telp = obj.getString("notelp");
-                        JSONObject alamat = obj.getJSONObject("alamat");
-                        String jalanRs = alamat.getString("jalan");
-                        String no_bangunanRs = alamat.getString("nomor_bangunan");
-                        String rtrwRs = alamat.getString("rtrw");
-                        String kelurahanRs = alamat.getString("kelurahan");
-                        String kecamatanRs = alamat.getString("kecamatan");
-                        String kotaRs = alamat.getString("kota");
-                        String infoRs = obj.getString("info");
-                        JSONArray arrDokter = obj.getJSONArray("dokter");
-                        String location = "Jl. "+jalanRs+", No. "+no_bangunanRs+", Rt/Rw. "+rtrwRs+", Kelurahan "+kelurahanRs+", Kecamatan "+kecamatanRs+", Kota "+kotaRs;
-                        String hospitalImage="";
-                        if (!obj.getString("image").equals("null")){
-                            hospitalImage = BASE_URL+obj.getString("image");
-                        }else{
-                            hospitalImage = BASE_URL+"/storage/Hospital.png";
-                        }
-                        mListDokterHospital.clear();
-                        for (int j = 0; j < arrDokter.length(); j++) {
-                            JSONObject jo = arrDokter.getJSONObject(j);
-                            String nameDokter = jo.getString("name");
-                            String email = jo.getString("email");
-                            int isVerified;
-                            if (!jo.getString("email_verified_at").equals(null)){
-                                isVerified = 1;
-                            }else{
-                                isVerified = 0;
-                            }
-                            String path = "";
-                            if (jo.has("image")){
-                                path = BASE_URL+jo.getString("image");
-                            }else{
-                                path = BASE_URL+"/storage/Hospital.png";
-                            }
-                            int harga = jo.getInt("harga");
-                            int idDokter = jo.getInt("id");
-                            int lamakerja = (jo.isNull("lama_kerja")) ? 0 : Integer.parseInt(jo.getString("lama_kerja"));
-                            float rating = Float.valueOf(jo.getString("rating"));
-                            String spec = "Interventional Cardiology";
-                            if (isVerified == 1) {
-                                mListDokterHospital.add(new DokterModel(idDokter, nameDokter, email, spec, name, location, path, harga, rating, isVerified, lamakerja));
-                            }
-                        }
-                        if (!kota.isEmpty() && mListHospital.size() < 5){
-                            double distance = -1.0;
-                            Locale locale = new Locale("in", "ID");
-                            Geocoder geocoder = new Geocoder(getActivity(), locale);
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        try {
+                            String s = response.body().string();
+                            JSONObject object = new JSONObject(s);
+                            JSONArray array = new JSONArray(object.getString("data"));
+                            mListHospital.clear();
+                            for (int i = 0; i < array.length(); i++) {
+                                JSONObject obj = array.getJSONObject(i);
+                                int id = obj.getInt("id");
+                                String name = obj.getString("name");
+                                String no_telp = obj.getString("notelp");
+                                JSONObject alamat = obj.getJSONObject("alamat");
+                                String jalanRs = alamat.getString("jalan");
+                                String no_bangunanRs = alamat.getString("nomor_bangunan");
+                                String rtrwRs = alamat.getString("rtrw");
+                                String kelurahanRs = alamat.getString("kelurahan");
+                                String kecamatanRs = alamat.getString("kecamatan");
+                                String kotaRs = alamat.getString("kota");
+                                String infoRs = obj.getString("info");
+                                JSONArray arrDokter = obj.getJSONArray("dokter");
+                                String location = "Jl. "+jalanRs+", No. "+no_bangunanRs+", Rt/Rw. "+rtrwRs+", Kelurahan "+kelurahanRs+", Kecamatan "+kecamatanRs+", Kota "+kotaRs;
+                                String hospitalImage="";
+                                if (!obj.getString("image").equals("null")){
+                                    hospitalImage = BASE_URL+obj.getString("image");
+                                }else{
+                                    hospitalImage = BASE_URL+"/storage/Hospital.png";
+                                }
+                                mListDokterHospital.clear();
+                                for (int j = 0; j < arrDokter.length(); j++) {
+                                    JSONObject jo = arrDokter.getJSONObject(j);
+                                    String nameDokter = jo.getString("name");
+                                    String email = jo.getString("email");
+                                    int isVerified;
+                                    if (!jo.getString("email_verified_at").equals(null)){
+                                        isVerified = 1;
+                                    }else{
+                                        isVerified = 0;
+                                    }
+                                    String path = "";
+                                    if (jo.has("image")){
+                                        path = BASE_URL+jo.getString("image");
+                                    }else{
+                                        path = BASE_URL+"/storage/Hospital.png";
+                                    }
+                                    int harga = jo.getInt("harga");
+                                    int idDokter = jo.getInt("id");
+                                    int lamakerja = (jo.isNull("lama_kerja")) ? 0 : Integer.parseInt(jo.getString("lama_kerja"));
+                                    float rating = Float.valueOf(jo.getString("rating"));
+                                    String spec = "Interventional Cardiology";
+                                    if (isVerified == 1) {
+                                        mListDokterHospital.add(new DokterModel(idDokter, nameDokter, email, spec, name, location, path, harga, rating, isVerified, lamakerja));
+                                    }
+                                }
+                                if (!kota.isEmpty() && mListHospital.size() < 5){
+                                    double distance = -1.0;
+                                    Locale locale = new Locale("in", "ID");
+                                    Geocoder geocoder = new Geocoder(getActivity(), locale);
 
-                            List<Address> addressesD = geocoder.getFromLocationName(name,1);
-                            if (addressesD.size() > 0) {
-                                double dLat = addressesD.get(0).getLatitude();
-                                double dLong = addressesD.get(0).getLongitude();
-                                double longDiff = sLong - dLong;
-                                distance = Math.sin(sLat*Math.PI/180.0)*Math.sin(dLat*Math.PI/180.0) + Math.cos(sLat*Math.PI/180.0)*Math.cos(dLat*Math.PI/180.0)*Math.cos(longDiff*Math.PI/180.0);
-                                distance = Math.acos(distance);
-                                distance = distance*180.0/Math.PI;
-                                distance = distance*60*1.1515;
-                                distance = distance*1.609344;
+                                    List<Address> addressesD = geocoder.getFromLocationName(name,1);
+                                    if (addressesD.size() > 0) {
+                                        double dLat = addressesD.get(0).getLatitude();
+                                        double dLong = addressesD.get(0).getLongitude();
+                                        double longDiff = sLong - dLong;
+                                        distance = Math.sin(sLat*Math.PI/180.0)*Math.sin(dLat*Math.PI/180.0) + Math.cos(sLat*Math.PI/180.0)*Math.cos(dLat*Math.PI/180.0)*Math.cos(longDiff*Math.PI/180.0);
+                                        distance = Math.acos(distance);
+                                        distance = distance*180.0/Math.PI;
+                                        distance = distance*60*1.1515;
+                                        distance = distance*1.609344;
+                                    }
+                                    String jenis="";
+                                    if (obj.getString("jenis").equalsIgnoreCase("umum")){
+                                        jenis = getActivity().getString(R.string.rsumum);
+                                    }else if (obj.getString("jenis").equalsIgnoreCase("spesialisasi")){
+                                        jenis = getActivity().getString(R.string.rsspesial);
+                                    }
+                                    if (distance < 20 && distance >= 0){
+                                        mListHospital.add(new HospitalModel(name, no_telp, jalanRs, no_bangunanRs, rtrwRs, kelurahanRs, kecamatanRs, kotaRs, "Provinsi", infoRs,jenis,hospitalImage,id,distance, mListDokterHospital));
+                                    }
+                                }
                             }
-                            String jenis="";
-                            if (obj.getString("jenis").equalsIgnoreCase("umum")){
-                                jenis = getActivity().getString(R.string.rsumum);
-                            }else if (obj.getString("jenis").equalsIgnoreCase("spesialisasi")){
-                                jenis = getActivity().getString(R.string.rsspesial);
-                            }
-                            if (distance < 20 && distance >= 0){
-                                mListHospital.add(new HospitalModel(name, no_telp, jalanRs, no_bangunanRs, rtrwRs, kelurahanRs, kecamatanRs, kotaRs, "Provinsi", infoRs,jenis,hospitalImage,id,distance, mListDokterHospital));
-                            }
+                            Collections.sort(mListHospital, Comparator.comparing(HospitalModel::getDistance));
+                            isHospitalDone = true;
+                            disabledShimmer();
+
+                        } catch (IOException | JSONException e) {
+                            e.printStackTrace();
+                            callHospital.clone().enqueue(this);
                         }
+                    } else {
+                        callHospital.clone().enqueue(this);
                     }
-                    Collections.sort(mListHospital, Comparator.comparing(HospitalModel::getDistance));
-                    isHospitalDone = true;
-                    disabledShimmer();
-
-                } catch (IOException | JSONException e) {
-                    e.printStackTrace();
+                } else {
                     callHospital.clone().enqueue(this);
                 }
             }

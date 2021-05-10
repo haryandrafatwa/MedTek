@@ -861,6 +861,7 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
                     setupJitsi();
                     options = setupVoiceJitsi(chatsModel.getIdJanji());
                     JitsiMeetActivity.launch(this, options);
+                    break;
                 case REQ_VIDEO_CALL:
                     Log.d(TAG, "TO_VIDEO_CALL");
                     boolean isVideoOn = false;
@@ -872,6 +873,7 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
                     setupJitsi();
                     options = setupVideoJitsi(isVideoOn, isAudioOn, chatsModel.getIdJanji());
                     JitsiMeetActivity.launch(this, options);
+                    break;
             }
         }
 
