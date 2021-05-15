@@ -56,9 +56,13 @@ android {
     productFlavors {
         production {
             buildConfigField "String", "BASE_URL", String.format("\"%s\"", releaseBaseUrl)
+            buildConfigField "String","MERCHANT_CLIENT_KEY",'"SB-Mid-client-ogjlb8p1FMGByIoq"'
+            buildConfigField "String","MERCHANT_BASE_URL",'"https://medtek-app.herokuapp.com/index.php/"'
         }
         dev {
             buildConfigField "String", "BASE_URL", String.format("\"%s\"", debugBaseUrl)
+            buildConfigField "String","MERCHANT_CLIENT_KEY",'"SB-Mid-client-ogjlb8p1FMGByIoq"'
+            buildConfigField "String","MERCHANT_BASE_URL",'"https://medtek-app.herokuapp.com/index.php/"'
         }
     }
 
@@ -122,6 +126,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 
+    implementation 'com.midtrans:uikit:1.28.0-SANDBOX'
 
     implementation 'com.android.support:cardview-v7:28.0.0'
     implementation 'com.squareup.picasso:picasso:2.71828'

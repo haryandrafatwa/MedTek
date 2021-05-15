@@ -424,6 +424,7 @@ public class DetailPasienFragment extends Fragment {
                                         bundle.putInt("harga",harga);
                                         bundle.putInt("balance",balance);
                                         bundle.putString("detailJanji",et_keluhan.getText().toString().trim());
+                                        bundle.putString("lastFragment","DetailPasien");
 
                                         if (docUri != null){
                                             bundle.putString("uri",docUri.toString());

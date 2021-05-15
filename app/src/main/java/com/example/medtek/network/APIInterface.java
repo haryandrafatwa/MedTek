@@ -249,6 +249,14 @@ public interface APIInterface {
     );
 
     @Headers({"Accept:application/json"})
+    @POST("payment/span")
+    @FormUrlEncoded
+    Call<ResponseBody> payment(
+            @Header("Authorization") String token,
+            @Field("idJanji") int idJanji
+    );
+
+    @Headers({"Accept:application/json"})
     @GET("get-pasien/{id}")
     Call<ResponseBody> getPasienId(
             @Path("id") int id

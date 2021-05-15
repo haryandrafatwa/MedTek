@@ -103,6 +103,7 @@ public class HomeFragment extends Fragment {
     private RecyclerView.Adapter mAdapterArtikel;
     private RecyclerView rv_artikel;
 
+
     private final ArrayList<DokterModel> mListDokter = new ArrayList<>();
     private RecyclerView.LayoutManager mLayoutManagerDokter;
     private RecyclerView.Adapter mAdapterADokter;
@@ -133,7 +134,7 @@ public class HomeFragment extends Fragment {
     private ImageView iv_search;
 
     private LinearLayout ll_wallet, ll_wallet_title;
-    private String mySaldo;
+    private String mySaldo, fName, lName, alamat, phone;
     private TextView tv_saldo, tv_saldo_user, tv_topup, tv_withdraw, tv_history;
     private ImageButton ib_topup, ib_withdraw, ib_history;
 
@@ -276,6 +277,13 @@ public class HomeFragment extends Fragment {
                                 String s = response.body().string();
                                 JSONObject obj = new JSONObject(s);
                                 userName = obj.getString("name");
+                                fName = userName.split(" ")[0];
+                                lName = userName.split(" ")[1];
+                                phone = obj.getString("notelp");
+                                JSONObject alamatObj = obj.getJSONObject("alamat");
+                                alamat = alamatObj.getString("jalan")+", No. "+alamatObj.getString("nomor_bangunan")
+                                        +", RT/RW. "+alamatObj.getString("rtrw")+", "+alamatObj.getString("kelurahan")
+                                        +", "+alamatObj.getString("kecamatan")+", "+alamatObj.getString("kota");
                                 JSONArray jsonArray = new JSONArray(obj.getString("image"));
                                 if (jsonArray.length() == 0){
                                     userImagePath = "/storage/Pasien.png";
@@ -497,8 +505,15 @@ public class HomeFragment extends Fragment {
         ib_topup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                NominalFragment nominalFragment = new NominalFragment();
-                setFragment(nominalFragment, "FragmentNominal");
+                /*NominalFragment nominalFragment = new NominalFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("FirstName",fName);
+                bundle.putString("LastName",lName);
+                bundle.putString("Alamat",alamat);
+                bundle.putString("Phone",phone);
+                nominalFragment.setArguments(bundle);
+                setFragment(nominalFragment,"FragmentNominal");*/
+                Toasty.info(getActivity(),"Under Maintenance!",Toasty.LENGTH_LONG).show();
             }
         });
 
