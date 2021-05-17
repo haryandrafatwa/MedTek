@@ -249,7 +249,7 @@ public interface APIInterface {
     );
 
     @Headers({"Accept:application/json"})
-    @POST("payment/span")
+    @POST("payment/snap")
     @FormUrlEncoded
     Call<ResponseBody> payment(
             @Header("Authorization") String token,

@@ -3,6 +3,7 @@ package com.example.medtek.ui.pasien.home.appointment;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -26,6 +27,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -37,19 +39,28 @@ import com.example.medtek.network.RetrofitClient;
 import com.example.medtek.network.request.JanjiRequest;
 import com.example.medtek.ui.activity.MainActivity;
 import com.example.medtek.ui.pasien.auth.LoginPasienActivity;
+import com.example.medtek.ui.pasien.home.HomeFragment;
 import com.example.medtek.ui.pasien.others.NominalFragment;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
+import com.midtrans.sdk.corekit.callback.GetTransactionStatusCallback;
 import com.midtrans.sdk.corekit.callback.TransactionFinishedCallback;
 import com.midtrans.sdk.corekit.core.MidtransSDK;
 import com.midtrans.sdk.corekit.core.PaymentMethod;
 import com.midtrans.sdk.corekit.core.TransactionRequest;
+import com.midtrans.sdk.corekit.core.UIKitCustomSetting;
 import com.midtrans.sdk.corekit.models.BillingAddress;
 import com.midtrans.sdk.corekit.models.CustomerDetails;
 import com.midtrans.sdk.corekit.models.ItemDetails;
+import com.midtrans.sdk.corekit.models.SnapTokenDetailResponse;
+import com.midtrans.sdk.corekit.models.SnapTransactionDetails;
 import com.midtrans.sdk.corekit.models.snap.Authentication;
 import com.midtrans.sdk.corekit.models.snap.CreditCard;
+import com.midtrans.sdk.corekit.models.snap.Gopay;
+import com.midtrans.sdk.corekit.models.snap.Shopeepay;
+import com.midtrans.sdk.corekit.models.snap.SnapPromo;
 import com.midtrans.sdk.corekit.models.snap.TransactionResult;
+import com.midtrans.sdk.corekit.models.snap.TransactionStatusResponse;
 import com.midtrans.sdk.uikit.SdkUIFlowBuilder;
 import com.squareup.picasso.Picasso;
 
@@ -82,7 +93,7 @@ import static com.example.medtek.utils.PropertyUtil.ACCESS_TOKEN;
 import static com.example.medtek.utils.PropertyUtil.REFRESH_TOKEN;
 import static com.example.medtek.utils.PropertyUtil.getData;
 
-public class CheckoutAppointmentFragment extends Fragment implements TransactionFinishedCallback {
+public class CheckoutAppointmentFragment extends Fragment implements TransactionFinishedCallback{
 
     private ChipNavigationBar bottomBar;
     private Toolbar toolbar;
@@ -100,7 +111,7 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
     private TextView tv_nama_dokter, tv_tgl_konsultasi, tv_jam_konsultasi, tv_harga, tv_total_harga, tv_saldo, tv_total_bayar, tv_sisa_saldo, tv_layanan, tv_kode_unik;
 
     private int saldo,idJanji,idTransaksi, totalBayar,layananInt;
-    private String access, refresh, fName, lName, alamat, phone, email;
+    private String access, refresh, fName, lName, alamat, phone, email, snapToken;
 
     private Socket socket;
     private final String SERVER_URL = "http://192.168.137.1:6001";
@@ -211,33 +222,25 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
                                                     tv_kode_unik.setText("Rp"+uniqueCode);
                                                     if (saldo < totalBayar){
                                                         tv_sisa_saldo.setText("Saldo Tidak Mencukupi");
-                                                        tv_sisa_saldo.setTextColor(getResources().getColor(R.color.colorPrimary));
+                                                        tv_sisa_saldo.setTextColor(Color.parseColor("#E51B23"));
                                                         btnNext.setText("Isi Ulang Sekarang");
                                                         btnNext.setOnClickListener(new View.OnClickListener() {
                                                             @Override
                                                             public void onClick(View v) {
                                                                 String detailJanji = localDate.format(dateFormat)+" Pukul "+bundle.getString("time")+"\n\nKeluhan:\n"+bundle.getString("detailJanji");
                                                                 if (bundle.getString("lastFragment").equalsIgnoreCase("DetailDokter")){
-                                                                    TransactionRequest request = new TransactionRequest(System.currentTimeMillis()+" ",totalBayar);
-                                                                    BillingAddress billingAddress = new BillingAddress();
-                                                                    billingAddress.setAddress(alamat);
-                                                                    CustomerDetails customerDetails = new CustomerDetails();
-                                                                    customerDetails.setFirstName(fName);
-                                                                    customerDetails.setLastName(lName);
-                                                                    customerDetails.setPhone(phone);
-                                                                    customerDetails.setEmail(email);
-                                                                    customerDetails.setBillingAddress(billingAddress);
-                                                                    ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Topup Saldo Sebesar Rp"+String.valueOf(harga));
+                                                                    idJanji = bundle.getInt("id_janji");
+                                                                    ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Konsultasi dengan "+tv_dr_name.getText().toString());
                                                                     ArrayList<ItemDetails> details = new ArrayList<>();
                                                                     details.add(itemDetails);
-                                                                    request.setCustomerDetails(customerDetails);
+                                                                    TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
                                                                     request.setItemDetails(details);
-                                                                    CreditCard creditCard = new CreditCard();
-                                                                    creditCard.setSaveCard(false);
-                                                                    creditCard.setAuthentication(Authentication.AUTH_RBA);
-                                                                    request.setCreditCard(creditCard);
                                                                     MidtransSDK.getInstance().setTransactionRequest(request);
-                                                                    MidtransSDK.getInstance().startPaymentUiFlow(getActivity());
+                                                                    if (snapToken == null){
+                                                                        MidtransSDK.getInstance().startPaymentUiFlow(getActivity());
+                                                                    }else{
+                                                                        MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
+                                                                    }
                                                                 }else{
                                                                     JanjiRequest request = new JanjiRequest(bundle.getInt("id_dokter"), bundle.getString("date"), detailJanji, localDate.format(dayFormat).toLowerCase());
                                                                     Call<ResponseBody> buatJanji = RetrofitClient.getInstance().getApi().buatJanji("Bearer "+access, request);
@@ -256,22 +259,20 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
                                                                                                 JSONObject transaksi = transaksiArr.getJSONObject(j);
                                                                                                 if (!transaksi.getBoolean("is_paid")){
                                                                                                     Log.e(TAG, "onResponse: idJanji ->"+transaksi.getInt("janji_id"));
-                                                                                                    TransactionRequest request = new TransactionRequest(System.currentTimeMillis()+" ",totalBayar);
-                                                                                                    BillingAddress billingAddress = new BillingAddress();
-                                                                                                    billingAddress.setAddress(alamat);
-                                                                                                    CustomerDetails customerDetails = new CustomerDetails();
-                                                                                                    customerDetails.setFirstName(fName);
-                                                                                                    customerDetails.setLastName(lName);
-                                                                                                    customerDetails.setEmail(email);
-                                                                                                    customerDetails.setPhone(phone);
-                                                                                                    customerDetails.setBillingAddress(billingAddress);
-                                                                                                    ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Topup Saldo Sebesar Rp"+String.valueOf(harga));
+                                                                                                    idJanji = transaksi.getInt("janji_id");
+                                                                                                    ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Konsultasi dengan "+tv_dr_name.getText().toString());
                                                                                                     ArrayList<ItemDetails> details = new ArrayList<>();
                                                                                                     details.add(itemDetails);
-                                                                                                    request.setCustomerDetails(customerDetails);
+                                                                                                    TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
                                                                                                     request.setItemDetails(details);
                                                                                                     MidtransSDK.getInstance().setTransactionRequest(request);
-                                                                                                    MidtransSDK.getInstance().startPaymentUiFlow(getActivity());
+                                                                                                    if (snapToken == null){
+                                                                                                        MidtransSDK.getInstance().startPaymentUiFlow(getActivity());
+                                                                                                    }else{
+                                                                                                        MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
+                                                                                                    }
+                                                                                                    getActivity().getSupportFragmentManager().beginTransaction().remove(getActivity().getSupportFragmentManager().findFragmentByTag("DetailPasienFragment")).commit();
+                                                                                                    getActivity().getSupportFragmentManager().beginTransaction().remove(getActivity().getSupportFragmentManager().findFragmentByTag("FragmentBuatJanji")).commit();
                                                                                                 }
                                                                                             }
                                                                                         }
@@ -300,7 +301,66 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
                                                             @Override
                                                             public void onClick(View v) {
                                                                 String detailJanji = localDate.format(dateFormat)+" Pukul "+bundle.getString("time")+"\n\nKeluhan:\n"+bundle.getString("detailJanji");
-//                                                                initializeDialogSuccess(detailJanji,localDate,totalBayar);
+                                                                if (bundle.getString("lastFragment").equalsIgnoreCase("DetailDokter")){
+                                                                    ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Konsultasi dengan "+tv_dr_name.getText().toString());
+                                                                    ArrayList<ItemDetails> details = new ArrayList<>();
+                                                                    details.add(itemDetails);
+                                                                    TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
+                                                                    request.setItemDetails(details);
+                                                                    MidtransSDK.getInstance().setTransactionRequest(request);
+                                                                    if (snapToken == null){
+                                                                        MidtransSDK.getInstance().startPaymentUiFlow(getActivity());
+                                                                    }else{
+                                                                        MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
+                                                                    }
+                                                                }else{
+                                                                    JanjiRequest request = new JanjiRequest(bundle.getInt("id_dokter"), bundle.getString("date"), detailJanji, localDate.format(dayFormat).toLowerCase());
+                                                                    Call<ResponseBody> buatJanji = RetrofitClient.getInstance().getApi().buatJanji("Bearer "+access, request);
+                                                                    buatJanji.enqueue(new Callback<ResponseBody>() {
+                                                                        @Override
+                                                                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                                                            try {
+                                                                                if (response.isSuccessful()){
+                                                                                    if (response.body() != null){
+                                                                                        String s = response.body().string();
+                                                                                        JSONObject object = new JSONObject(s);
+                                                                                        if (object.has("success")){
+                                                                                            JSONObject janjiSuccess = object.getJSONObject("data");
+                                                                                            JSONArray transaksiArr = janjiSuccess.getJSONArray("transaksi");
+                                                                                            for (int j = 0; j < transaksiArr.length(); j++) {
+                                                                                                JSONObject transaksi = transaksiArr.getJSONObject(j);
+                                                                                                if (!transaksi.getBoolean("is_paid")){
+                                                                                                    Log.e(TAG, "onResponse: idJanji ->"+transaksi.getInt("janji_id"));
+                                                                                                    idJanji = transaksi.getInt("janji_id");
+                                                                                                    ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Konsultasi dengan "+tv_dr_name.getText().toString());
+                                                                                                    ArrayList<ItemDetails> details = new ArrayList<>();
+                                                                                                    details.add(itemDetails);
+                                                                                                    TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
+                                                                                                    request.setItemDetails(details);
+                                                                                                    MidtransSDK.getInstance().setTransactionRequest(request);
+                                                                                                    if (snapToken == null){
+                                                                                                        MidtransSDK.getInstance().startPaymentUiFlow(getActivity());
+                                                                                                    }else{
+                                                                                                        MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
+                                                                                                    }
+                                                                                                    getActivity().getSupportFragmentManager().beginTransaction().remove(getActivity().getSupportFragmentManager().findFragmentByTag("DetailPasienFragment")).commit();
+                                                                                                    getActivity().getSupportFragmentManager().beginTransaction().remove(getActivity().getSupportFragmentManager().findFragmentByTag("FragmentBuatJanji")).commit();
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            }catch (IOException | JSONException e) {
+                                                                                e.printStackTrace();
+                                                                            }
+                                                                        }
+
+                                                                        @Override
+                                                                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                                                                        }
+                                                                    });
+                                                                }
                                                             }
                                                         });
                                                     }
@@ -365,6 +425,7 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
                 .setClientKey(BuildConfig.MERCHANT_CLIENT_KEY)
                 .enableLog(true)
                 .setTransactionFinishedCallback(this)
+                .setUIkitCustomSetting(uiKitCustomSetting())
                 .buildSDK();
     }
 
@@ -794,7 +855,8 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
                                         Log.e(TAG, "onResponse: idJanji ->"+transaksi.getInt("janji_id"));
                                     }
                                 }
-                                *//*Call<ResponseBody> getJanji = RetrofitClient.getInstance().getApi().getUserJanji("Bearer "+access);
+                                */
+        /*Call<ResponseBody> getJanji = RetrofitClient.getInstance().getApi().getUserJanji("Bearer "+access);
                                 getJanji.enqueue(new Callback<ResponseBody>() {
                                     @Override
                                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -934,7 +996,8 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
                                     public void onFailure(Call<ResponseBody> call, Throwable t) {
 
                                     }
-                                });*//*
+                                });*/
+        /*
                             }
                         }
                     }
@@ -1082,42 +1145,137 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
         if (transactionResult.getResponse()!=null){
             switch (transactionResult.getStatus()){
                 case TransactionResult.STATUS_SUCCESS:
-                    Toasty.success(getActivity(),"Transaksi Berhasil",Toasty.LENGTH_LONG).show();
-                    SFL.stopShimmer();
-                    relativeContent.setVisibility(View.VISIBLE);
-                    linearLoader.setVisibility(View.GONE);
+                    Call<ResponseBody> payment = RetrofitClient.getInstance().getApi().payment("Bearer "+access,idJanji);
+                    payment.enqueue(new Callback<ResponseBody>() {
+                        @Override
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            if (response.body() != null){
+                                if (response.isSuccessful()){
+                                    try {
+                                        Log.e(TAG, "onResponse: "+response.body().string());
+                                        Toasty.success(getActivity(),"Transaksi Berhasil",Toasty.LENGTH_LONG).show();
+                                        FragmentManager fm = getActivity().getSupportFragmentManager();
+                                        for(int i = 0; i < fm.getBackStackEntryCount(); ++i) {
+                                            fm.popBackStack();
+                                        }
+                                        setFragment(new HomeFragment(),"FragmentHomePasien");
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+                            payment.clone().enqueue(this);
+                        }
+                    });
                     break;
                 case TransactionResult.STATUS_PENDING:
-                    Toasty.warning(getActivity(),"Transaksi Pending",Toasty.LENGTH_LONG).show();
-                    SFL.stopShimmer();
-                    relativeContent.setVisibility(View.VISIBLE);
-                    linearLoader.setVisibility(View.GONE);
+                    String snap = MidtransSDK.getInstance().readAuthenticationToken();
+                    MidtransSDK.getInstance().getTransactionStatus(snap, new GetTransactionStatusCallback() {
+                        @Override
+                        public void onSuccess(TransactionStatusResponse response) {
+                            // do action for response
+                            Call<ResponseBody> payment = RetrofitClient.getInstance().getApi().payment("Bearer "+access,idJanji);
+                            payment.enqueue(new Callback<ResponseBody>() {
+                                @Override
+                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                    if (response.body() != null){
+                                        if (response.isSuccessful()){
+                                            try {
+                                                Log.e(TAG, "onResponse: "+response.body().string());
+                                                Toasty.success(getActivity(),"Transaksi Berhasil",Toasty.LENGTH_LONG).show();
+                                                FragmentManager fm = getActivity().getSupportFragmentManager();
+                                                for(int i = 0; i < fm.getBackStackEntryCount(); ++i) {
+                                                    fm.popBackStack();
+                                                }
+                                                setFragment(new HomeFragment(),"FragmentHomePasien");
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                    payment.clone().enqueue(this);
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onFailure(TransactionStatusResponse response, String reason) {
+                            // do nothing
+                            Toasty.warning(getActivity(),"Transaksi "+response.getTransactionStatus(),Toasty.LENGTH_LONG).show();
+                            snapToken = snap;
+                        }
+
+                        @Override
+                        public void onError(Throwable error) {
+                            // do action if error
+                            Toasty.error(getActivity(),"Transaksi Error: "+error.getMessage(),Toasty.LENGTH_LONG).show();
+                            snapToken = snap;
+                        }
+                    });
                     break;
                 case TransactionResult.STATUS_FAILED:
                     Toasty.error(getActivity(),"Transaksi Gagal",Toasty.LENGTH_LONG).show();
-                    SFL.stopShimmer();
-                    relativeContent.setVisibility(View.VISIBLE);
-                    linearLoader.setVisibility(View.GONE);
                     break;
             }
             transactionResult.getResponse().getValidationMessages();
         }else if(transactionResult.isTransactionCanceled()){
             Toasty.error(getActivity(),"Transaksi Batal",Toasty.LENGTH_LONG).show();
-            SFL.stopShimmer();
-            relativeContent.setVisibility(View.VISIBLE);
-            linearLoader.setVisibility(View.GONE);
         }else{
             if (transactionResult.getStatus().equalsIgnoreCase(TransactionResult.STATUS_INVALID)){
                 Toasty.error(getActivity(),"Transaksi Salah",Toasty.LENGTH_LONG).show();
-                SFL.stopShimmer();
-                relativeContent.setVisibility(View.VISIBLE);
-                linearLoader.setVisibility(View.GONE);
             }else{
                 Toasty.error(getActivity(),"Transaksi Selesai dengan Kesalahan",Toasty.LENGTH_LONG).show();
-                SFL.stopShimmer();
-                relativeContent.setVisibility(View.VISIBLE);
-                linearLoader.setVisibility(View.GONE);
             }
         }
+    }
+
+    private UIKitCustomSetting uiKitCustomSetting(){
+        UIKitCustomSetting uIKitCustomSetting = new UIKitCustomSetting();
+        uIKitCustomSetting.setSkipCustomerDetailsPages(true);
+        uIKitCustomSetting.setShowPaymentStatus(true);
+        return uIKitCustomSetting;
+    }
+
+    private TransactionRequest initTransactionRequest(double bayar, String phone, String fName, String lName, String email, String alamat) {
+        // Create new Transaction Request
+        TransactionRequest transactionRequestNew = new
+                TransactionRequest(System.currentTimeMillis() + "", bayar);
+        transactionRequestNew.setCustomerDetails(initCustomerDetails(phone, fName, lName, email, alamat));
+
+        CreditCard creditCard = new CreditCard();
+        creditCard.setSaveCard(false);
+        creditCard.setAuthentication(Authentication.AUTH_3DS);
+
+        transactionRequestNew.setCreditCard(creditCard);
+        transactionRequestNew.setGopay(new Gopay("demo:://midtrans"));
+        transactionRequestNew.setShopeepay(new Shopeepay("demo:://midtrans"));
+
+        return transactionRequestNew;
+    }
+
+    private CustomerDetails initCustomerDetails(String phone, String fName, String lName, String email, String alamat) {
+        //define customer detail (mandatory for coreflow)
+        CustomerDetails mCustomerDetails = new CustomerDetails();
+        mCustomerDetails.setPhone(phone);
+        mCustomerDetails.setFirstName(fName);
+        mCustomerDetails.setLastName(lName);
+        mCustomerDetails.setEmail(email);
+        mCustomerDetails.setCustomerIdentifier(email);
+
+        BillingAddress billingAddress = new BillingAddress();
+        billingAddress.setAddress(alamat);
+        billingAddress.setFirstName(fName);
+        billingAddress.setLastName(lName);
+        billingAddress.setPhone(phone);
+        mCustomerDetails.setBillingAddress(billingAddress);
+        return mCustomerDetails;
     }
 }

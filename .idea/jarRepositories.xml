@@ -71,5 +71,10 @@
       <option name="name" value="maven4" />
       <option name="url" value="http://dl.bintray.com/pt-midtrans/maven" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven4" />
+      <option name="name" value="maven4" />
+      <option name="url" value="https://dl.bintray.com/pt-midtrans/maven" />
+    </remote-repository>
   </component>
 </project>

@@ -1,5 +1,6 @@
 package com.example.medtek.ui.pasien.home.doctors;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -80,6 +81,7 @@ public class DetailDokterFragment extends Fragment {
     private RecyclerView.LayoutManager mLayoutManager;
     private FeedbackAdapter mAdapter;
     private RecyclerView recyclerView;
+    private ProgressDialog progressDialog;
 
     private ChipNavigationBar bottomNavigationView;
     private Toolbar toolbar;
@@ -93,7 +95,7 @@ public class DetailDokterFragment extends Fragment {
     private RelativeLayout rl_content,rl_loader;
     private ShimmerFrameLayout shimmerFrameLayout;
     private String access = "", refresh = "", nama, nama_dokter, detail_janji, date, time;
-    private int harga, balance, id_doc;
+    private int harga, balance, id_doc, idJanji;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -234,6 +236,7 @@ public class DetailDokterFragment extends Fragment {
                     btnBuatJanji.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
+                            progressDialog.show();
                             if (!access.equals("") && !refresh.equals("")) {
                                 Call<ResponseBody> getUser = RetrofitClient.getInstance().getApi().getUser("Bearer "+access);
                                 getUser.enqueue(new Callback<ResponseBody>() {
@@ -289,6 +292,7 @@ public class DetailDokterFragment extends Fragment {
                                                                             JSONObject janjiObj = sortedJanji.getJSONObject(0);
                                                                             JSONObject doctObj = janjiObj.getJSONObject("dokter");
                                                                             JSONArray transArr = janjiObj.getJSONArray("transaksi");
+                                                                            idJanji = janjiObj.getInt("id");
                                                                             for (int j = 0; j < transArr.length(); j++) {
                                                                                 JSONObject transObj = transArr.getJSONObject(j);
                                                                                 if (!transObj.getBoolean("is_paid")){
@@ -308,16 +312,18 @@ public class DetailDokterFragment extends Fragment {
                                                                                 bundle.putInt("harga",harga);
                                                                                 bundle.putInt("balance",balance);
                                                                                 bundle.putInt("id_dokter",id_doc);
+                                                                                bundle.putInt("id_janji",idJanji);
                                                                                 bundle.putString("date",date);
                                                                                 bundle.putString("lastFragment","DetailDokter");
 
                                                                                 bundle.putString("time",detail_janji.split("Pukul")[1].split("\n")[0]);
                                                                                 bundle.putString("detailJanji",detail_janji);
-
+                                                                                progressDialog.dismiss();
                                                                                 CheckoutAppointmentFragment checkoutAppointmentFragment = new CheckoutAppointmentFragment();
                                                                                 checkoutAppointmentFragment.setArguments(bundle);
                                                                                 setFragment(checkoutAppointmentFragment,"FragmentCheckoutAppointment");
                                                                             }else{
+                                                                                progressDialog.dismiss();
                                                                                 BuatJanjiFragment buatJanjiFragment = new BuatJanjiFragment();
                                                                                 Bundle bundle = new Bundle();
                                                                                 bundle.putInt("id_dokter",id_dokter);
@@ -391,6 +397,11 @@ public class DetailDokterFragment extends Fragment {
 
         toolbar = getActivity().findViewById(R.id.toolbar);
         setToolbar();
+
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage("Mohon tunggu ...");
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.setCancelable(false);
 
         tv_dr_name = getActivity().findViewById(R.id.tv_dr_name);
         tv_dr_spec = getActivity().findViewById(R.id.tv_dr_special);
