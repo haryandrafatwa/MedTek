@@ -87,7 +87,7 @@ public class DokterAdapter extends RecyclerView.Adapter<DokterAdapter.ViewHolder
             public void onClick(View v) {
                 DetailDokterFragment detailDokterFragment = new DetailDokterFragment();
                 Bundle bundle = new Bundle();
-                bundle.putInt("id_dokter",model.getId());
+                bundle.putInt("id_doc",model.getId());
                 detailDokterFragment.setArguments(bundle);
                 FragmentTransaction fragmentTransaction = mActivity.getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.frameFragment,detailDokterFragment).addToBackStack("FragmentDetailDokter");

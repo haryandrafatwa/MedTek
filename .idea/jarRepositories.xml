@@ -61,5 +61,20 @@
       <option name="name" value="maven5" />
       <option name="url" value="https://maven.fabric.io/public" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven4" />
+      <option name="name" value="maven4" />
+      <option name="url" value="file:/$PROJECT_DIR$/app/org.codehaus.grovy" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven4" />
+      <option name="name" value="maven4" />
+      <option name="url" value="http://dl.bintray.com/pt-midtrans/maven" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven4" />
+      <option name="name" value="maven4" />
+      <option name="url" value="https://dl.bintray.com/pt-midtrans/maven" />
+    </remote-repository>
   </component>
 </project>

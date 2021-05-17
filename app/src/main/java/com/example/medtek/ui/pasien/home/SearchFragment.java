@@ -203,8 +203,12 @@ public class SearchFragment extends Fragment {
                         tv_seeall_dokter.setVisibility(View.GONE);
                     }
                     mListDokter.clear();
-                    for (int i = 0; i < 4; i++) {
-                        mListDokter.add(listDokter.get(i));
+                    if (listDokter.size() < 4){
+                        mListDokter.addAll(listDokter);
+                    }else{
+                        for (int i = 0; i < 4; i++) {
+                            mListDokter.add(listDokter.get(i));
+                        }
                     }
                     mAdapterDokter.notifyDataSetChanged();
                     rv_dokter.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -365,8 +369,12 @@ public class SearchFragment extends Fragment {
                         tv_seeall_dokter.setVisibility(View.GONE);
                     }
                     mListDokter.clear();
-                    for (int i = 0; i < 4; i++) {
-                        mListDokter.add(listDokter.get(i));
+                    if (listDokter.size() < 4){
+                        mListDokter.addAll(listDokter);
+                    }else{
+                        for (int i = 0; i < 4; i++) {
+                            mListDokter.add(listDokter.get(i));
+                        }
                     }
                     mAdapterDokter.notifyDataSetChanged();
                 }else{

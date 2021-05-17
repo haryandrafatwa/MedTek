@@ -90,8 +90,6 @@ public class RegisterPasienActivity extends AppCompatActivity {
                                     @Override
                                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                                         try {
-                                            Log.d("errorRegist", response.errorBody().string());
-                                            Log.d("errorRegist", response.message() + response.code());
                                             btn_clone.setVisibility(View.GONE);
                                             String s = response.errorBody().string();
                                             JSONObject obj = new JSONObject(s);

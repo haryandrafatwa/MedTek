@@ -55,7 +55,7 @@ public class WalletFragment extends Fragment {
 
     private ChipNavigationBar bottomBar;
     private Toolbar toolbar;
-    private String access, refresh;
+    private String access, refresh, fName, lName, alamat, phone;
 
     private TextView tv_now_date, tv_saldo;
     private ImageButton ib_topup;
@@ -96,6 +96,13 @@ public class WalletFragment extends Fragment {
                         String s = response.body().string();
                         JSONObject raw = new JSONObject(s);
                         String name = raw.getString("name");
+                        fName = name.split(" ")[0];
+                        lName = name.split(" ")[1];
+                        phone = raw.getString("notelp");
+                        JSONObject alamatObj = raw.getJSONObject("alamat");
+                        alamat = alamatObj.getString("jalan")+", No. "+alamatObj.getString("nomor_bangunan")
+                                +", RT/RW. "+alamatObj.getString("rtrw")+", "+alamatObj.getString("kelurahan")
+                                +", "+alamatObj.getString("kecamatan")+", "+alamatObj.getString("kota");
                         JSONObject wallet = raw.getJSONObject("wallet");
                         String balance = wallet.getString("balance");
                         balance = NumberFormat.getInstance(Locale.ITALIAN).format(Integer.valueOf(balance));
@@ -204,42 +211,15 @@ public class WalletFragment extends Fragment {
         ib_topup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                NominalFragment nominalFragment = new NominalFragment();
-                setFragment(nominalFragment,"FragmentNominal");
-
-                /*BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getActivity(), R.style.BottomSheetDialogTheme);
-                View bottomSheetView = LayoutInflater.from(getActivity().getApplicationContext()).inflate(R.layout.fragment_topup, (RelativeLayout) getActivity().findViewById(R.id.dialogTopup));
-                bottomSheetView.findViewById(R.id.nominal).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        bottomSheetDialog.dismiss();
-                    }
-                });
-
-                CurrencyEditText et_nominal = (CurrencyEditText) bottomSheetView.findViewById(R.id.et_nominal_topup);
-
-                RubberSeekBar rsb_nominal = bottomSheetView.findViewById(R.id.rsb_nominal);
-                rsb_nominal.setOnRubberSeekBarChangeListener(new RubberSeekBar.OnRubberSeekBarChangeListener() {
-                    @Override
-                    public void onProgressChanged(@NotNull RubberSeekBar rubberSeekBar, int i, boolean b) {
-                        i = ((int)Math.round(i/10000 ))*10000;
-//                        et_nominal.setText("Rp "+String.valueOf(i));
-                    }
-
-                    @Override
-                    public void onStartTrackingTouch(@NotNull RubberSeekBar rubberSeekBar) {
-
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(@NotNull RubberSeekBar rubberSeekBar) {
-
-                    }
-                });
-                bottomSheetDialog.setCancelable(false);
-                bottomSheetDialog.setContentView(bottomSheetView);
-                bottomSheetDialog.show();*/
-
+                /*NominalFragment nominalFragment = new NominalFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("FirstName",fName);
+                bundle.putString("LastName",lName);
+                bundle.putString("Alamat",alamat);
+                bundle.putString("Phone",phone);
+                nominalFragment.setArguments(bundle);
+                setFragment(nominalFragment,"FragmentNominal");*/
+                Toasty.info(getActivity(),"Under Maintenance!",Toasty.LENGTH_LONG).show();
             }
         });
 
