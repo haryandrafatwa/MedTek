@@ -112,15 +112,36 @@ public class ChatFragment extends BaseFragment {
     }
 
     @Override
-    protected void setupData(@Nullable Bundle savedInstanceState) {}
+    protected void setupData(@Nullable Bundle savedInstanceState) {
+        // FOR DEBUGGING
+        if (isPatient()) {
+            ArrayList<ChatsModel.Chat> chats = new ArrayList<>();
+            ChatsModel newActiveChatsModel = new ChatsModel(468, chats);
+            newActiveChatsModel.setIdSender(92);
+            newActiveChatsModel.setSenderName("gabs");
+            newActiveChatsModel.setSenderAvatar("/storage/Dokter.png");
+            newActiveChatsModel.setIdJanji(466);
+            setData(ACTIVE_CHAT, newActiveChatsModel);
+        } else {
+            ArrayList<ChatsModel.Chat> chats = new ArrayList<>();
+            ChatsModel newActiveChatsModel = new ChatsModel(468, chats);
+            newActiveChatsModel.setIdSender(91);
+            newActiveChatsModel.setSenderName("Gabriel");
+            newActiveChatsModel.setSenderAvatar("/storage/avatar/91/1618050914.jpeg");
+            newActiveChatsModel.setIdJanji(466);
+            setData(ACTIVE_CHAT, newActiveChatsModel);
+        }
+
+    }
 
     public void initState() {
         sizeOfAppointment = 0;
         sizeOfChats = 0;
         sizeOfAppointmentNow = 0;
         sizeOfChatsNow = 0;
-        isAppointmentDone = false;
-        isChatsDone = false;
+        // FOR DEBUGGING
+        isAppointmentDone = true /* false */;
+        isChatsDone = true /* false */;
     }
 
     @Override
@@ -148,13 +169,14 @@ public class ChatFragment extends BaseFragment {
         if (binding != null) {
             App.getInstance().runOnUiThread(() -> {
                 if (searchData(ACTIVE_CHAT)) {
-                    ChatsModel activeChatsModel = (ChatsModel) getData(ACTIVE_CHAT);
-                    for (ChatsModel model: chatsModels) {
-                        if (model.getIdConversation() == activeChatsModel.getIdConversation()) {
-                            chatsModels.remove(model);
-                            break;
-                        }
-                    }
+//                    FOR DEBUGGING
+//                    ChatsModel activeChatsModel = (ChatsModel) getData(ACTIVE_CHAT);
+//                    for (ChatsModel model: chatsModels) {
+//                        if (model.getIdConversation() == activeChatsModel.getIdConversation()) {
+//                            chatsModels.remove(model);
+//                            break;
+//                        }
+//                    }
                 }
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -615,7 +637,8 @@ public class ChatFragment extends BaseFragment {
         initState();
         isLoading();
         binding.swipeRefresh.setRefreshing(false);
-        getDataSchedule();
+//        FOR DEBUGGING
+//        getDataSchedule();
         if (searchData(ACTIVE_CHAT)) {
             setupDataRVActiveChats();
         } else {

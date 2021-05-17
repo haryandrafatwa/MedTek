@@ -237,6 +237,9 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
         imagesCountNow = 0;
         count = 0;
         isEndChats = false;
+
+        // FOR DEBUGGING
+        SocketUtil.getInstance().setChannelVideoChat(chatsModel.getIdJanji());
     }
 
     //Register EventBus
@@ -302,7 +305,8 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
                     JanjiModel janjiUpdate = (JanjiModel) newEvent;
                     Log.d(TAG, "idStatus: " + janjiUpdate.getJanji().getIdStatus());
                     if (janjiUpdate.getJanji().getIdStatus() == SUDAH_SELESAI) {
-                        endSession();
+                        // FOR DEBUGGING
+//                        endSession();
                     }
                 } else if (newEvent instanceof String) {
                     String newMessage = (String) newEvent;
