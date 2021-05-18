@@ -274,8 +274,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSuccess(GetJanjiListResponse result) {
                 List<AppointmentModel> appointmentModels = new ArrayList<>(result.getData());
-                // FOR DEBUGGING
-//                getDataHistoryChats(appointmentModels);
+                getDataHistoryChats(appointmentModels);
                 chatFragment.addDataSchedule(result.getData());
             }
 

@@ -1,10 +1,7 @@
 package com.example.medtek.ui.pasien.home.appointment;
 
-import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -26,8 +23,6 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -37,28 +32,21 @@ import com.example.medtek.BuildConfig;
 import com.example.medtek.R;
 import com.example.medtek.network.RetrofitClient;
 import com.example.medtek.network.request.JanjiRequest;
-import com.example.medtek.ui.activity.MainActivity;
-import com.example.medtek.ui.pasien.auth.LoginPasienActivity;
 import com.example.medtek.ui.pasien.home.HomeFragment;
-import com.example.medtek.ui.pasien.others.NominalFragment;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 import com.midtrans.sdk.corekit.callback.GetTransactionStatusCallback;
 import com.midtrans.sdk.corekit.callback.TransactionFinishedCallback;
 import com.midtrans.sdk.corekit.core.MidtransSDK;
-import com.midtrans.sdk.corekit.core.PaymentMethod;
 import com.midtrans.sdk.corekit.core.TransactionRequest;
 import com.midtrans.sdk.corekit.core.UIKitCustomSetting;
 import com.midtrans.sdk.corekit.models.BillingAddress;
 import com.midtrans.sdk.corekit.models.CustomerDetails;
 import com.midtrans.sdk.corekit.models.ItemDetails;
-import com.midtrans.sdk.corekit.models.SnapTokenDetailResponse;
-import com.midtrans.sdk.corekit.models.SnapTransactionDetails;
 import com.midtrans.sdk.corekit.models.snap.Authentication;
 import com.midtrans.sdk.corekit.models.snap.CreditCard;
 import com.midtrans.sdk.corekit.models.snap.Gopay;
 import com.midtrans.sdk.corekit.models.snap.Shopeepay;
-import com.midtrans.sdk.corekit.models.snap.SnapPromo;
 import com.midtrans.sdk.corekit.models.snap.TransactionResult;
 import com.midtrans.sdk.corekit.models.snap.TransactionStatusResponse;
 import com.midtrans.sdk.uikit.SdkUIFlowBuilder;
@@ -80,9 +68,6 @@ import java.util.Locale;
 import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
 import io.socket.client.Socket;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -175,9 +160,13 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
                             try {
                                 String s = response.body().string();
                                 JSONObject object = new JSONObject(s);
-                                String name = object.getString("name");
-                                fName = name.split(" ")[0];
-                                lName = name.split(" ")[1];
+                                String userName = obj.getString("name");
+                                String[] userNameArr = userName.split(" ");
+                                fName = userNameArr[0];
+                                lName = "";
+                                if (userNameArr.length > 1) {
+                                    lName = userName.split(" ")[1];
+                                }
                                 phone = object.getString("notelp");
                                 email = object.getString("email");
                                 JSONObject alamatObj = object.getJSONObject("alamat");

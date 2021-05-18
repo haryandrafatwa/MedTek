@@ -42,7 +42,6 @@ import com.example.medtek.ui.pasien.home.doctors.DokterAdapter;
 import com.example.medtek.ui.pasien.home.doctors.DokterFragment;
 import com.example.medtek.ui.pasien.home.hospitals.HospitalAdapter;
 import com.example.medtek.ui.pasien.home.hospitals.HospitalFragment;
-import com.example.medtek.ui.pasien.others.NominalFragment;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -277,8 +276,12 @@ public class HomeFragment extends Fragment {
                                 String s = response.body().string();
                                 JSONObject obj = new JSONObject(s);
                                 userName = obj.getString("name");
-                                fName = userName.split(" ")[0];
-                                lName = userName.split(" ")[1];
+                                String[] userNameArr = userName.split(" ");
+                                fName = userNameArr[0];
+                                lName = "";
+                                if (userNameArr.length > 1) {
+                                    lName = userName.split(" ")[1];
+                                }
                                 phone = obj.getString("notelp");
                                 JSONObject alamatObj = obj.getJSONObject("alamat");
                                 alamat = alamatObj.getString("jalan")+", No. "+alamatObj.getString("nomor_bangunan")
