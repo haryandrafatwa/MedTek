@@ -2,6 +2,7 @@ package com.example.medtek.ui.pasien.home.appointment;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -12,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
@@ -63,6 +66,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -114,7 +118,10 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_checkout_appointment, container, false);
+        View view = inflater.inflate(R.layout.fragment_checkout_appointment, container, false);
+        view.setFocusableInTouchMode(true);
+        view.requestFocus();
+        return view;
     }
 
     @Override
@@ -123,7 +130,7 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
         initialize();
         initMidTrans();
         bundle = getArguments();
-
+        snapToken = bundle.getString("snapToken");
         Call<ResponseBody> callDokter = RetrofitClient.getInstance().getApi().getDokterId(bundle.getInt("id_dokter"));
         callDokter.enqueue(new Callback<ResponseBody>() {
             @Override
@@ -146,9 +153,15 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
                     tv_dr_rs.setText(rs_name);
                     tv_dr_rs_loc.setText(rs_loc);
                     String path="";
+                    JSONArray jsonArrayImage = new JSONArray(obj.getString("image"));
                     if (new JSONArray(obj.getString("image")).length() !=0){
-                        JSONArray jsonArray = new JSONArray(obj.getString("image"));
-                        path = BASE_URL+jsonArray.getJSONObject(0).getString("path");
+                        for (int j = 0; j < jsonArrayImage.length(); j++) {
+                            JSONObject imageObj = jsonArrayImage.getJSONObject(j);
+                            if (imageObj.getInt("type_id") == 1) {
+                                path = BASE_URL + imageObj.getString("path");
+                                break;
+                            }
+                        }
                     }else{
                         path = BASE_URL+"/storage/Dokter.png";
                     }
@@ -243,32 +256,63 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
                                                                                         String s = response.body().string();
                                                                                         JSONObject object = new JSONObject(s);
                                                                                         if (object.has("success")){
+                                                                                            getView().setOnKeyListener(new View.OnKeyListener() {
+                                                                                                @Override
+                                                                                                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                                                                                                    if (event.getAction() ==KeyEvent.ACTION_DOWN){
+                                                                                                        if( keyCode == KeyEvent.KEYCODE_BACK) {
+                                                                                                            FragmentManager manager = getActivity().getSupportFragmentManager();
+                                                                                                            manager.popBackStack();
+                                                                                                            manager.popBackStack();
+                                                                                                            manager.popBackStack();
+                                                                                                            return true;
+                                                                                                        }
+                                                                                                    }
+                                                                                                    return false;
+                                                                                                }
+                                                                                            });
+                                                                                            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                                                                                                @Override
+                                                                                                public void onClick(View v) {
+                                                                                                    FragmentManager manager = getActivity().getSupportFragmentManager();
+                                                                                                    manager.popBackStack();
+                                                                                                    manager.popBackStack();
+                                                                                                    manager.popBackStack();
+                                                                                                }
+                                                                                            });
                                                                                             JSONObject janjiSuccess = object.getJSONObject("data");
                                                                                             JSONArray transaksiArr = janjiSuccess.getJSONArray("transaksi");
                                                                                             for (int j = 0; j < transaksiArr.length(); j++) {
                                                                                                 JSONObject transaksi = transaksiArr.getJSONObject(j);
                                                                                                 if (!transaksi.getBoolean("is_paid")){
-                                                                                                    Log.e(TAG, "onResponse: idJanji ->"+transaksi.getInt("janji_id"));
-//                                                                                                    idJanji = transaksi.getInt("janji_id");
                                                                                                     setIdJanji(transaksi.getInt("janji_id"));
-                                                                                                    ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Konsultasi dengan "+tv_dr_name.getText().toString());
-                                                                                                    ArrayList<ItemDetails> details = new ArrayList<>();
-                                                                                                    details.add(itemDetails);
-                                                                                                    TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
-                                                                                                    request.setItemDetails(details);
-                                                                                                    MidtransSDK.getInstance().setTransactionRequest(request);
-                                                                                                    if (snapToken == null){
-                                                                                                        MidtransSDK.getInstance().startPaymentUiFlow(getActivity());
-                                                                                                    }else{
-                                                                                                        MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
-                                                                                                    }
-                                                                                                    if (getActivity().getSupportFragmentManager().findFragmentByTag("DetailPasienFragment") != null){
-                                                                                                        getActivity().getSupportFragmentManager().beginTransaction().remove(getActivity().getSupportFragmentManager().findFragmentByTag("DetailPasienFragment")).commit();
-                                                                                                    }
-                                                                                                    if (getActivity().getSupportFragmentManager().findFragmentByTag("FragmentBuatJanji") != null){
-                                                                                                        getActivity().getSupportFragmentManager().beginTransaction().remove(getActivity().getSupportFragmentManager().findFragmentByTag("FragmentBuatJanji")).commit();
-                                                                                                    }
-                                                                                                    bundle.putString("lastFragment","DetailDokter");
+                                                                                                    Call<ResponseBody> payment = RetrofitClient.getInstance().getApi().payment("Bearer "+access,idJanji);
+                                                                                                    payment.enqueue(new Callback<ResponseBody>() {
+                                                                                                        @Override
+                                                                                                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                                                                                            if (response.body() != null){
+                                                                                                                try {
+                                                                                                                    Log.e(TAG, "onResponse: "+response.body().string());
+                                                                                                                    JSONObject responseObj = new JSONObject(response.body().string());
+                                                                                                                    snapToken = responseObj.getString("token");
+                                                                                                                    ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Konsultasi dengan "+tv_dr_name.getText().toString());
+                                                                                                                    ArrayList<ItemDetails> details = new ArrayList<>();
+                                                                                                                    details.add(itemDetails);
+                                                                                                                    TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
+                                                                                                                    request.setItemDetails(details);
+                                                                                                                    MidtransSDK.getInstance().setTransactionRequest(request);
+                                                                                                                    MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
+                                                                                                                } catch (IOException | JSONException e) {
+                                                                                                                    e.printStackTrace();
+                                                                                                                }
+                                                                                                            }
+                                                                                                        }
+
+                                                                                                        @Override
+                                                                                                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                                                                                            payment.clone().enqueue(this);
+                                                                                                        }
+                                                                                                    });
                                                                                                 }
                                                                                             }
                                                                                         }
@@ -322,30 +366,64 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
                                                                                         String s = response.body().string();
                                                                                         JSONObject object = new JSONObject(s);
                                                                                         if (object.has("success")){
+                                                                                            getView().setOnKeyListener(new View.OnKeyListener() {
+                                                                                                @Override
+                                                                                                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                                                                                                    if (event.getAction() ==KeyEvent.ACTION_DOWN){
+                                                                                                        if( keyCode == KeyEvent.KEYCODE_BACK) {
+                                                                                                            FragmentManager manager = getActivity().getSupportFragmentManager();
+                                                                                                            manager.popBackStack();
+                                                                                                            manager.popBackStack();
+                                                                                                            manager.popBackStack();
+                                                                                                            return true;
+                                                                                                        }
+                                                                                                    }
+                                                                                                    return false;
+                                                                                                }
+                                                                                            });
+                                                                                            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                                                                                                @Override
+                                                                                                public void onClick(View v) {
+                                                                                                    FragmentManager manager = getActivity().getSupportFragmentManager();
+                                                                                                    manager.popBackStack();
+                                                                                                    manager.popBackStack();
+                                                                                                    manager.popBackStack();
+                                                                                                }
+                                                                                            });
                                                                                             JSONObject janjiSuccess = object.getJSONObject("data");
                                                                                             JSONArray transaksiArr = janjiSuccess.getJSONArray("transaksi");
                                                                                             for (int j = 0; j < transaksiArr.length(); j++) {
                                                                                                 JSONObject transaksi = transaksiArr.getJSONObject(j);
                                                                                                 if (!transaksi.getBoolean("is_paid")){
                                                                                                     setIdJanji(transaksi.getInt("janji_id"));
-                                                                                                    ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Konsultasi dengan "+tv_dr_name.getText().toString());
-                                                                                                    ArrayList<ItemDetails> details = new ArrayList<>();
-                                                                                                    details.add(itemDetails);
-                                                                                                    TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
-                                                                                                    request.setItemDetails(details);
-                                                                                                    MidtransSDK.getInstance().setTransactionRequest(request);
-                                                                                                    if (snapToken == null){
-                                                                                                        MidtransSDK.getInstance().startPaymentUiFlow(getActivity());
-                                                                                                    }else{
-                                                                                                        MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
-                                                                                                    }
-                                                                                                    if (getActivity().getSupportFragmentManager().findFragmentByTag("DetailPasienFragment") != null){
-                                                                                                        getActivity().getSupportFragmentManager().beginTransaction().remove(getActivity().getSupportFragmentManager().findFragmentByTag("DetailPasienFragment")).commit();
-                                                                                                    }
-                                                                                                    if (getActivity().getSupportFragmentManager().findFragmentByTag("FragmentBuatJanji") != null){
-                                                                                                        getActivity().getSupportFragmentManager().beginTransaction().remove(getActivity().getSupportFragmentManager().findFragmentByTag("FragmentBuatJanji")).commit();
-                                                                                                    }
-                                                                                                    bundle.putString("lastFragment","DetailDokter");
+                                                                                                    Call<ResponseBody> payment = RetrofitClient.getInstance().getApi().payment("Bearer "+access,idJanji);
+                                                                                                    payment.enqueue(new Callback<ResponseBody>() {
+                                                                                                        @Override
+                                                                                                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                                                                                            if (response.body() != null){
+                                                                                                                try {
+                                                                                                                    String s = response.body().string();
+                                                                                                                    Log.e(TAG, "onResponsePayment: "+s);
+                                                                                                                    JSONObject responseObj = new JSONObject(s);
+                                                                                                                    snapToken = responseObj.getString("token");
+                                                                                                                    ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Konsultasi dengan "+tv_dr_name.getText().toString());
+                                                                                                                    ArrayList<ItemDetails> details = new ArrayList<>();
+                                                                                                                    details.add(itemDetails);
+                                                                                                                    TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
+                                                                                                                    request.setItemDetails(details);
+                                                                                                                    MidtransSDK.getInstance().setTransactionRequest(request);
+                                                                                                                    MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
+                                                                                                                } catch (IOException | JSONException e) {
+                                                                                                                    e.printStackTrace();
+                                                                                                                }
+                                                                                                            }
+                                                                                                        }
+
+                                                                                                        @Override
+                                                                                                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                                                                                            payment.clone().enqueue(this);
+                                                                                                        }
+                                                                                                    });
                                                                                                 }
                                                                                             }
                                                                                         }
@@ -746,119 +824,62 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
         this.refresh = (String) getData(REFRESH_TOKEN);
     }
 
-    /*private void transactionCallback(boolean status, String desc){
-        if (status){
-            Call<ResponseBody> payment = RetrofitClient.getInstance().getApi().payment("Bearer "+access,idJanji);
-            payment.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    if (response.body() != null){
-                        if (response.isSuccessful()){
-                            try {
-                                Log.e(TAG, "onResponse: "+response.body().string());
-                                Toasty.success(getActivity(),"Transaksi "+desc,Toasty.LENGTH_LONG).show();
-                                *//*FragmentManager fm = getActivity().getSupportFragmentManager();
-                                for(int i = 0; i < fm.getBackStackEntryCount(); ++i) {
-                                    fm.popBackStack();
-                                }
-                                setFragment(new HomeFragment(),"FragmentHomePasien");*//*
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    payment.clone().enqueue(this);
-                }
-            });
-        }else{
-            Toasty.error(getActivity(),"Transaksi "+desc,Toasty.LENGTH_LONG).show();
-        }
-    }*/
-
     @Override
     public void onTransactionFinished(TransactionResult transactionResult) {
         if (transactionResult.getResponse()!=null){
             switch (transactionResult.getStatus()){
                 case TransactionResult.STATUS_SUCCESS:
                     Log.e(TAG, "onTransactionFinished: "+idJanji );
-                    Call<ResponseBody> payment = RetrofitClient.getInstance().getApi().payment("Bearer "+access,idJanji);
-                    payment.enqueue(new Callback<ResponseBody>() {
-                        @Override
-                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                            if (response.body() != null){
-                                if (response.isSuccessful()){
-                                    try {
-                                        Log.e(TAG, "onResponse: "+response.body().string());
-                                        Toasty.success(getActivity(),"Transaksi Berhasil",Toasty.LENGTH_LONG).show();
-                                        FragmentManager fm = getActivity().getSupportFragmentManager();
-                                        for(int i = 0; i < fm.getBackStackEntryCount(); ++i) {
-                                            fm.popBackStack();
-                                        }
-                                        setFragment(new HomeFragment(),"FragmentHomePasien");
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<ResponseBody> call, Throwable t) {
-                            payment.clone().enqueue(this);
-                        }
-                    });
-                    break;
-                case TransactionResult.STATUS_PENDING:
-                    String snap = MidtransSDK.getInstance().readAuthenticationToken();
-                    MidtransSDK.getInstance().getTransactionStatus(snap, new GetTransactionStatusCallback() {
+                    MidtransSDK.getInstance().getTransactionStatus(snapToken, new GetTransactionStatusCallback() {
                         @Override
                         public void onSuccess(TransactionStatusResponse response) {
                             // do action for response
                             Log.e(TAG, "onTransactionFinished: "+idJanji );
-                            Call<ResponseBody> payment = RetrofitClient.getInstance().getApi().payment("Bearer "+access,idJanji);
-                            payment.enqueue(new Callback<ResponseBody>() {
-                                @Override
-                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                    if (response.body() != null){
-                                        if (response.isSuccessful()){
-                                            try {
-                                                Log.e(TAG, "onResponse: "+response.body().string());
-                                                Toasty.success(getActivity(),"Transaksi Berhasil",Toasty.LENGTH_LONG).show();
-                                                FragmentManager fm = getActivity().getSupportFragmentManager();
-                                                for(int i = 0; i < fm.getBackStackEntryCount(); ++i) {
-                                                    fm.popBackStack();
-                                                }
-                                                setFragment(new HomeFragment(),"FragmentHomePasien");
-                                            } catch (IOException e) {
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    }
-                                }
-
-                                @Override
-                                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                    payment.clone().enqueue(this);
-                                }
-                            });
+                            Toasty.success(getActivity(),"Transaksi Berhasil",Toasty.LENGTH_LONG).show();
+                            FragmentManager fm = getActivity().getSupportFragmentManager();
+                            for(int i = 0; i < fm.getBackStackEntryCount(); ++i) {
+                                fm.popBackStack();
+                            }
+                            setFragment(new HomeFragment(),"FragmentHomePasien");
                         }
 
                         @Override
                         public void onFailure(TransactionStatusResponse response, String reason) {
                             // do nothing
                             Toasty.warning(getActivity(),"Transaksi "+response.getTransactionStatus(),Toasty.LENGTH_LONG).show();
-                            snapToken = snap;
                         }
 
                         @Override
                         public void onError(Throwable error) {
                             // do action if error
                             Toasty.error(getActivity(),"Transaksi Error: "+error.getMessage(),Toasty.LENGTH_LONG).show();
-                            snapToken = snap;
+                        }
+                    });
+                    break;
+                case TransactionResult.STATUS_PENDING:
+                    MidtransSDK.getInstance().getTransactionStatus(snapToken, new GetTransactionStatusCallback() {
+                        @Override
+                        public void onSuccess(TransactionStatusResponse response) {
+                            // do action for response
+                            Log.e(TAG, "onTransactionFinished: "+idJanji );
+                            Toasty.success(getActivity(),"Transaksi Berhasil",Toasty.LENGTH_LONG).show();
+                            FragmentManager fm = getActivity().getSupportFragmentManager();
+                            for(int i = 0; i < fm.getBackStackEntryCount(); ++i) {
+                                fm.popBackStack();
+                            }
+                            setFragment(new HomeFragment(),"FragmentHomePasien");
+                        }
+
+                        @Override
+                        public void onFailure(TransactionStatusResponse response, String reason) {
+                            // do nothing
+                            Toasty.warning(getActivity(),"Transaksi "+response.getTransactionStatus(),Toasty.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onError(Throwable error) {
+                            // do action if error
+                            Toasty.error(getActivity(),"Transaksi Error: "+error.getMessage(),Toasty.LENGTH_LONG).show();
                         }
                     });
                     break;

@@ -346,18 +346,24 @@ public class BuatJanjiFragment extends Fragment {
                                             String dateCenter = tv_date_center.getText().toString().trim();
                                             String dayLeft = tv_day_left.getText().toString().trim();
                                             String dateLeft = tv_date_left.getText().toString().trim();
+                                            long tempLeft = left;
+                                            long tempCenter = center;
                                             if (left > right){
+                                                left = right;
                                                 tv_day_left.setText("Hari Ini");
                                                 tv_date_left.setText(date.format(halfDateFormat));
-                                                tv_day_center.setText(dayLeft);
-                                                tv_date_center.setText(dateLeft);
-                                                tv_day_right.setText(dayCenter);
-                                                tv_date_right.setText(dateCenter);
-                                            }else{
-                                                tv_day_center.setText(strDays[dayInt]);
-                                                tv_date_center.setText(date.format(halfDateFormat));
-                                                tv_day_right.setText(dayCenter);
-                                                tv_date_right.setText(dateCenter);
+                                                if (left > center){
+                                                    right = tempLeft;
+                                                    tv_day_right.setText(dayLeft);
+                                                    tv_date_right.setText(dateLeft);
+                                                }else{
+                                                    center = tempLeft;
+                                                    right = tempCenter;
+                                                    tv_day_center.setText(dayLeft);
+                                                    tv_date_center.setText(dateLeft);
+                                                    tv_day_right.setText(dayCenter);
+                                                    tv_date_right.setText(dateCenter);
+                                                }
                                             }
 
                                         }else{
@@ -495,7 +501,7 @@ public class BuatJanjiFragment extends Fragment {
             @Override
             public void onClick(View v) {
 //                Toasty.success(getActivity(),"Tanggal: "+day+", "+date+", Jam: "+timeString,Toasty.LENGTH_LONG).show();
-                DetailPasienFragment detailPasienFragment = new DetailPasienFragment();
+                Fragment detailPasienFragment = new DetailPasienFragment();
 
                 Locale locale = new Locale("in", "ID");
                 DateTimeFormatter dayFormat = DateTimeFormatter.ofPattern("dd MMM yyyy",locale).withLocale(locale);
@@ -1637,7 +1643,7 @@ public class BuatJanjiFragment extends Fragment {
 
     private void setFragment(Fragment fragment,String TAG) {
         FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frameFragment,fragment).addToBackStack(TAG);
+        fragmentTransaction.replace(R.id.frameFragment,fragment,TAG).addToBackStack(TAG);
         fragmentTransaction.commit();
     }
 

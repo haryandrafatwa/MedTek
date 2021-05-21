@@ -57,12 +57,14 @@ android {
         production {
             buildConfigField "String", "BASE_URL", String.format("\"%s\"", releaseBaseUrl)
             buildConfigField "String","MERCHANT_CLIENT_KEY",'"SB-Mid-client-ogjlb8p1FMGByIoq"'
-            buildConfigField "String","MERCHANT_BASE_URL",'"https://medtek-app.herokuapp.com/index.php/"'
+//            buildConfigField "String","MERCHANT_BASE_URL",'"https://medtek-app.herokuapp.com/index.php/"'
+            buildConfigField "String","MERCHANT_BASE_URL",'"https://api.telemedicine.co.id/api/payment/snap/"'
         }
         dev {
             buildConfigField "String", "BASE_URL", String.format("\"%s\"", debugBaseUrl)
             buildConfigField "String","MERCHANT_CLIENT_KEY",'"SB-Mid-client-ogjlb8p1FMGByIoq"'
-            buildConfigField "String","MERCHANT_BASE_URL",'"https://medtek-app.herokuapp.com/index.php/"'
+//            buildConfigField "String","MERCHANT_BASE_URL",'"https://medtek-app.herokuapp.com/index.php/"'
+            buildConfigField "String","MERCHANT_BASE_URL",'"https://api.telemedicine.co.id/api/payment/snap/"'
         }
     }
 

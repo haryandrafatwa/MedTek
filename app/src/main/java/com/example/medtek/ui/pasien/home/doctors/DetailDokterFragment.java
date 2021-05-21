@@ -83,6 +83,7 @@ public class DetailDokterFragment extends Fragment {
     private FeedbackAdapter mAdapter;
     private RecyclerView recyclerView;
     private ProgressDialog progressDialog;
+    private boolean status = false;
 
     private ChipNavigationBar bottomNavigationView;
     private Toolbar toolbar;
@@ -95,7 +96,7 @@ public class DetailDokterFragment extends Fragment {
 
     private RelativeLayout rl_content,rl_loader;
     private ShimmerFrameLayout shimmerFrameLayout;
-    private String access = "", refresh = "", nama, nama_dokter, detail_janji, date, time;
+    private String access = "", refresh = "", nama, nama_dokter, detail_janji, date, time, snapToken;
     private int harga, balance, id_doc, idJanji;
 
     @Override
@@ -267,45 +268,49 @@ public class DetailDokterFragment extends Fragment {
                                                                             String s = response.body().string();
                                                                             JSONObject object = new JSONObject(s);
                                                                             JSONArray objArr = object.getJSONArray("data");
-                                                                            List<JSONObject> jsonValues = new ArrayList<JSONObject>();
-                                                                            for (int i = 0; i < objArr.length(); i++) {
-                                                                                jsonValues.add(objArr.getJSONObject(i));
-                                                                            }
-                                                                            Collections.sort(jsonValues, new Comparator<JSONObject>() {
-                                                                                @Override
-                                                                                public int compare(JSONObject o1, JSONObject o2) {
-                                                                                    int idA = 0;
-                                                                                    int idB = 0;
-                                                                                    try {
-                                                                                        idA = o1.getInt("id");
-                                                                                        idB = o2.getInt("id");
-                                                                                    } catch (JSONException e) {
-                                                                                        e.printStackTrace();
+                                                                            if (objArr.length() > 0){
+                                                                                List<JSONObject> jsonValues = new ArrayList<JSONObject>();
+                                                                                for (int i = 0; i < objArr.length(); i++) {
+                                                                                    jsonValues.add(objArr.getJSONObject(i));
+                                                                                }
+                                                                                Collections.sort(jsonValues, new Comparator<JSONObject>() {
+                                                                                    @Override
+                                                                                    public int compare(JSONObject o1, JSONObject o2) {
+                                                                                        int idA = 0;
+                                                                                        int idB = 0;
+                                                                                        try {
+                                                                                            idA = o1.getInt("id");
+                                                                                            idB = o2.getInt("id");
+                                                                                        } catch (JSONException e) {
+                                                                                            e.printStackTrace();
+                                                                                        }
+                                                                                        return -Integer.compare(idA,idB);
                                                                                     }
-                                                                                    return -Integer.compare(idA,idB);
+                                                                                });
+                                                                                JSONArray sortedJanji = new JSONArray();
+                                                                                for (int i = 0; i < objArr.length(); i++) {
+                                                                                    sortedJanji.put(jsonValues.get(i));
                                                                                 }
-                                                                            });
-                                                                            boolean status = false;
-                                                                            JSONArray sortedJanji = new JSONArray();
-                                                                            for (int i = 0; i < objArr.length(); i++) {
-                                                                                sortedJanji.put(jsonValues.get(i));
-                                                                            }
-                                                                            JSONObject janjiObj = sortedJanji.getJSONObject(0);
-                                                                            JSONObject doctObj = janjiObj.getJSONObject("dokter");
-                                                                            JSONArray transArr = janjiObj.getJSONArray("transaksi");
-                                                                            idJanji = janjiObj.getInt("id");
-                                                                            for (int j = 0; j < transArr.length(); j++) {
-                                                                                JSONObject transObj = transArr.getJSONObject(j);
-                                                                                if (!transObj.getBoolean("is_paid")){
-                                                                                    status = false;
-                                                                                    nama_dokter = doctObj.getString("name");
-                                                                                    id_doc = doctObj.getInt("id");
-                                                                                    harga = doctObj.getInt("harga");
-                                                                                    detail_janji = janjiObj.getString("detailJanji");
-                                                                                    date = janjiObj.getString("tglJanji");
-                                                                                }else{
-                                                                                    status = true;
+                                                                                JSONObject janjiObj = sortedJanji.getJSONObject(0);
+                                                                                JSONObject doctObj = janjiObj.getJSONObject("dokter");
+                                                                                JSONArray transArr = janjiObj.getJSONArray("transaksi");
+                                                                                idJanji = janjiObj.getInt("id");
+                                                                                for (int j = 0; j < transArr.length(); j++) {
+                                                                                    JSONObject transObj = transArr.getJSONObject(j);
+                                                                                    if (!transObj.getBoolean("is_paid")){
+                                                                                        setStatus(false);
+                                                                                        nama_dokter = doctObj.getString("name");
+                                                                                        id_doc = doctObj.getInt("id");
+                                                                                        harga = doctObj.getInt("harga");
+                                                                                        detail_janji = janjiObj.getString("detailJanji");
+                                                                                        date = janjiObj.getString("tglJanji");
+                                                                                        snapToken = transObj.getString("snapToken");
+                                                                                    }else{
+                                                                                        setStatus(true);
+                                                                                    }
                                                                                 }
+                                                                            }else{
+                                                                                setStatus(true);
                                                                             }
                                                                             if (!status){
                                                                                 bundle.putString("nama",nama);
@@ -315,6 +320,7 @@ public class DetailDokterFragment extends Fragment {
                                                                                 bundle.putInt("id_dokter",id_doc);
                                                                                 bundle.putInt("id_janji",idJanji);
                                                                                 bundle.putString("date",date);
+                                                                                bundle.putString("snapToken",snapToken);
                                                                                 bundle.putString("lastFragment","DetailDokter");
 
                                                                                 bundle.putString("time",detail_janji.split("Pukul")[1].split("\n")[0]);
@@ -326,13 +332,17 @@ public class DetailDokterFragment extends Fragment {
                                                                                 setFragment(checkoutAppointmentFragment,"FragmentCheckoutAppointment");
                                                                             }else{
                                                                                 progressDialog.dismiss();
-                                                                                BuatJanjiFragment buatJanjiFragment = new BuatJanjiFragment();
+                                                                                Fragment buatJanjiFragment = new BuatJanjiFragment();
                                                                                 Bundle bundle = new Bundle();
                                                                                 bundle.putInt("id_dokter",id_dokter);
                                                                                 buatJanjiFragment.setArguments(bundle);
                                                                                 setFragment(buatJanjiFragment,"FragmentBuatJanji");
                                                                             }
+                                                                        }else{
+                                                                            getUserJanji.clone().enqueue(this);
                                                                         }
+                                                                    }else{
+                                                                        getUserJanji.clone().enqueue(this);
                                                                     }
                                                                 } catch (IOException|JSONException e) {
                                                                     e.printStackTrace();
@@ -341,7 +351,7 @@ public class DetailDokterFragment extends Fragment {
 
                                                             @Override
                                                             public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                                                                getUserJanji.clone().enqueue(this);
                                                             }
                                                         });
                                                     }else{
@@ -451,7 +461,7 @@ public class DetailDokterFragment extends Fragment {
 
     private void setFragment(Fragment fragment,String TAG) {
         FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frameFragment,fragment).addToBackStack(TAG);
+        fragmentTransaction.replace(R.id.frameFragment,fragment,TAG).addToBackStack(TAG);
         fragmentTransaction.commit();
     }
 
@@ -472,4 +482,7 @@ public class DetailDokterFragment extends Fragment {
         startActivity(home);
     }
 
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
 }
