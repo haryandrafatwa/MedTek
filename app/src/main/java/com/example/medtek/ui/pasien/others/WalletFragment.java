@@ -96,8 +96,13 @@ public class WalletFragment extends Fragment {
                         String s = response.body().string();
                         JSONObject raw = new JSONObject(s);
                         String name = raw.getString("name");
-                        fName = name.split(" ")[0];
-                        lName = name.split(" ")[1];
+                        if (name.split(" ").length > 1){
+                            fName = name.split(" ")[0];
+                            lName = name.split(" ")[1];
+                        }else{
+                            fName = name.split(" ")[0];
+                            lName = "";
+                        }
                         phone = raw.getString("notelp");
                         JSONObject alamatObj = raw.getJSONObject("alamat");
                         alamat = alamatObj.getString("jalan")+", No. "+alamatObj.getString("nomor_bangunan")

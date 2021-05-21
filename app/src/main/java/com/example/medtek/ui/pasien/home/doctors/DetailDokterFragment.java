@@ -61,6 +61,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static android.content.ContentValues.TAG;
 import static com.example.medtek.network.RetrofitClient.BASE_URL;
 import static com.example.medtek.utils.PropertyUtil.ACCESS_TOKEN;
 import static com.example.medtek.utils.PropertyUtil.LOGIN_STATUS;
@@ -319,6 +320,7 @@ public class DetailDokterFragment extends Fragment {
                                                                                 bundle.putString("time",detail_janji.split("Pukul")[1].split("\n")[0]);
                                                                                 bundle.putString("detailJanji",detail_janji);
                                                                                 progressDialog.dismiss();
+                                                                                Log.e(TAG, "onResponse: idJanji ->"+idJanji);
                                                                                 CheckoutAppointmentFragment checkoutAppointmentFragment = new CheckoutAppointmentFragment();
                                                                                 checkoutAppointmentFragment.setArguments(bundle);
                                                                                 setFragment(checkoutAppointmentFragment,"FragmentCheckoutAppointment");

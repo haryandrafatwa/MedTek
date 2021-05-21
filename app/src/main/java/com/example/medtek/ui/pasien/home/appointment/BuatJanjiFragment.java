@@ -54,6 +54,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static android.content.ContentValues.TAG;
 import static com.example.medtek.network.RetrofitClient.BASE_URL;
 
 public class BuatJanjiFragment extends Fragment {
@@ -127,10 +128,16 @@ public class BuatJanjiFragment extends Fragment {
                         tv_dr_rs.setText(rs_name);
                         tv_dr_rs_loc.setText(rs_loc);
                         String path="";
+                        JSONArray jsonArrayImage = new JSONArray(obj.getString("image"));
                         if (new JSONArray(obj.getString("image")).length() !=0){
-                            JSONArray jsonArray = new JSONArray(obj.getString("image"));
-                            path = BASE_URL+jsonArray.getJSONObject(0).getString("path");
-                        }else{
+                            for (int j = 0; j < jsonArrayImage.length(); j++) {
+                                JSONObject imageObj = jsonArrayImage.getJSONObject(j);
+                                if (imageObj.getInt("type_id") == 1) {
+                                    path = BASE_URL + imageObj.getString("path");
+                                    break;
+                                }
+                            }
+                        } else {
                             path = BASE_URL+"/storage/Dokter.png";
                         }
 
@@ -141,7 +148,6 @@ public class BuatJanjiFragment extends Fragment {
                         Locale locale = new Locale("in", "ID");
                         DateTimeFormatter dayFormat = DateTimeFormatter.ofPattern("EEEE",locale);
                         DateTimeFormatter halfDateFormat = DateTimeFormatter.ofPattern("dd MMM",locale);
-
                         if (jsonArray.length() == 1){
                             int dayInt = Integer.parseInt(jsonArray.getJSONObject(0).getString("day_id"));
                             for (int i = 0; i < 3; i++) {
@@ -180,8 +186,8 @@ public class BuatJanjiFragment extends Fragment {
                             }
                         }else if(jsonArray.length() == 2){
                             List<Integer> dayId = new ArrayList<>();
-                            dayId.add(Integer.parseInt(jsonArray.getJSONObject(0).getString("day_id")));
-                            dayId.add(Integer.parseInt(jsonArray.getJSONObject(1).getString("day_id")));
+                            dayId.add(jsonArray.getJSONObject(0).getInt("day_id"));
+                            dayId.add(jsonArray.getJSONObject(1).getInt("day_id"));
                             Collections.sort(dayId);
                             for (int i = 0; i < 3; i++) {
                                 if (i==2){
@@ -300,8 +306,14 @@ public class BuatJanjiFragment extends Fragment {
                                 }
                             }
                         }else{
+
+                            List<Integer> dayId = new ArrayList<>();
                             for (int i = 0; i < jsonArray.length(); i++) {
-                                int dayInt = Integer.parseInt(jsonArray.getJSONObject(i).getString("day_id"));
+                                dayId.add(jsonArray.getJSONObject(i).getInt("day_id"));
+                            }
+                            Collections.sort(dayId);
+                            for (int i = 0; i < dayId.size(); i++) {
+                                int dayInt = dayId.get(i);
 
                                 if (date.format(dayFormat).equalsIgnoreCase(strDays[dayInt])){
                                     if (tv_day_left.getText().toString().isEmpty()){
@@ -355,6 +367,7 @@ public class BuatJanjiFragment extends Fragment {
                                     }
                                 }else{
                                     for (int j = 0; j < 7; j++) {
+                                        Log.e(TAG, (j+1)+". onResponse: "+date.plusDays(j+1).format(dayFormat)+" >< "+strDays[dayInt]);
                                         if (date.plusDays(j+1).format(dayFormat).equalsIgnoreCase(strDays[dayInt])){
                                             if (tv_day_left.getText().toString().isEmpty()){
                                                 left = date.plusDays(j+1).toEpochSecond(ZoneOffset.UTC);
@@ -384,7 +397,11 @@ public class BuatJanjiFragment extends Fragment {
                                                     String dayLeft = tv_day_left.getText().toString().trim();
                                                     String dateLeft = tv_date_left.getText().toString().trim();
                                                     if (left > right){
-                                                        tv_day_left.setText("Besok");
+                                                        if (date.plusDays(j+1).getDayOfWeek().getValue() == (date.getDayOfWeek().getValue()+1)){
+                                                            tv_day_left.setText("Besok");
+                                                        }else{
+                                                            tv_day_left.setText(strDays[date.plusDays(j+1).getDayOfWeek().getValue()]);
+                                                        }
                                                         tv_date_left.setText(date.plusDays(j+1).format(halfDateFormat));
                                                         tv_day_center.setText(dayLeft);
                                                         tv_date_center.setText(dateLeft);
@@ -432,6 +449,20 @@ public class BuatJanjiFragment extends Fragment {
                         ll_pick.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+                                ll_left.setBackground(getResources().getDrawable(R.drawable.bg_recycler_item));
+                                tv_day_left.setTextColor(getActivity().getColor(R.color.colorAccent));
+                                tv_date_left.setTextColor(getActivity().getColor(R.color.colorAccent));
+
+                                ll_center.setBackground(getResources().getDrawable(R.drawable.bg_recycler_item));
+                                tv_day_center.setTextColor(getActivity().getColor(R.color.colorAccent));
+                                tv_date_center.setTextColor(getActivity().getColor(R.color.colorAccent));
+
+                                ll_right.setBackground(getResources().getDrawable(R.drawable.bg_recycler_item));
+                                tv_day_right.setTextColor(getActivity().getColor(R.color.colorAccent));
+                                tv_date_right.setTextColor(getActivity().getColor(R.color.colorAccent));
+
+                                ll_pick.setBackground(getResources().getDrawable(R.drawable.bg_selected));
+
                                 showDialog(days);
                             }
                         });
@@ -448,7 +479,6 @@ public class BuatJanjiFragment extends Fragment {
 
                             }
                         });
-                    }else{
                     }
                 } catch (IOException | JSONException e) {
                     e.printStackTrace();
@@ -673,11 +703,17 @@ public class BuatJanjiFragment extends Fragment {
 
         datePickerDialog.setMinDate(calendar);
         datePickerDialog.setMaxDate(maxDate);
-
+        for (int i = 0; i < selectable.size(); i++) {
+            Log.e(TAG, "showDialog: "+selectable.get(i)[0]);
+        }
         for (Calendar loopDate = calendar; calendar.before(maxDate);calendar.add(Calendar.DATE,1),loopDate = calendar){
             int dayOfWeek = loopDate.get(Calendar.DAY_OF_WEEK);
+            Log.e(TAG, "dayOfWeek: "+(dayOfWeek-1));
+            if (dayOfWeek == 1){
+                dayOfWeek = 8;
+            }
             for (int i = 0; i < selectable.size(); i++) {
-                if ((dayOfWeek-1) == selectable.get(i)[0]){
+                if ((dayOfWeek-1) == (selectable.get(i)[0])){
                     selectableDays = new Calendar[1];
                     selectableDays[0] = loopDate;
                     datePickerDialog.setSelectableDays(selectableDays);
@@ -717,6 +753,9 @@ public class BuatJanjiFragment extends Fragment {
         ll_left.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                ll_pick.setBackground(getResources().getDrawable(R.drawable.bg_recycler_item));
+
                 ll_left.setBackground(getResources().getDrawable(R.drawable.bg_selected));
                 tv_day_left.setTextColor(getActivity().getColor(R.color.colorPrimary));
                 tv_date_left.setTextColor(getActivity().getColor(R.color.colorPrimary));
@@ -728,6 +767,7 @@ public class BuatJanjiFragment extends Fragment {
                 ll_right.setBackground(getResources().getDrawable(R.drawable.bg_recycler_item));
                 tv_day_right.setTextColor(getActivity().getColor(R.color.colorAccent));
                 tv_date_right.setTextColor(getActivity().getColor(R.color.colorAccent));
+
                 id=0;
                 timeString="";
                 btnNext.setEnabled(false);
@@ -912,6 +952,9 @@ public class BuatJanjiFragment extends Fragment {
         ll_center.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                ll_pick.setBackground(getResources().getDrawable(R.drawable.bg_recycler_item));
+
                 ll_center.setBackground(getResources().getDrawable(R.drawable.bg_selected));
                 tv_day_center.setTextColor(getActivity().getColor(R.color.colorPrimary));
                 tv_date_center.setTextColor(getActivity().getColor(R.color.colorPrimary));
@@ -1109,6 +1152,9 @@ public class BuatJanjiFragment extends Fragment {
         ll_right.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                ll_pick.setBackground(getResources().getDrawable(R.drawable.bg_recycler_item));
+
                 ll_right.setBackground(getResources().getDrawable(R.drawable.bg_selected));
                 tv_day_right.setTextColor(getActivity().getColor(R.color.colorPrimary));
                 tv_date_right.setTextColor(getActivity().getColor(R.color.colorPrimary));

@@ -50,6 +50,7 @@ public class MenungguKonfirmasiFragment extends Fragment {
     private String access, refresh;
     private ChipNavigationBar bottomBar;
     private Toolbar toolbar;
+    private boolean status;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -96,9 +97,20 @@ public class MenungguKonfirmasiFragment extends Fragment {
                                 }
 
                                 if (object.getInt("idStatus") == 1){
-                                    mList.add(new JanjiModel(object.getInt("id"),object.getInt("idPasien"),object.getInt("idDokter"),object.getInt("idConversation"),
-                                            idReport,object.getInt("day_id"),object.getInt("idStatus"),object.getString("tglJanji"),object.getString("detailJanji"),
-                                            filePath));
+                                    JSONArray transaksi = object.getJSONArray("transaksi");
+                                    for (int j = 0; j < transaksi.length(); j++) {
+                                        JSONObject transObj = transaksi.getJSONObject(j);
+                                        if (!transObj.getBoolean("is_paid")){
+                                            status = false;
+                                        }else{
+                                            status = true;
+                                        }
+                                    }
+                                    if (status){
+                                        mList.add(new JanjiModel(object.getInt("id"),object.getInt("idPasien"),object.getInt("idDokter"),object.getInt("idConversation"),
+                                                idReport,object.getInt("day_id"),object.getInt("idStatus"),object.getString("tglJanji"),object.getString("detailJanji"),
+                                                filePath));
+                                    }
                                 }
                             }
                             initRecyclerViewItem();

@@ -85,6 +85,7 @@ public class HomeFragment extends Fragment {
 
     private Socket socket;
     private String CHANNEL_MESSAGES;
+    private boolean status;
 
     private DateTimeFormatter day, dayFormat;
 
@@ -328,9 +329,20 @@ public class HomeFragment extends Fragment {
 
                                 if (object.getInt("idStatus") == 1){
                                     if (mList.size() < 3){
-                                        mList.add(new JanjiModel(object.getInt("id"),object.getInt("idPasien"),object.getInt("idDokter"),object.getInt("idConversation"),
-                                                idReport,object.getInt("day_id"),object.getInt("idStatus"),object.getString("tglJanji"),object.getString("detailJanji"),
-                                                filePath));
+                                        JSONArray transaksi = object.getJSONArray("transaksi");
+                                        for (int j = 0; j < transaksi.length(); j++) {
+                                            JSONObject transObj = transaksi.getJSONObject(j);
+                                            if (!transObj.getBoolean("is_paid")){
+                                                status = false;
+                                            }else{
+                                                status = true;
+                                            }
+                                        }
+                                        if (status){
+                                            mList.add(new JanjiModel(object.getInt("id"),object.getInt("idPasien"),object.getInt("idDokter"),object.getInt("idConversation"),
+                                                    idReport,object.getInt("day_id"),object.getInt("idStatus"),object.getString("tglJanji"),object.getString("detailJanji"),
+                                                    filePath));
+                                        }
                                     }
                                 }
                             }
