@@ -54,6 +54,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static android.content.ContentValues.TAG;
 import static com.example.medtek.network.RetrofitClient.BASE_URL;
 
 public class BuatJanjiFragment extends Fragment {
@@ -109,346 +110,389 @@ public class BuatJanjiFragment extends Fragment {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 try {
-                    String s = response.body().string();
-                    JSONObject object = new JSONObject(s);
-                    JSONObject obj = new JSONObject(object.getString("data"));
-                    if (new JSONArray(obj.getString("jadwal")).length() !=0){
-                        tv_dr_name.setText(obj.getString("name"));
-                        JSONObject specObj = new JSONObject(obj.getString("specialization"));
-                        String spec = specObj.getString("specialization");
-                        tv_dr_specialist.setText(spec);
-                        JSONObject rsObject = new JSONObject(obj.getString("hospital"));
-                        String rs_name = rsObject.getString("name");
-                        JSONObject alamatObject = new JSONObject(obj.getString("alamat"));
-                        String kelurahan = alamatObject.getString("kelurahan");
-                        String kecamatan = alamatObject.getString("kecamatan");
-                        String kota = alamatObject.getString("kota");
-                        String rs_loc = kecamatan+", "+kota;
-                        tv_dr_rs.setText(rs_name);
-                        tv_dr_rs_loc.setText(rs_loc);
-                        String path="";
-                        if (new JSONArray(obj.getString("image")).length() !=0){
-                            JSONArray jsonArray = new JSONArray(obj.getString("image"));
-                            path = BASE_URL+jsonArray.getJSONObject(0).getString("path");
-                        }else{
-                            path = BASE_URL+"/storage/Dokter.png";
-                        }
-
-                        JSONArray jsonArray = new JSONArray(obj.getString("jadwal"));
-                        String[] strDays = new String[] { "", "Senin", "Selasa","Rabu", "Kamis","Jumat", "Sabtu", "Minggu" };
-
-                        LocalDateTime date = LocalDateTime.now();
-                        Locale locale = new Locale("in", "ID");
-                        DateTimeFormatter dayFormat = DateTimeFormatter.ofPattern("EEEE",locale);
-                        DateTimeFormatter halfDateFormat = DateTimeFormatter.ofPattern("dd MMM",locale);
-
-                        if (jsonArray.length() == 1){
-                            int dayInt = Integer.parseInt(jsonArray.getJSONObject(0).getString("day_id"));
-                            for (int i = 0; i < 3; i++) {
-                                if (date.format(dayFormat).equalsIgnoreCase(strDays[dayInt])){
-                                    Log.e("GETJADWALDOKTER", date.format(dayFormat)+": "+strDays[dayInt]);
-                                    if (tv_day_left.getText().toString().isEmpty()){
-                                        tv_day_left.setText("Hari Ini");
-                                        tv_date_left.setText(date.format(halfDateFormat));
-                                    }else if (tv_day_center.getText().toString().isEmpty()){
-                                        tv_day_center.setText(strDays[dayInt]);
-                                        tv_date_center.setText(date.plusDays(7).format(halfDateFormat));
-                                    }else {
-                                        tv_day_right.setText(strDays[dayInt]);
-                                        tv_date_right.setText(date.plusDays(14).format(halfDateFormat));
+                    if (response.body() != null){
+                        if (response.isSuccessful()){
+                            String s = response.body().string();
+                            JSONObject object = new JSONObject(s);
+                            JSONObject obj = new JSONObject(object.getString("data"));
+                            if (new JSONArray(obj.getString("jadwal")).length() !=0){
+                                tv_dr_name.setText(obj.getString("name"));
+                                JSONObject specObj = new JSONObject(obj.getString("specialization"));
+                                String spec = specObj.getString("specialization");
+                                tv_dr_specialist.setText(spec);
+                                JSONObject rsObject = new JSONObject(obj.getString("hospital"));
+                                String rs_name = rsObject.getString("name");
+                                JSONObject alamatObject = new JSONObject(obj.getString("alamat"));
+                                String kelurahan = alamatObject.getString("kelurahan");
+                                String kecamatan = alamatObject.getString("kecamatan");
+                                String kota = alamatObject.getString("kota");
+                                String rs_loc = kecamatan+", "+kota;
+                                tv_dr_rs.setText(rs_name);
+                                tv_dr_rs_loc.setText(rs_loc);
+                                String path="";
+                                JSONArray jsonArrayImage = new JSONArray(obj.getString("image"));
+                                if (new JSONArray(obj.getString("image")).length() !=0){
+                                    for (int j = 0; j < jsonArrayImage.length(); j++) {
+                                        JSONObject imageObj = jsonArrayImage.getJSONObject(j);
+                                        if (imageObj.getInt("type_id") == 1) {
+                                            path = BASE_URL + imageObj.getString("path");
+                                            break;
+                                        }
                                     }
-                                }else{
-                                    for (int j = 0; j < 7; j++) {
-                                        if (date.plusDays(j+1).format(dayFormat).equalsIgnoreCase(strDays[dayInt])){
+                                } else {
+                                    path = BASE_URL+"/storage/Dokter.png";
+                                }
+
+                                JSONArray jsonArray = new JSONArray(obj.getString("jadwal"));
+                                String[] strDays = new String[] { "", "Senin", "Selasa","Rabu", "Kamis","Jumat", "Sabtu", "Minggu" };
+
+                                LocalDateTime date = LocalDateTime.now();
+                                Locale locale = new Locale("in", "ID");
+                                DateTimeFormatter dayFormat = DateTimeFormatter.ofPattern("EEEE",locale);
+                                DateTimeFormatter halfDateFormat = DateTimeFormatter.ofPattern("dd MMM",locale);
+                                if (jsonArray.length() == 1){
+                                    int dayInt = Integer.parseInt(jsonArray.getJSONObject(0).getString("day_id"));
+                                    for (int i = 0; i < 3; i++) {
+                                        if (date.format(dayFormat).equalsIgnoreCase(strDays[dayInt])){
+                                            Log.e("GETJADWALDOKTER", date.format(dayFormat)+": "+strDays[dayInt]);
                                             if (tv_day_left.getText().toString().isEmpty()){
-                                                if (j==0){
-                                                    tv_day_left.setText("Besok");
-                                                }else{
-                                                    tv_day_left.setText(strDays[dayInt]);
-                                                }
-                                                tv_date_left.setText(date.plusDays(j+1).format(halfDateFormat));
-                                            }else if (tv_day_center.getText().toString().isEmpty()){
-                                                tv_day_center.setText(strDays[dayInt]);
-                                                tv_date_center.setText(date.plusDays(j+8).format(halfDateFormat));
-                                            }else {
-                                                tv_day_right.setText(strDays[dayInt]);
-                                                tv_date_right.setText(date.plusDays(j+15).format(halfDateFormat));
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }else if(jsonArray.length() == 2){
-                            List<Integer> dayId = new ArrayList<>();
-                            dayId.add(Integer.parseInt(jsonArray.getJSONObject(0).getString("day_id")));
-                            dayId.add(Integer.parseInt(jsonArray.getJSONObject(1).getString("day_id")));
-                            Collections.sort(dayId);
-                            for (int i = 0; i < 3; i++) {
-                                if (i==2){
-                                    int dayInt = dayId.get(0);
-
-                                    String dayTemp = tv_day_center.getText().toString().trim();
-                                    String dateTemp = tv_date_center.getText().toString().trim();
-                                    if (dayTemp.equalsIgnoreCase(strDays[dayInt])){
-                                        dayInt = Integer.parseInt(jsonArray.getJSONObject(1).getString("day_id"));
-                                    }
-
-                                    if (date.format(dayFormat).equalsIgnoreCase(strDays[dayInt])){
-                                        if (tv_day_left.getText().toString().isEmpty()){
-                                            tv_day_left.setText("Hari Ini");
-                                            tv_date_left.setText(date.format(halfDateFormat));
-                                        }else if (tv_day_center.getText().toString().isEmpty()){
-                                            tv_day_center.setText(strDays[dayInt]);
-                                            tv_date_center.setText(date.plusDays(7).format(halfDateFormat));
-                                        }else {
-                                            tv_day_right.setText(strDays[dayInt]);
-                                            tv_date_right.setText(date.plusDays(7).format(halfDateFormat));
-                                        }
-                                        Log.e("GETJADWALDOKTER",date.format(halfDateFormat)+"; "+date.plusDays(7).format(halfDateFormat)+"; "+date.plusDays(14).format(halfDateFormat));
-                                    }else{
-                                        for (int j = 7; j < 14; j++) {
-                                            if (date.plusDays(j+1).format(dayFormat).equalsIgnoreCase(strDays[dayInt])){
-                                                if (tv_day_center.getText().toString().isEmpty()){
-                                                    center = date.plusDays(j+1).toEpochSecond(ZoneOffset.UTC);
-                                                    tv_day_center.setText(strDays[dayInt]);
-                                                    tv_date_center.setText(date.plusDays(j+1).format(halfDateFormat));
-                                                }else {
-                                                    right = date.plusDays(j+1).toEpochSecond(ZoneOffset.UTC);
-//                                                if (Integer.parseInt(tv_date_center.getText().toString().split(" ")[0]) > Integer.parseInt(date.plusDays(j+1).format(halfDateFormat).split(" ")[0])){
-                                                    if (center > right){
-                                                        String dayValue = tv_day_center.getText().toString().trim();
-                                                        String dateValue = tv_date_center.getText().toString().trim();
-                                                        tv_day_center.setText(strDays[dayInt]);
-                                                        tv_date_center.setText(date.plusDays(j+1).format(halfDateFormat));
-                                                        tv_day_right.setText(dayValue);
-                                                        tv_date_right.setText(dateValue);
-                                                    }else{
-                                                        tv_day_right.setText(strDays[dayInt]);
-                                                        tv_date_right.setText(date.plusDays(j+1).format(halfDateFormat));
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }else{
-                                    int dayInt = dayId.get(i);
-
-                                    if (date.format(dayFormat).equalsIgnoreCase(strDays[dayInt])){
-                                        if (tv_day_left.getText().toString().isEmpty()){
-                                            tv_day_left.setText("Hari Ini");
-                                            tv_date_left.setText(date.format(halfDateFormat));
-                                        }else if (tv_day_center.getText().toString().isEmpty()){
-                                            String dayValue = tv_day_left.getText().toString().trim();
-                                            String dateValue = tv_date_left.getText().toString().trim();
-                                            tv_day_left.setText("Hari Ini");
-                                            tv_date_left.setText(date.format(halfDateFormat));
-                                            tv_day_center.setText(dayValue);
-                                            tv_date_center.setText(dateValue);
-                                        }else {
-                                            tv_day_right.setText(strDays[dayInt]);
-                                            tv_date_right.setText(date.plusDays(7).format(halfDateFormat));
-                                        }
-                                        Log.e("GETJADWALDOKTER",date.format(halfDateFormat)+"; "+date.plusDays(7).format(halfDateFormat)+"; "+date.plusDays(14).format(halfDateFormat));
-                                    }else{
-                                        for (int j = 0; j < 7; j++) {
-                                            if (date.plusDays(j+1).format(dayFormat).equalsIgnoreCase(strDays[dayInt])){
-                                                if (tv_day_left.getText().toString().isEmpty()){
-                                                    left = date.plusDays(j+1).toEpochSecond(ZoneOffset.UTC);
-                                                    if ((j+1) == 1){
-                                                        tv_day_left.setText("Besok");
-                                                    }else{
-                                                        tv_day_left.setText(strDays[dayInt]);
-                                                    }
-                                                    tv_date_left.setText(date.plusDays(j+1).format(halfDateFormat));
-                                                }else if (tv_day_center.getText().toString().isEmpty()){
-                                                    center = date.plusDays(j+1).toEpochSecond(ZoneOffset.UTC);
-
-                                                    if (left > center){
-                                                        String dayValue = tv_day_left.getText().toString().trim();
-                                                        String dateValue = tv_date_left.getText().toString().trim();
-//                                                        tv_day_left.setText(strDays[dayInt]);
-                                                        tv_day_left.setText("Hari Ini");
-                                                        tv_date_left.setText(date.plusDays(j+1).format(halfDateFormat));
-                                                        tv_day_center.setText(dayValue);
-                                                        tv_date_center.setText(dateValue);
-                                                    }else{
-                                                        if ((j+1) == 1){
-                                                            tv_day_center.setText("Besok");
-                                                        }else{
-                                                            tv_day_center.setText(strDays[dayInt]);
-                                                        }
-                                                        tv_date_center.setText(date.plusDays(j+1).format(halfDateFormat));
-                                                    }
-                                                }else {
-                                                    right = date.plusDays(j+1).toEpochSecond(ZoneOffset.UTC);
-//                                                if (Integer.parseInt(tv_date_center.getText().toString().split(" ")[0]) > Integer.parseInt(date.plusDays(j+1).format(halfDateFormat).split(" ")[0])){
-                                                    if (center > right){
-                                                        String dayValue = tv_day_center.getText().toString().trim();
-                                                        String dateValue = tv_date_center.getText().toString().trim();
-                                                        tv_day_center.setText(strDays[dayInt]);
-                                                        tv_date_center.setText(date.plusDays(j+1).format(halfDateFormat));
-                                                        tv_day_right.setText(dayValue);
-                                                        tv_date_right.setText(dateValue);
-                                                    }else{
-                                                        tv_day_right.setText(strDays[dayInt]);
-                                                        tv_date_right.setText(date.plusDays(j+1).format(halfDateFormat));
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }else{
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                int dayInt = Integer.parseInt(jsonArray.getJSONObject(i).getString("day_id"));
-
-                                if (date.format(dayFormat).equalsIgnoreCase(strDays[dayInt])){
-                                    if (tv_day_left.getText().toString().isEmpty()){
-                                        left = date.toEpochSecond(ZoneOffset.UTC);
-                                        tv_day_left.setText("Hari Ini");
-                                        tv_date_left.setText(date.format(halfDateFormat));
-                                    }else if (tv_day_center.getText().toString().isEmpty()){
-                                        center = date.toEpochSecond(ZoneOffset.UTC);
-                                        if (left > center){
-                                            String dayValue = tv_day_left.getText().toString().trim();
-                                            String dateValue = tv_date_left.getText().toString().trim();
-//                                            tv_day_left.setText(strDays[dayInt]);
-                                            tv_day_left.setText("Hari Ini");
-                                            tv_date_left.setText(date.format(halfDateFormat));
-                                            tv_day_center.setText(dayValue);
-                                            tv_date_center.setText(dateValue);
-                                            long temp = left;
-                                            left = center;
-                                            center = temp;
-                                        }else{
-                                            tv_day_center.setText(strDays[dayInt]);
-                                            tv_date_center.setText(date.format(halfDateFormat));
-                                        }
-                                    }else {
-                                        right = date.toEpochSecond(ZoneOffset.UTC);
-                                        tv_day_right.setText(strDays[dayInt]);
-                                        tv_date_right.setText(date.format(halfDateFormat));
-                                        if (center > right){
-                                            String dayCenter = tv_day_center.getText().toString().trim();
-                                            String dateCenter = tv_date_center.getText().toString().trim();
-                                            String dayLeft = tv_day_left.getText().toString().trim();
-                                            String dateLeft = tv_date_left.getText().toString().trim();
-                                            if (left > right){
                                                 tv_day_left.setText("Hari Ini");
                                                 tv_date_left.setText(date.format(halfDateFormat));
-                                                tv_day_center.setText(dayLeft);
-                                                tv_date_center.setText(dateLeft);
-                                                tv_day_right.setText(dayCenter);
-                                                tv_date_right.setText(dateCenter);
-                                            }else{
+                                            }else if (tv_day_center.getText().toString().isEmpty()){
                                                 tv_day_center.setText(strDays[dayInt]);
-                                                tv_date_center.setText(date.format(halfDateFormat));
-                                                tv_day_right.setText(dayCenter);
-                                                tv_date_right.setText(dateCenter);
+                                                tv_date_center.setText(date.plusDays(7).format(halfDateFormat));
+                                            }else {
+                                                tv_day_right.setText(strDays[dayInt]);
+                                                tv_date_right.setText(date.plusDays(14).format(halfDateFormat));
+                                            }
+                                        }else{
+                                            for (int j = 0; j < 7; j++) {
+                                                if (date.plusDays(j+1).format(dayFormat).equalsIgnoreCase(strDays[dayInt])){
+                                                    if (tv_day_left.getText().toString().isEmpty()){
+                                                        if (j==0){
+                                                            tv_day_left.setText("Besok");
+                                                        }else{
+                                                            tv_day_left.setText(strDays[dayInt]);
+                                                        }
+                                                        tv_date_left.setText(date.plusDays(j+1).format(halfDateFormat));
+                                                    }else if (tv_day_center.getText().toString().isEmpty()){
+                                                        tv_day_center.setText(strDays[dayInt]);
+                                                        tv_date_center.setText(date.plusDays(j+8).format(halfDateFormat));
+                                                    }else {
+                                                        tv_day_right.setText(strDays[dayInt]);
+                                                        tv_date_right.setText(date.plusDays(j+15).format(halfDateFormat));
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }else if(jsonArray.length() == 2){
+                                    List<Integer> dayId = new ArrayList<>();
+                                    dayId.add(jsonArray.getJSONObject(0).getInt("day_id"));
+                                    dayId.add(jsonArray.getJSONObject(1).getInt("day_id"));
+                                    Collections.sort(dayId);
+                                    for (int i = 0; i < 3; i++) {
+                                        if (i==2){
+                                            int dayInt = dayId.get(0);
+
+                                            String dayTemp = tv_day_center.getText().toString().trim();
+                                            String dateTemp = tv_date_center.getText().toString().trim();
+                                            if (dayTemp.equalsIgnoreCase(strDays[dayInt])){
+                                                dayInt = Integer.parseInt(jsonArray.getJSONObject(1).getString("day_id"));
                                             }
 
+                                            if (date.format(dayFormat).equalsIgnoreCase(strDays[dayInt])){
+                                                if (tv_day_left.getText().toString().isEmpty()){
+                                                    tv_day_left.setText("Hari Ini");
+                                                    tv_date_left.setText(date.format(halfDateFormat));
+                                                }else if (tv_day_center.getText().toString().isEmpty()){
+                                                    tv_day_center.setText(strDays[dayInt]);
+                                                    tv_date_center.setText(date.plusDays(7).format(halfDateFormat));
+                                                }else {
+                                                    tv_day_right.setText(strDays[dayInt]);
+                                                    tv_date_right.setText(date.plusDays(7).format(halfDateFormat));
+                                                }
+                                                Log.e("GETJADWALDOKTER",date.format(halfDateFormat)+"; "+date.plusDays(7).format(halfDateFormat)+"; "+date.plusDays(14).format(halfDateFormat));
+                                            }else{
+                                                for (int j = 7; j < 14; j++) {
+                                                    if (date.plusDays(j+1).format(dayFormat).equalsIgnoreCase(strDays[dayInt])){
+                                                        if (tv_day_center.getText().toString().isEmpty()){
+                                                            center = date.plusDays(j+1).toEpochSecond(ZoneOffset.UTC);
+                                                            tv_day_center.setText(strDays[dayInt]);
+                                                            tv_date_center.setText(date.plusDays(j+1).format(halfDateFormat));
+                                                        }else {
+                                                            right = date.plusDays(j+1).toEpochSecond(ZoneOffset.UTC);
+//                                                if (Integer.parseInt(tv_date_center.getText().toString().split(" ")[0]) > Integer.parseInt(date.plusDays(j+1).format(halfDateFormat).split(" ")[0])){
+                                                            if (center > right){
+                                                                String dayValue = tv_day_center.getText().toString().trim();
+                                                                String dateValue = tv_date_center.getText().toString().trim();
+                                                                tv_day_center.setText(strDays[dayInt]);
+                                                                tv_date_center.setText(date.plusDays(j+1).format(halfDateFormat));
+                                                                tv_day_right.setText(dayValue);
+                                                                tv_date_right.setText(dateValue);
+                                                            }else{
+                                                                tv_day_right.setText(strDays[dayInt]);
+                                                                tv_date_right.setText(date.plusDays(j+1).format(halfDateFormat));
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }else{
-                                            tv_day_right.setText(strDays[dayInt]);
-                                            tv_date_right.setText(date.format(halfDateFormat));
+                                            int dayInt = dayId.get(i);
+
+                                            if (date.format(dayFormat).equalsIgnoreCase(strDays[dayInt])){
+                                                if (tv_day_left.getText().toString().isEmpty()){
+                                                    tv_day_left.setText("Hari Ini");
+                                                    tv_date_left.setText(date.format(halfDateFormat));
+                                                }else if (tv_day_center.getText().toString().isEmpty()){
+                                                    String dayValue = tv_day_left.getText().toString().trim();
+                                                    String dateValue = tv_date_left.getText().toString().trim();
+                                                    tv_day_left.setText("Hari Ini");
+                                                    tv_date_left.setText(date.format(halfDateFormat));
+                                                    tv_day_center.setText(dayValue);
+                                                    tv_date_center.setText(dateValue);
+                                                }else {
+                                                    tv_day_right.setText(strDays[dayInt]);
+                                                    tv_date_right.setText(date.plusDays(7).format(halfDateFormat));
+                                                }
+                                                Log.e("GETJADWALDOKTER",date.format(halfDateFormat)+"; "+date.plusDays(7).format(halfDateFormat)+"; "+date.plusDays(14).format(halfDateFormat));
+                                            }else{
+                                                for (int j = 0; j < 7; j++) {
+                                                    if (date.plusDays(j+1).format(dayFormat).equalsIgnoreCase(strDays[dayInt])){
+                                                        if (tv_day_left.getText().toString().isEmpty()){
+                                                            left = date.plusDays(j+1).toEpochSecond(ZoneOffset.UTC);
+                                                            if ((j+1) == 1){
+                                                                tv_day_left.setText("Besok");
+                                                            }else{
+                                                                tv_day_left.setText(strDays[dayInt]);
+                                                            }
+                                                            tv_date_left.setText(date.plusDays(j+1).format(halfDateFormat));
+                                                        }else if (tv_day_center.getText().toString().isEmpty()){
+                                                            center = date.plusDays(j+1).toEpochSecond(ZoneOffset.UTC);
+
+                                                            if (left > center){
+                                                                String dayValue = tv_day_left.getText().toString().trim();
+                                                                String dateValue = tv_date_left.getText().toString().trim();
+//                                                        tv_day_left.setText(strDays[dayInt]);
+                                                                tv_day_left.setText("Hari Ini");
+                                                                tv_date_left.setText(date.plusDays(j+1).format(halfDateFormat));
+                                                                tv_day_center.setText(dayValue);
+                                                                tv_date_center.setText(dateValue);
+                                                            }else{
+                                                                if ((j+1) == 1){
+                                                                    tv_day_center.setText("Besok");
+                                                                }else{
+                                                                    tv_day_center.setText(strDays[dayInt]);
+                                                                }
+                                                                tv_date_center.setText(date.plusDays(j+1).format(halfDateFormat));
+                                                            }
+                                                        }else {
+                                                            right = date.plusDays(j+1).toEpochSecond(ZoneOffset.UTC);
+//                                                if (Integer.parseInt(tv_date_center.getText().toString().split(" ")[0]) > Integer.parseInt(date.plusDays(j+1).format(halfDateFormat).split(" ")[0])){
+                                                            if (center > right){
+                                                                String dayValue = tv_day_center.getText().toString().trim();
+                                                                String dateValue = tv_date_center.getText().toString().trim();
+                                                                tv_day_center.setText(strDays[dayInt]);
+                                                                tv_date_center.setText(date.plusDays(j+1).format(halfDateFormat));
+                                                                tv_day_right.setText(dayValue);
+                                                                tv_date_right.setText(dateValue);
+                                                            }else{
+                                                                tv_day_right.setText(strDays[dayInt]);
+                                                                tv_date_right.setText(date.plusDays(j+1).format(halfDateFormat));
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }else{
-                                    for (int j = 0; j < 7; j++) {
-                                        if (date.plusDays(j+1).format(dayFormat).equalsIgnoreCase(strDays[dayInt])){
+
+                                    List<Integer> dayId = new ArrayList<>();
+                                    for (int i = 0; i < jsonArray.length(); i++) {
+                                        dayId.add(jsonArray.getJSONObject(i).getInt("day_id"));
+                                    }
+                                    Collections.sort(dayId);
+                                    for (int i = 0; i < dayId.size(); i++) {
+                                        int dayInt = dayId.get(i);
+
+                                        if (date.format(dayFormat).equalsIgnoreCase(strDays[dayInt])){
                                             if (tv_day_left.getText().toString().isEmpty()){
-                                                left = date.plusDays(j+1).toEpochSecond(ZoneOffset.UTC);
-                                                tv_day_left.setText(strDays[dayInt]);
-                                                tv_date_left.setText(date.plusDays(j+1).format(halfDateFormat));
+                                                left = date.toEpochSecond(ZoneOffset.UTC);
+                                                tv_day_left.setText("Hari Ini");
+                                                tv_date_left.setText(date.format(halfDateFormat));
                                             }else if (tv_day_center.getText().toString().isEmpty()){
-                                                center = date.plusDays(j+1).toEpochSecond(ZoneOffset.UTC);
+                                                center = date.toEpochSecond(ZoneOffset.UTC);
                                                 if (left > center){
                                                     String dayValue = tv_day_left.getText().toString().trim();
                                                     String dateValue = tv_date_left.getText().toString().trim();
-                                                    tv_day_left.setText(strDays[dayInt]);
-                                                    tv_date_left.setText(date.plusDays(j+1).format(halfDateFormat));
+//                                            tv_day_left.setText(strDays[dayInt]);
+                                                    tv_day_left.setText("Hari Ini");
+                                                    tv_date_left.setText(date.format(halfDateFormat));
                                                     tv_day_center.setText(dayValue);
                                                     tv_date_center.setText(dateValue);
+                                                    long temp = left;
+                                                    left = center;
+                                                    center = temp;
                                                 }else{
                                                     tv_day_center.setText(strDays[dayInt]);
-                                                    tv_date_center.setText(date.plusDays(j+1).format(halfDateFormat));
+                                                    tv_date_center.setText(date.format(halfDateFormat));
                                                 }
                                             }else {
-                                                right = date.plusDays(j+1).toEpochSecond(ZoneOffset.UTC);
+                                                right = date.toEpochSecond(ZoneOffset.UTC);
                                                 tv_day_right.setText(strDays[dayInt]);
-                                                tv_date_right.setText(date.plusDays(j+1).format(halfDateFormat));
-                                                Log.e("COMPARINGRANDC",center+" : "+right);
+                                                tv_date_right.setText(date.format(halfDateFormat));
                                                 if (center > right){
                                                     String dayCenter = tv_day_center.getText().toString().trim();
                                                     String dateCenter = tv_date_center.getText().toString().trim();
                                                     String dayLeft = tv_day_left.getText().toString().trim();
                                                     String dateLeft = tv_date_left.getText().toString().trim();
+                                                    long tempLeft = left;
+                                                    long tempCenter = center;
                                                     if (left > right){
-                                                        tv_day_left.setText("Besok");
-                                                        tv_date_left.setText(date.plusDays(j+1).format(halfDateFormat));
-                                                        tv_day_center.setText(dayLeft);
-                                                        tv_date_center.setText(dateLeft);
-                                                        tv_day_right.setText(dayCenter);
-                                                        tv_date_right.setText(dateCenter);
-                                                        long tempL = left;
-                                                        long tempC = center;
                                                         left = right;
-                                                        center = tempL;
-                                                        right = tempC;
-                                                    }else{
-                                                        tv_day_center.setText(strDays[dayInt]);
-                                                        tv_date_center.setText(date.plusDays(j+1).format(halfDateFormat));
-                                                        tv_day_right.setText(dayCenter);
-                                                        tv_date_right.setText(dateCenter);
-                                                        long tempC = center;
-                                                        center = right;
-                                                        right = tempC;
+                                                        tv_day_left.setText("Hari Ini");
+                                                        tv_date_left.setText(date.format(halfDateFormat));
+                                                        if (left > center){
+                                                            right = tempLeft;
+                                                            tv_day_right.setText(dayLeft);
+                                                            tv_date_right.setText(dateLeft);
+                                                        }else{
+                                                            center = tempLeft;
+                                                            right = tempCenter;
+                                                            tv_day_center.setText(dayLeft);
+                                                            tv_date_center.setText(dateLeft);
+                                                            tv_day_right.setText(dayCenter);
+                                                            tv_date_right.setText(dateCenter);
+                                                        }
                                                     }
 
                                                 }else{
                                                     tv_day_right.setText(strDays[dayInt]);
-                                                    tv_date_right.setText(date.plusDays(j+1).format(halfDateFormat));
+                                                    tv_date_right.setText(date.format(halfDateFormat));
+                                                }
+                                            }
+                                        }else{
+                                            for (int j = 0; j < 7; j++) {
+                                                Log.e(TAG, (j+1)+". onResponse: "+date.plusDays(j+1).format(dayFormat)+" >< "+strDays[dayInt]);
+                                                if (date.plusDays(j+1).format(dayFormat).equalsIgnoreCase(strDays[dayInt])){
+                                                    if (tv_day_left.getText().toString().isEmpty()){
+                                                        left = date.plusDays(j+1).toEpochSecond(ZoneOffset.UTC);
+                                                        tv_day_left.setText(strDays[dayInt]);
+                                                        tv_date_left.setText(date.plusDays(j+1).format(halfDateFormat));
+                                                    }else if (tv_day_center.getText().toString().isEmpty()){
+                                                        center = date.plusDays(j+1).toEpochSecond(ZoneOffset.UTC);
+                                                        if (left > center){
+                                                            String dayValue = tv_day_left.getText().toString().trim();
+                                                            String dateValue = tv_date_left.getText().toString().trim();
+                                                            tv_day_left.setText(strDays[dayInt]);
+                                                            tv_date_left.setText(date.plusDays(j+1).format(halfDateFormat));
+                                                            tv_day_center.setText(dayValue);
+                                                            tv_date_center.setText(dateValue);
+                                                        }else{
+                                                            tv_day_center.setText(strDays[dayInt]);
+                                                            tv_date_center.setText(date.plusDays(j+1).format(halfDateFormat));
+                                                        }
+                                                    }else {
+                                                        right = date.plusDays(j+1).toEpochSecond(ZoneOffset.UTC);
+                                                        tv_day_right.setText(strDays[dayInt]);
+                                                        tv_date_right.setText(date.plusDays(j+1).format(halfDateFormat));
+                                                        Log.e("COMPARINGRANDC",center+" : "+right);
+                                                        if (center > right){
+                                                            String dayCenter = tv_day_center.getText().toString().trim();
+                                                            String dateCenter = tv_date_center.getText().toString().trim();
+                                                            String dayLeft = tv_day_left.getText().toString().trim();
+                                                            String dateLeft = tv_date_left.getText().toString().trim();
+                                                            if (left > right){
+                                                                if (date.plusDays(j+1).getDayOfWeek().getValue() == (date.getDayOfWeek().getValue()+1)){
+                                                                    tv_day_left.setText("Besok");
+                                                                }else{
+                                                                    tv_day_left.setText(strDays[date.plusDays(j+1).getDayOfWeek().getValue()]);
+                                                                }
+                                                                tv_date_left.setText(date.plusDays(j+1).format(halfDateFormat));
+                                                                tv_day_center.setText(dayLeft);
+                                                                tv_date_center.setText(dateLeft);
+                                                                tv_day_right.setText(dayCenter);
+                                                                tv_date_right.setText(dateCenter);
+                                                                long tempL = left;
+                                                                long tempC = center;
+                                                                left = right;
+                                                                center = tempL;
+                                                                right = tempC;
+                                                            }else{
+                                                                tv_day_center.setText(strDays[dayInt]);
+                                                                tv_date_center.setText(date.plusDays(j+1).format(halfDateFormat));
+                                                                tv_day_right.setText(dayCenter);
+                                                                tv_date_right.setText(dateCenter);
+                                                                long tempC = center;
+                                                                center = right;
+                                                                right = tempC;
+                                                            }
+
+                                                        }else{
+                                                            tv_day_right.setText(strDays[dayInt]);
+                                                            tv_date_right.setText(date.plusDays(j+1).format(halfDateFormat));
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
                                     }
                                 }
+
+                                days.clear();
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    int[] jadwal = new int[3];
+                                    jadwal[0] = Integer.parseInt(jsonArray.getJSONObject(i).getString("day_id"));
+                                    String startHour = jsonArray.getJSONObject(i).getString("startHour");
+                                    int sHour = Integer.parseInt(startHour.split(":")[0]);
+                                    String endHour = jsonArray.getJSONObject(i).getString("endHour");
+                                    int eHour = Integer.parseInt(endHour.split(":")[0]);
+                                    jadwal[1] = sHour;
+                                    jadwal[2] = eHour;
+                                    days.add(jadwal);
+                                }
+
+                                ll_pick.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        ll_left.setBackground(getResources().getDrawable(R.drawable.bg_recycler_item));
+                                        tv_day_left.setTextColor(getActivity().getColor(R.color.colorAccent));
+                                        tv_date_left.setTextColor(getActivity().getColor(R.color.colorAccent));
+
+                                        ll_center.setBackground(getResources().getDrawable(R.drawable.bg_recycler_item));
+                                        tv_day_center.setTextColor(getActivity().getColor(R.color.colorAccent));
+                                        tv_date_center.setTextColor(getActivity().getColor(R.color.colorAccent));
+
+                                        ll_right.setBackground(getResources().getDrawable(R.drawable.bg_recycler_item));
+                                        tv_day_right.setTextColor(getActivity().getColor(R.color.colorAccent));
+                                        tv_date_right.setTextColor(getActivity().getColor(R.color.colorAccent));
+
+                                        ll_pick.setBackground(getResources().getDrawable(R.drawable.bg_selected));
+
+                                        showDialog(days);
+                                    }
+                                });
+                                Picasso.get().load(path).into(circleImageView, new com.squareup.picasso.Callback() {
+                                    @Override
+                                    public void onSuccess() {
+                                        rl_content.setVisibility(View.VISIBLE);
+                                        ll_loader.setVisibility(View.GONE);
+                                        shimmerFrameLayout.startShimmer();
+                                    }
+
+                                    @Override
+                                    public void onError(Exception e) {
+
+                                    }
+                                });
                             }
+                        }else{
+                            call.clone().enqueue(this);
                         }
-
-                        days.clear();
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            int[] jadwal = new int[3];
-                            jadwal[0] = Integer.parseInt(jsonArray.getJSONObject(i).getString("day_id"));
-                            String startHour = jsonArray.getJSONObject(i).getString("startHour");
-                            int sHour = Integer.parseInt(startHour.split(":")[0]);
-                            String endHour = jsonArray.getJSONObject(i).getString("endHour");
-                            int eHour = Integer.parseInt(endHour.split(":")[0]);
-                            jadwal[1] = sHour;
-                            jadwal[2] = eHour;
-                            days.add(jadwal);
-                        }
-
-                        ll_pick.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                showDialog(days);
-                            }
-                        });
-                        Picasso.get().load(path).into(circleImageView, new com.squareup.picasso.Callback() {
-                            @Override
-                            public void onSuccess() {
-                                rl_content.setVisibility(View.VISIBLE);
-                                ll_loader.setVisibility(View.GONE);
-                                shimmerFrameLayout.startShimmer();
-                            }
-
-                            @Override
-                            public void onError(Exception e) {
-
-                            }
-                        });
                     }else{
+                        call.clone().enqueue(this);
                     }
                 } catch (IOException | JSONException e) {
                     e.printStackTrace();
@@ -457,7 +501,7 @@ public class BuatJanjiFragment extends Fragment {
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                call.clone().enqueue(this);
             }
         });
 
@@ -465,7 +509,7 @@ public class BuatJanjiFragment extends Fragment {
             @Override
             public void onClick(View v) {
 //                Toasty.success(getActivity(),"Tanggal: "+day+", "+date+", Jam: "+timeString,Toasty.LENGTH_LONG).show();
-                DetailPasienFragment detailPasienFragment = new DetailPasienFragment();
+                Fragment detailPasienFragment = new DetailPasienFragment();
 
                 Locale locale = new Locale("in", "ID");
                 DateTimeFormatter dayFormat = DateTimeFormatter.ofPattern("dd MMM yyyy",locale).withLocale(locale);
@@ -673,11 +717,17 @@ public class BuatJanjiFragment extends Fragment {
 
         datePickerDialog.setMinDate(calendar);
         datePickerDialog.setMaxDate(maxDate);
-
+        for (int i = 0; i < selectable.size(); i++) {
+            Log.e(TAG, "showDialog: "+selectable.get(i)[0]);
+        }
         for (Calendar loopDate = calendar; calendar.before(maxDate);calendar.add(Calendar.DATE,1),loopDate = calendar){
             int dayOfWeek = loopDate.get(Calendar.DAY_OF_WEEK);
+            Log.e(TAG, "dayOfWeek: "+(dayOfWeek-1));
+            if (dayOfWeek == 1){
+                dayOfWeek = 8;
+            }
             for (int i = 0; i < selectable.size(); i++) {
-                if ((dayOfWeek-1) == selectable.get(i)[0]){
+                if ((dayOfWeek-1) == (selectable.get(i)[0])){
                     selectableDays = new Calendar[1];
                     selectableDays[0] = loopDate;
                     datePickerDialog.setSelectableDays(selectableDays);
@@ -717,6 +767,9 @@ public class BuatJanjiFragment extends Fragment {
         ll_left.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                ll_pick.setBackground(getResources().getDrawable(R.drawable.bg_recycler_item));
+
                 ll_left.setBackground(getResources().getDrawable(R.drawable.bg_selected));
                 tv_day_left.setTextColor(getActivity().getColor(R.color.colorPrimary));
                 tv_date_left.setTextColor(getActivity().getColor(R.color.colorPrimary));
@@ -728,6 +781,7 @@ public class BuatJanjiFragment extends Fragment {
                 ll_right.setBackground(getResources().getDrawable(R.drawable.bg_recycler_item));
                 tv_day_right.setTextColor(getActivity().getColor(R.color.colorAccent));
                 tv_date_right.setTextColor(getActivity().getColor(R.color.colorAccent));
+
                 id=0;
                 timeString="";
                 btnNext.setEnabled(false);
@@ -912,6 +966,9 @@ public class BuatJanjiFragment extends Fragment {
         ll_center.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                ll_pick.setBackground(getResources().getDrawable(R.drawable.bg_recycler_item));
+
                 ll_center.setBackground(getResources().getDrawable(R.drawable.bg_selected));
                 tv_day_center.setTextColor(getActivity().getColor(R.color.colorPrimary));
                 tv_date_center.setTextColor(getActivity().getColor(R.color.colorPrimary));
@@ -1109,6 +1166,9 @@ public class BuatJanjiFragment extends Fragment {
         ll_right.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                ll_pick.setBackground(getResources().getDrawable(R.drawable.bg_recycler_item));
+
                 ll_right.setBackground(getResources().getDrawable(R.drawable.bg_selected));
                 tv_day_right.setTextColor(getActivity().getColor(R.color.colorPrimary));
                 tv_date_right.setTextColor(getActivity().getColor(R.color.colorPrimary));
@@ -1591,7 +1651,7 @@ public class BuatJanjiFragment extends Fragment {
 
     private void setFragment(Fragment fragment,String TAG) {
         FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frameFragment,fragment).addToBackStack(TAG);
+        fragmentTransaction.replace(R.id.frameFragment,fragment,TAG).addToBackStack(TAG);
         fragmentTransaction.commit();
     }
 

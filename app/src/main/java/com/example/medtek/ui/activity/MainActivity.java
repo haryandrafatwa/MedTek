@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
                 if (searchData(LOGIN_STATUS) || searchData(ACCESS_TOKEN)) {
                     if (fragment != null){
                         fragmentManager = getSupportFragmentManager();
-                        fragmentManager.beginTransaction().replace(R.id.frameFragment, fragment).addToBackStack(TAG).commit();
+                        fragmentManager.beginTransaction().replace(R.id.frameFragment, fragment,TAG).commit();
                     }
                 }
             });

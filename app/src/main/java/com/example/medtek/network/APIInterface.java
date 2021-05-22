@@ -240,11 +240,10 @@ public interface APIInterface {
     );
 
     @Headers({"Accept:application/json"})
-    @POST("payment")
+    @POST("payment/wallet")
     @FormUrlEncoded
     Call<ResponseBody> bayar(
             @Header("Authorization") String token,
-            @Field("idTransaksi") int idTransaksi,
             @Field("idJanji") int idJanji
     );
 
