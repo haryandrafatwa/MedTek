@@ -185,9 +185,15 @@ public class DetailPasienFragment extends Fragment {
                                         tv_dr_rs.setText(rs_name);
                                         tv_dr_rs_loc.setText(rs_loc);
                                         String path="";
+                                        JSONArray jsonArrayImage = new JSONArray(obj.getString("image"));
                                         if (new JSONArray(obj.getString("image")).length() !=0){
-                                            JSONArray jsonArray = new JSONArray(obj.getString("image"));
-                                            path = BASE_URL+jsonArray.getJSONObject(0).getString("path");
+                                            for (int j = 0; j < jsonArrayImage.length(); j++) {
+                                                JSONObject imageObj = jsonArrayImage.getJSONObject(j);
+                                                if (imageObj.getInt("type_id") == 1) {
+                                                    path = BASE_URL + imageObj.getString("path");
+                                                    break;
+                                                }
+                                            }
                                         }else{
                                             path = BASE_URL+"/storage/Dokter.png";
                                         }
@@ -278,64 +284,6 @@ public class DetailPasienFragment extends Fragment {
                 callKTP.clone().enqueue(this);
             }
         });
-
-        /*Call<ResponseBody> getUserDetail = RetrofitClient.getInstance().getApi().getUser("Bearer "+access);
-        getUserDetail.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                try {
-                    if (response.isSuccessful()){
-                        if (response.body() != null){
-                            String s = response.body().string();
-                            JSONObject object = new JSONObject(s);
-                            et_fullname.setText(object.getString("name"));
-                            nama = object.getString("name");
-                            email = object.getString("email");
-                            if (!object.isNull("berat_badan")){
-                                bb = object.getInt("berat_badan");
-                                et_bb.setText(bb+"");
-                            }
-                            if (!object.isNull("tinggi_badan")){
-                                tb = object.getInt("tinggi_badan");
-                                et_tb.setText(tb+"");
-                            }
-                            if (!object.isNull("lingkar_tubuh")){
-                                lp = object.getInt("lingkar_tubuh");
-                                et_lp.setText(lp+"");
-                            }
-                            JSONObject walletObj = object.getJSONObject("wallet");
-                            balance = walletObj.getInt("balance");
-                            if (!object.getString("tglLahir").equalsIgnoreCase("null")){
-                                Locale locale = new Locale("in", "ID");
-                                DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd MMMM YYYY",locale);
-                                LocalDate localDate = LocalDate.parse(object.getString("tglLahir"));
-                                et_dob.setText(localDate.format(dateFormat));
-                            }
-                            JSONArray imageArray = object.getJSONArray("image");
-                            if (imageArray.length() != 0 ){
-                                for (int i = 0; i < imageArray.length(); i++) {
-                                    JSONObject imageObj = imageArray.getJSONObject(i);
-                                    if (imageObj.getInt("type_id") == 2){
-                                        Picasso.get().load(BASE_URL+imageObj.getString("path")).into(riv_id_card);
-                                        Log.e("TAG", "onResponse: "+ BASE_URL+imageObj.getString("path"));
-                                    }
-                                }
-                            }
-                            rl_content.setVisibility(View.VISIBLE);
-                            ll_loader.setVisibility(View.GONE);
-                            shimmerFrameLayout.stopShimmer();
-                        }
-                    }
-                } catch (IOException | JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-            }
-        });*/
 
         rl_id_card.setOnClickListener(new View.OnClickListener() {
             @Override
