@@ -288,6 +288,7 @@
     <string name="wrong_password_desc">Password yang anda masukkan salah, mohon masukkan kembali password yang sesuai.</string>
     <string name="error_title">Error</string>
     <string name="error_null_desc">Mohon maaf, terjadi kesalahan pada sistem.</string>
+    <string name="error_null_desc_with_cause">Mohon maaf, terjadi kesalahan pada sistem. \n __cause__</string>
     <string name="error_busy_desc">Mohon maaf, sistem sedang sibuk saat ini.</string>
     <string name="error_no_conn_desc">Mohon maaf, periksa koneksi internet kamu kembali.</string>
     <string name="error_wrong_role_desc">Mohon maaf, email ini tidak terdaftar sebagai akun &lt;b>__role__&lt;/b>.</string>
@@ -301,7 +302,7 @@
     <string name="tv_recent_chats_title">Recent Chats</string>
     <string name="active_chats_title">Active Chats</string>
     <string name="no_chats_desc">Tidak ada histori chat saat ini.</string>
-    <string name="no_schedule_desc">Anda tidak mempunyai jadwal konsultasi saat ini.\nUntuk membuat janji,</string>
+    <string name="no_schedule_desc">Anda tidak mempunyai jadwal konsultasi saat ini</string>
     <string name="klik_disini">klik disini.</string>
     <string name="amount_patient">__amount__ orang</string>
     <string name="incoming_call">Incoming</string>

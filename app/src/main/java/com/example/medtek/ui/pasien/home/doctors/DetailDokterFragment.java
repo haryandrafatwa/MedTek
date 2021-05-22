@@ -19,6 +19,7 @@ import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
@@ -30,29 +31,23 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.medtek.R;
 import com.example.medtek.model.pasien.FeedbackModel;
 import com.example.medtek.network.RetrofitClient;
-import com.example.medtek.ui.activity.MainActivity;
 import com.example.medtek.ui.activity.WelcomePageActivity;
-import com.example.medtek.ui.pasien.home.HomeFragment;
 import com.example.medtek.ui.pasien.home.appointment.BuatJanjiFragment;
 import com.example.medtek.ui.pasien.home.appointment.CheckoutAppointmentFragment;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.gson.JsonObject;
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.threeten.bp.LocalDate;
-import org.threeten.bp.format.DateTimeFormatter;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
@@ -68,7 +63,6 @@ import static com.example.medtek.utils.PropertyUtil.LOGIN_STATUS;
 import static com.example.medtek.utils.PropertyUtil.REFRESH_TOKEN;
 import static com.example.medtek.utils.PropertyUtil.getData;
 import static com.example.medtek.utils.PropertyUtil.searchData;
-import static com.example.medtek.utils.Utils.TAG;
 
 public class DetailDokterFragment extends Fragment {
 
@@ -99,6 +93,8 @@ public class DetailDokterFragment extends Fragment {
     private String access = "", refresh = "", nama, nama_dokter, detail_janji, date, time, snapToken;
     private int harga, balance, id_doc, idJanji;
 
+    private boolean isOnAttach = false;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,7 +109,9 @@ public class DetailDokterFragment extends Fragment {
     public void onStart() {
         super.onStart();
         initialize();
-        loadData(getActivity());
+        if (isOnAttach) {
+            loadData(getActivity());
+        }
 
         Bundle bundle = getArguments();
         int id_dokter = bundle.getInt("id_doc");
@@ -125,242 +123,64 @@ public class DetailDokterFragment extends Fragment {
                 try {
                     if (response.body()!=null){
                         if (response.isSuccessful()){
-                            String s = response.body().string();
-                            JSONObject object = new JSONObject(s);
-                            JSONObject obj = new JSONObject(object.getString("data"));
-                            tv_dr_name.setText(obj.getString("name"));
-                            JSONObject specObj = new JSONObject(obj.getString("specialization"));
-                            String spec = specObj.getString("specialization");
-                            tv_dr_spec.setText(spec);
-                            tv_dr_exp.setText((obj.isNull("lama_kerja") ? "-" : obj.getString("lama_kerja"))+" "+getActivity().getResources().getString(R.string.tahun)+" "+getActivity().getResources().getString(R.string.exp));
-                            JSONObject rsObject = new JSONObject(obj.getString("hospital"));
-                            String rs_name = rsObject.getString("name");
-                            JSONObject alamatObject = new JSONObject(obj.getString("alamat"));
-                            String kelurahan = alamatObject.getString("kelurahan");
-                            String kota = alamatObject.getString("kota");
-                            String rs_loc = kelurahan+", "+kota;
-                            tv_dr_rs.setText(rs_name);
-                            tv_dr_rs_loc.setText(rs_loc);
-                            tv_dr_grd.setText(obj.getString("lulusan"));
-                            String path="";
+                            if (isOnAttach) {
+                                String s = response.body().string();
+                                JSONObject object = new JSONObject(s);
+                                JSONObject obj = new JSONObject(object.getString("data"));
+                                tv_dr_name.setText(obj.getString("name"));
+                                JSONObject specObj = new JSONObject(obj.getString("specialization"));
+                                String spec = specObj.getString("specialization");
+                                tv_dr_spec.setText(spec);
+                                tv_dr_exp.setText((obj.isNull("lama_kerja") ? "-" : obj.getString("lama_kerja"))+" "+getActivity().getResources().getString(R.string.tahun)+" "+getActivity().getResources().getString(R.string.exp));
+                                JSONObject rsObject = new JSONObject(obj.getString("hospital"));
+                                String rs_name = rsObject.getString("name");
+                                JSONObject alamatObject = new JSONObject(obj.getString("alamat"));
+                                String kelurahan = alamatObject.getString("kelurahan");
+                                String kota = alamatObject.getString("kota");
+                                String rs_loc = kelurahan+", "+kota;
+                                tv_dr_rs.setText(rs_name);
+                                tv_dr_rs_loc.setText(rs_loc);
+                                tv_dr_grd.setText(obj.getString("lulusan"));
+                                String path="";
 
-                            JSONArray jsonArrayImage = new JSONArray(obj.getString("image"));
-                            if (new JSONArray(obj.getString("image")).length() !=0){
-                                for (int j = 0; j < jsonArrayImage.length(); j++) {
-                                    JSONObject imageObj = jsonArrayImage.getJSONObject(j);
-                                    if (imageObj.getInt("type_id") == 1) {
-                                        path = BASE_URL + imageObj.getString("path");
-                                        break;
+                                JSONArray jsonArrayImage = new JSONArray(obj.getString("image"));
+                                if (new JSONArray(obj.getString("image")).length() !=0){
+                                    for (int j = 0; j < jsonArrayImage.length(); j++) {
+                                        JSONObject imageObj = jsonArrayImage.getJSONObject(j);
+                                        if (imageObj.getInt("type_id") == 1) {
+                                            path = BASE_URL + imageObj.getString("path");
+                                            break;
+                                        }
                                     }
-                                }
-                            } else {
-                                path = BASE_URL+"/storage/Dokter.png";
-                            }
-
-                            initRecyclerViewItem();
-                            if (new JSONArray(obj.getString("feedback")).length() !=0){
-                                JSONArray jsonArray = new JSONArray(obj.getString("feedback"));
-                                tv_dr_tot_rev.setText("("+jsonArray.length()+" "+getActivity().getResources().getString(R.string.review)+")");
-                                float rating = 0;
-                                mList.clear();
-                                for (int i = 0; i < jsonArray.length(); i++) {
-                                    JSONObject feedbackObj = jsonArray.getJSONObject(i);
-                                    float rat = Float.valueOf(feedbackObj.getString("rating"));
-                                    rating+=rat;
-                                    int id = feedbackObj.getInt("id");
-                                    String message = feedbackObj.getString("message");
-                                    String post_date = feedbackObj.getString("created_at");
-                                    Call<ResponseBody> callReviewer = RetrofitClient.getInstance().getApi().getFeedbackId(id);
-                                    callReviewer.enqueue(new Callback<ResponseBody>() {
-                                        @Override
-                                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                            try {
-                                                String s = response.body().string();
-                                                JSONObject feedbackObj = new JSONObject(s);
-                                                JSONObject dataObj = feedbackObj.getJSONObject("data");
-                                                JSONObject pasienObj = dataObj.getJSONObject("pasien");
-                                                String name = pasienObj.getString("name");
-                                                mList.add(new FeedbackModel(id,name,message,post_date,"",rat));
-                                                mAdapter.notifyDataSetChanged();
-                                            } catch (IOException | JSONException e) {
-                                                e.printStackTrace();
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                            callReviewer.clone().enqueue(this);
-                                        }
-                                    });
-                                }
-                                ratingBar.setRating(rating/jsonArray.length());
-                                tv_dr_rat.setText(rating/jsonArray.length()+"/5.0");
-                            }else{
-                                ratingBar.setRating(0);
-                                tv_dr_rat.setText(0+"/5.0");
-                                tv_dr_tot_rev.setText(getActivity().getResources().getString(R.string.blmadaulasan));
-                            }
-
-                            Picasso.get().load(path).into(civ_dokter, new com.squareup.picasso.Callback() {
-                                @Override
-                                public void onSuccess() {
-                                    rl_content.setVisibility(View.VISIBLE);
-                                    rl_loader.setVisibility(View.GONE);
-                                    shimmerFrameLayout.stopShimmer();
+                                } else {
+                                    path = BASE_URL+"/storage/Dokter.png";
                                 }
 
-                                @Override
-                                public void onError(Exception e) {
-                                    e.printStackTrace();
-                                }
-                            });
-
-                            ib_rs_loc.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getActivity(), R.style.BottomSheetDialogTheme);
-                                    View bottomSheetView = LayoutInflater.from(getActivity().getApplicationContext()).inflate(R.layout.bottom_sheet_rs_detail, (RelativeLayout) getActivity().findViewById(R.id.bottomSheetRSDetail));
-                                    TextView tv_dr_rs = bottomSheetView.findViewById(R.id.tv_dr_rs);
-                                    TextView tv_dr_rs_loc = bottomSheetView.findViewById(R.id.tv_dr_rs_loc);
-                                    tv_dr_rs.setText(rs_name);
-                                    tv_dr_rs_loc.setText(rs_loc);
-                                    bottomSheetView.findViewById(R.id.tv_direct_me).setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
-                                                    Uri.parse("google.navigation:q="+rs_name));
-                                            startActivity(intent);
-                                        }
-                                    });
-                                    bottomSheetDialog.setContentView(bottomSheetView);
-                                    bottomSheetDialog.show();
-                                }
-                            });
-
-                            btnBuatJanji.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    progressDialog.show();
-                                    if (!access.equals("") && !refresh.equals("")) {
-                                        Call<ResponseBody> getUser = RetrofitClient.getInstance().getApi().getUser("Bearer "+access);
-                                        getUser.enqueue(new Callback<ResponseBody>() {
+                                initRecyclerViewItem();
+                                if (new JSONArray(obj.getString("feedback")).length() !=0){
+                                    JSONArray jsonArray = new JSONArray(obj.getString("feedback"));
+                                    tv_dr_tot_rev.setText("("+jsonArray.length()+" "+getActivity().getResources().getString(R.string.review)+")");
+                                    float rating = 0;
+                                    mList.clear();
+                                    for (int i = 0; i < jsonArray.length(); i++) {
+                                        JSONObject feedbackObj = jsonArray.getJSONObject(i);
+                                        float rat = Float.valueOf(feedbackObj.getString("rating"));
+                                        rating+=rat;
+                                        int id = feedbackObj.getInt("id");
+                                        String message = feedbackObj.getString("message");
+                                        String post_date = feedbackObj.getString("created_at");
+                                        Call<ResponseBody> callReviewer = RetrofitClient.getInstance().getApi().getFeedbackId(id);
+                                        callReviewer.enqueue(new Callback<ResponseBody>() {
                                             @Override
                                             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                                try{
-                                                    if (response.isSuccessful()){
-                                                        if (response.body() != null){
-                                                            String s = response.body().string();
-                                                            JSONObject user = new JSONObject(s);
-                                                            nama = user.getString("name");
-                                                            JSONObject walletObj = user.getJSONObject("wallet");
-                                                            balance = walletObj.getInt("balance");
-                                                            if (!user.isNull("email_verified_at")){
-                                                        /*BuatJanjiFragment buatJanjiFragment = new BuatJanjiFragment();
-                                                        Bundle bundle = new Bundle();
-                                                        bundle.putInt("id_dokter",id_dokter);
-                                                        buatJanjiFragment.setArguments(bundle);
-                                                        setFragment(buatJanjiFragment,"FragmentBuatJanji");*/
-                                                                Call<ResponseBody> getUserJanji = RetrofitClient.getInstance().getApi().getUserJanji("Bearer "+access);
-                                                                getUserJanji.enqueue(new Callback<ResponseBody>() {
-                                                                    @Override
-                                                                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                                                        try {
-                                                                            if (response.isSuccessful()) {
-                                                                                if (response.body() != null) {
-                                                                                    String s = response.body().string();
-                                                                                    JSONObject object = new JSONObject(s);
-                                                                                    JSONArray objArr = object.getJSONArray("data");
-                                                                                    if (objArr.length() > 0){
-                                                                                        List<JSONObject> jsonValues = new ArrayList<JSONObject>();
-                                                                                        for (int i = 0; i < objArr.length(); i++) {
-                                                                                            jsonValues.add(objArr.getJSONObject(i));
-                                                                                        }
-                                                                                        Collections.sort(jsonValues, new Comparator<JSONObject>() {
-                                                                                            @Override
-                                                                                            public int compare(JSONObject o1, JSONObject o2) {
-                                                                                                int idA = 0;
-                                                                                                int idB = 0;
-                                                                                                try {
-                                                                                                    idA = o1.getInt("id");
-                                                                                                    idB = o2.getInt("id");
-                                                                                                } catch (JSONException e) {
-                                                                                                    e.printStackTrace();
-                                                                                                }
-                                                                                                return -Integer.compare(idA,idB);
-                                                                                            }
-                                                                                        });
-                                                                                        JSONArray sortedJanji = new JSONArray();
-                                                                                        for (int i = 0; i < objArr.length(); i++) {
-                                                                                            sortedJanji.put(jsonValues.get(i));
-                                                                                        }
-                                                                                        JSONObject janjiObj = sortedJanji.getJSONObject(0);
-                                                                                        JSONObject doctObj = janjiObj.getJSONObject("dokter");
-                                                                                        JSONArray transArr = janjiObj.getJSONArray("transaksi");
-                                                                                        idJanji = janjiObj.getInt("id");
-                                                                                        for (int j = 0; j < transArr.length(); j++) {
-                                                                                            JSONObject transObj = transArr.getJSONObject(j);
-                                                                                            if (!transObj.getBoolean("is_paid")){
-                                                                                                setStatus(false);
-                                                                                                nama_dokter = doctObj.getString("name");
-                                                                                                id_doc = doctObj.getInt("id");
-                                                                                                harga = doctObj.getInt("harga");
-                                                                                                detail_janji = janjiObj.getString("detailJanji");
-                                                                                                date = janjiObj.getString("tglJanji");
-                                                                                                snapToken = transObj.getString("snapToken");
-                                                                                            }else{
-                                                                                                setStatus(true);
-                                                                                            }
-                                                                                        }
-                                                                                    }else{
-                                                                                        setStatus(true);
-                                                                                    }
-                                                                                    if (!status){
-                                                                                        bundle.putString("nama",nama);
-                                                                                        bundle.putString("nama_dokter",nama_dokter);
-                                                                                        bundle.putInt("harga",harga);
-                                                                                        bundle.putInt("balance",balance);
-                                                                                        bundle.putInt("id_dokter",id_doc);
-                                                                                        bundle.putInt("id_janji",idJanji);
-                                                                                        bundle.putString("date",date);
-                                                                                        bundle.putString("snapToken",snapToken);
-                                                                                        bundle.putString("lastFragment","DetailDokter");
-
-                                                                                        bundle.putString("time",detail_janji.split("Pukul")[1].split("\n")[0]);
-                                                                                        bundle.putString("detailJanji",detail_janji);
-                                                                                        progressDialog.dismiss();
-                                                                                        Log.e(TAG, "onResponse: idJanji ->"+idJanji);
-                                                                                        CheckoutAppointmentFragment checkoutAppointmentFragment = new CheckoutAppointmentFragment();
-                                                                                        checkoutAppointmentFragment.setArguments(bundle);
-                                                                                        setFragment(checkoutAppointmentFragment,"FragmentCheckoutAppointment");
-                                                                                    }else{
-                                                                                        progressDialog.dismiss();
-                                                                                        Fragment buatJanjiFragment = new BuatJanjiFragment();
-                                                                                        Bundle bundle = new Bundle();
-                                                                                        bundle.putInt("id_dokter",id_dokter);
-                                                                                        buatJanjiFragment.setArguments(bundle);
-                                                                                        setFragment(buatJanjiFragment,"FragmentBuatJanji");
-                                                                                    }
-                                                                                }else{
-                                                                                    getUserJanji.clone().enqueue(this);
-                                                                                }
-                                                                            }else{
-                                                                                getUserJanji.clone().enqueue(this);
-                                                                            }
-                                                                        } catch (IOException|JSONException e) {
-                                                                            e.printStackTrace();
-                                                                        }
-                                                                    }
-
-                                                                    @Override
-                                                                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                                                        getUserJanji.clone().enqueue(this);
-                                                                    }
-                                                                });
-                                                            }else{
-                                                                Toasty.error(getActivity(),"Silahkan verifikasi akun terlebih dahulu!").show();
-                                                            }
-                                                        }
-                                                    }
+                                                try {
+                                                    String s = response.body().string();
+                                                    JSONObject feedbackObj = new JSONObject(s);
+                                                    JSONObject dataObj = feedbackObj.getJSONObject("data");
+                                                    JSONObject pasienObj = dataObj.getJSONObject("pasien");
+                                                    String name = pasienObj.getString("name");
+                                                    mList.add(new FeedbackModel(id,name,message,post_date,"",rat));
+                                                    mAdapter.notifyDataSetChanged();
                                                 } catch (IOException | JSONException e) {
                                                     e.printStackTrace();
                                                 }
@@ -368,14 +188,194 @@ public class DetailDokterFragment extends Fragment {
 
                                             @Override
                                             public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                                                callReviewer.clone().enqueue(this);
                                             }
                                         });
-                                    } else {
-                                        navigateWelcome();
                                     }
+                                    ratingBar.setRating(rating/jsonArray.length());
+                                    tv_dr_rat.setText(rating/jsonArray.length()+"/5.0");
+                                }else{
+                                    ratingBar.setRating(0);
+                                    tv_dr_rat.setText(0+"/5.0");
+                                    tv_dr_tot_rev.setText(getActivity().getResources().getString(R.string.blmadaulasan));
                                 }
-                            });
+
+                                Picasso.get().load(path).into(civ_dokter, new com.squareup.picasso.Callback() {
+                                    @Override
+                                    public void onSuccess() {
+                                        rl_content.setVisibility(View.VISIBLE);
+                                        rl_loader.setVisibility(View.GONE);
+                                        shimmerFrameLayout.stopShimmer();
+                                    }
+
+                                    @Override
+                                    public void onError(Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                });
+
+                                ib_rs_loc.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getActivity(), R.style.BottomSheetDialogTheme);
+                                        View bottomSheetView = LayoutInflater.from(getActivity().getApplicationContext()).inflate(R.layout.bottom_sheet_rs_detail, (RelativeLayout) getActivity().findViewById(R.id.bottomSheetRSDetail));
+                                        TextView tv_dr_rs = bottomSheetView.findViewById(R.id.tv_dr_rs);
+                                        TextView tv_dr_rs_loc = bottomSheetView.findViewById(R.id.tv_dr_rs_loc);
+                                        tv_dr_rs.setText(rs_name);
+                                        tv_dr_rs_loc.setText(rs_loc);
+                                        bottomSheetView.findViewById(R.id.tv_direct_me).setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                                                        Uri.parse("google.navigation:q="+rs_name));
+                                                startActivity(intent);
+                                            }
+                                        });
+                                        bottomSheetDialog.setContentView(bottomSheetView);
+                                        bottomSheetDialog.show();
+                                    }
+                                });
+
+                                btnBuatJanji.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        if (!access.equals("") && !refresh.equals("")) {
+                                            progressDialog.show();
+                                            Call<ResponseBody> getUser = RetrofitClient.getInstance().getApi().getUser("Bearer "+access);
+                                            getUser.enqueue(new Callback<ResponseBody>() {
+                                                @Override
+                                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                                    try{
+                                                        if (response.isSuccessful()){
+                                                            if (response.body() != null){
+                                                                String s = response.body().string();
+                                                                JSONObject user = new JSONObject(s);
+                                                                nama = user.getString("name");
+                                                                JSONObject walletObj = user.getJSONObject("wallet");
+                                                                balance = walletObj.getInt("balance");
+                                                                if (!user.isNull("email_verified_at")){
+                                                        /*BuatJanjiFragment buatJanjiFragment = new BuatJanjiFragment();
+                                                        Bundle bundle = new Bundle();
+                                                        bundle.putInt("id_dokter",id_dokter);
+                                                        buatJanjiFragment.setArguments(bundle);
+                                                        setFragment(buatJanjiFragment,"FragmentBuatJanji");*/
+                                                                    Call<ResponseBody> getUserJanji = RetrofitClient.getInstance().getApi().getUserJanji("Bearer "+access);
+                                                                    getUserJanji.enqueue(new Callback<ResponseBody>() {
+                                                                        @Override
+                                                                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                                                            try {
+                                                                                if (response.isSuccessful()) {
+                                                                                    if (response.body() != null) {
+                                                                                        String s = response.body().string();
+                                                                                        JSONObject object = new JSONObject(s);
+                                                                                        JSONArray objArr = object.getJSONArray("data");
+                                                                                        if (objArr.length() > 0){
+                                                                                            List<JSONObject> jsonValues = new ArrayList<JSONObject>();
+                                                                                            for (int i = 0; i < objArr.length(); i++) {
+                                                                                                jsonValues.add(objArr.getJSONObject(i));
+                                                                                            }
+                                                                                            Collections.sort(jsonValues, new Comparator<JSONObject>() {
+                                                                                                @Override
+                                                                                                public int compare(JSONObject o1, JSONObject o2) {
+                                                                                                    int idA = 0;
+                                                                                                    int idB = 0;
+                                                                                                    try {
+                                                                                                        idA = o1.getInt("id");
+                                                                                                        idB = o2.getInt("id");
+                                                                                                    } catch (JSONException e) {
+                                                                                                        e.printStackTrace();
+                                                                                                    }
+                                                                                                    return -Integer.compare(idA,idB);
+                                                                                                }
+                                                                                            });
+                                                                                            JSONArray sortedJanji = new JSONArray();
+                                                                                            for (int i = 0; i < objArr.length(); i++) {
+                                                                                                sortedJanji.put(jsonValues.get(i));
+                                                                                            }
+                                                                                            JSONObject janjiObj = sortedJanji.getJSONObject(0);
+                                                                                            JSONObject doctObj = janjiObj.getJSONObject("dokter");
+                                                                                            JSONArray transArr = janjiObj.getJSONArray("transaksi");
+                                                                                            idJanji = janjiObj.getInt("id");
+                                                                                            for (int j = 0; j < transArr.length(); j++) {
+                                                                                                JSONObject transObj = transArr.getJSONObject(j);
+                                                                                                if (!transObj.getBoolean("is_paid")){
+                                                                                                    setStatus(false);
+                                                                                                    nama_dokter = doctObj.getString("name");
+                                                                                                    id_doc = doctObj.getInt("id");
+                                                                                                    harga = doctObj.getInt("harga");
+                                                                                                    detail_janji = janjiObj.getString("detailJanji");
+                                                                                                    date = janjiObj.getString("tglJanji");
+                                                                                                    snapToken = transObj.getString("snapToken");
+                                                                                                }else{
+                                                                                                    setStatus(true);
+                                                                                                }
+                                                                                            }
+                                                                                        }else{
+                                                                                            setStatus(true);
+                                                                                        }
+                                                                                        if (!status){
+                                                                                            bundle.putString("nama",nama);
+                                                                                            bundle.putString("nama_dokter",nama_dokter);
+                                                                                            bundle.putInt("harga",harga);
+                                                                                            bundle.putInt("balance",balance);
+                                                                                            bundle.putInt("id_dokter",id_doc);
+                                                                                            bundle.putInt("id_janji",idJanji);
+                                                                                            bundle.putString("date",date);
+                                                                                            bundle.putString("snapToken",snapToken);
+                                                                                            bundle.putString("lastFragment","DetailDokter");
+
+                                                                                            bundle.putString("time",detail_janji.split("Pukul")[1].split("\n")[0]);
+                                                                                            bundle.putString("detailJanji",detail_janji);
+                                                                                            progressDialog.dismiss();
+                                                                                            Log.e(TAG, "onResponse: idJanji ->"+idJanji);
+                                                                                            CheckoutAppointmentFragment checkoutAppointmentFragment = new CheckoutAppointmentFragment();
+                                                                                            checkoutAppointmentFragment.setArguments(bundle);
+                                                                                            setFragment(checkoutAppointmentFragment,"FragmentCheckoutAppointment");
+                                                                                        }else{
+                                                                                            progressDialog.dismiss();
+                                                                                            Fragment buatJanjiFragment = new BuatJanjiFragment();
+                                                                                            Bundle bundle = new Bundle();
+                                                                                            bundle.putInt("id_dokter",id_dokter);
+                                                                                            buatJanjiFragment.setArguments(bundle);
+                                                                                            setFragment(buatJanjiFragment,"FragmentBuatJanji");
+                                                                                        }
+                                                                                    }else{
+                                                                                        getUserJanji.clone().enqueue(this);
+                                                                                    }
+                                                                                }else{
+                                                                                    getUserJanji.clone().enqueue(this);
+                                                                                }
+                                                                            } catch (IOException|JSONException e) {
+                                                                                e.printStackTrace();
+                                                                            }
+                                                                        }
+
+                                                                        @Override
+                                                                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                                                            getUserJanji.clone().enqueue(this);
+                                                                        }
+                                                                    });
+                                                                }else{
+                                                                    Toasty.error(getActivity(),"Silahkan verifikasi akun terlebih dahulu!").show();
+                                                                }
+                                                            }
+                                                        }
+                                                    } catch (IOException | JSONException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                                                }
+                                            });
+                                        } else {
+                                            navigateWelcome();
+                                        }
+                                    }
+                                });
+                            }
                         }else{
                             call.clone().enqueue(this);
                         }
@@ -491,5 +491,17 @@ public class DetailDokterFragment extends Fragment {
 
     public void setStatus(boolean status) {
         this.status = status;
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        isOnAttach = true;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        isOnAttach = false;
     }
 }

@@ -90,7 +90,6 @@ import pl.aprilapps.easyphotopicker.MediaFile;
 import pl.aprilapps.easyphotopicker.MediaSource;
 
 import static com.example.medtek.BuildConfig.BASE_URL;
-import static com.example.medtek.constant.APPConstant.ERROR_NULL;
 import static com.example.medtek.constant.APPConstant.EVENT_RESPONSE_ON_CALL;
 import static com.example.medtek.constant.APPConstant.LOGIN_PASIEN;
 import static com.example.medtek.constant.APPConstant.MESSAGE_HANGUP_RESPONSE_VOICE_CALL;
@@ -237,9 +236,6 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
         imagesCountNow = 0;
         count = 0;
         isEndChats = false;
-
-        // FOR TEMP
-//        SocketUtil.getInstance().setChannelVideoChat(chatsModel.getIdJanji());
     }
 
     //Register EventBus
@@ -305,7 +301,6 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
                     JanjiModel janjiUpdate = (JanjiModel) newEvent;
                     Log.d(TAG, "idStatus: " + janjiUpdate.getJanji().getIdStatus());
                     if (janjiUpdate.getJanji().getIdStatus() == SUDAH_SELESAI) {
-//                        FOR TEMP
                         endSession();
                     }
                 } else if (newEvent instanceof String) {
@@ -969,7 +964,7 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
             @Override
             public void onError(Throwable t) {
                 Log.d(TAG(ChatRoomActivity.class), "Error");
-                showToastyError(ChatRoomActivity.this, ERROR_NULL);
+                showToastyError(ChatRoomActivity.this, t.getMessage());
             }
 
             @Override
@@ -1048,7 +1043,7 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
             @Override
             public void onError(Throwable t) {
                 Log.d(TAG(ChatRoomActivity.class), "Error");
-                showToastyError(ChatRoomActivity.this, ERROR_NULL);
+                showToastyError(ChatRoomActivity.this, t.getMessage());
             }
 
             @Override
@@ -1154,7 +1149,7 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
             @Override
             public void onError(Throwable t) {
                 Log.d(TAG(ChatRoomActivity.class), "Error");
-                showToastyError(ChatRoomActivity.this, ERROR_NULL);
+                showToastyError(ChatRoomActivity.this, t.getMessage());
             }
 
             @Override
@@ -1252,7 +1247,7 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
             @Override
             public void onError(Throwable t) {
                 Log.d(TAG(ChatRoomActivity.class), "Error");
-                showToastyError(ChatRoomActivity.this, ERROR_NULL);
+                showToastyError(ChatRoomActivity.this, t.getMessage());
             }
 
             @Override

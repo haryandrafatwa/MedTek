@@ -34,7 +34,6 @@ import com.example.medtek.model.MessageModel;
 import com.example.medtek.model.ScheduleDoctorModel;
 import com.example.medtek.model.UserModel;
 import com.example.medtek.model.state.ChatType;
-import com.example.medtek.network.base.BaseResponse;
 import com.example.medtek.network.response.GetInfoUserResponse;
 import com.example.medtek.network.socket.SocketUtil;
 import com.example.medtek.ui.activity.ChatRoomActivity;
@@ -62,7 +61,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import static com.example.medtek.App.ID_CHANNEL_MESSAGE;
-import static com.example.medtek.constant.APPConstant.ERROR_NULL;
 import static com.example.medtek.constant.APPConstant.IMAGE_AVATAR;
 import static com.example.medtek.constant.APPConstant.MESSAGE_REQUEST_VIDEO_CALL;
 import static com.example.medtek.constant.APPConstant.MESSAGE_REQUEST_VOICE_CALL;
@@ -112,36 +110,15 @@ public class ChatFragment extends BaseFragment {
     }
 
     @Override
-    protected void setupData(@Nullable Bundle savedInstanceState) {
-        // FOR TEMP
-//        if (isPatient()) {
-//            ArrayList<ChatsModel.Chat> chats = new ArrayList<>();
-//            ChatsModel newActiveChatsModel = new ChatsModel(468, chats);
-//            newActiveChatsModel.setIdSender(92);
-//            newActiveChatsModel.setSenderName("gabs");
-//            newActiveChatsModel.setSenderAvatar("/storage/Dokter.png");
-//            newActiveChatsModel.setIdJanji(466);
-//            setData(ACTIVE_CHAT, newActiveChatsModel);
-//        } else {
-//            ArrayList<ChatsModel.Chat> chats = new ArrayList<>();
-//            ChatsModel newActiveChatsModel = new ChatsModel(468, chats);
-//            newActiveChatsModel.setIdSender(91);
-//            newActiveChatsModel.setSenderName("Gabriel");
-//            newActiveChatsModel.setSenderAvatar("/storage/avatar/91/1618050914.jpeg");
-//            newActiveChatsModel.setIdJanji(466);
-//            setData(ACTIVE_CHAT, newActiveChatsModel);
-//        }
-//
-    }
+    protected void setupData(@Nullable Bundle savedInstanceState) {}
 
     public void initState() {
         sizeOfAppointment = 0;
         sizeOfChats = 0;
         sizeOfAppointmentNow = 0;
         sizeOfChatsNow = 0;
-        // FOR TEMP
-        isAppointmentDone = false /* false */;
-        isChatsDone = false /* false */;
+        isAppointmentDone = false;
+        isChatsDone = false;
     }
 
     @Override
@@ -156,7 +133,7 @@ public class ChatFragment extends BaseFragment {
         chatsHistoryAdapter = new ChatsListAdapter(getContext(), false);
         chatsActiveAdapter = new ChatsListAdapter(getContext(), true);
         doStart();
-        setMakeSchedule();
+//        setMakeSchedule();
         binding.rlSearch.setOnClickListener(v -> {
             ((MainActivity) getActivity()).navigateToSearchActivity();
         });
@@ -407,33 +384,6 @@ public class ChatFragment extends BaseFragment {
         ChatRoomActivity.navigate(getActivity(), model, reqCode);
     }
 
-    public void startChat(int idJanji) {
-        ((MainActivity) getActivity()).appointmentController.getJanjiStart(valueOf(idJanji), new BaseCallback<BaseResponse>() {
-            @Override
-            public void onSuccess(BaseResponse result) {
-                Log.d(TAG, "Chat Start");
-            }
-
-            @Override
-            public void onError(Throwable t) {
-                Log.d(TAG(ChatFragment.class), "Error");
-                showToastyError(getActivity(), ERROR_NULL);
-            }
-
-            @Override
-            public void onNoConnection() {
-                Log.d(TAG(ChatFragment.class), "No Connection");
-                showToastyError(getActivity(), NO_CONNECTION);
-            }
-
-            @Override
-            public void onServerBroken() {
-                Log.d(TAG(ChatFragment.class), "Server Broken");
-                showToastyError(getActivity(), SERVER_BROKEN);
-            }
-        });
-    }
-
     @Override
     protected void destroyView() {
         binding = null;
@@ -613,7 +563,7 @@ public class ChatFragment extends BaseFragment {
                     @Override
                     public void onError(Throwable t) {
                         Log.d(TAG(ChatFragment.class), "Error");
-                        showToastyError(getActivity(), ERROR_NULL);
+                        showToastyError(getActivity(), t.getMessage());
                     }
 
                     @Override
@@ -636,7 +586,6 @@ public class ChatFragment extends BaseFragment {
         initState();
         isLoading();
         binding.swipeRefresh.setRefreshing(false);
-//      FOR TEMP
         getDataSchedule();
         if (searchData(ACTIVE_CHAT)) {
             setupDataRVActiveChats();

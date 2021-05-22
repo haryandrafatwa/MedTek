@@ -39,7 +39,6 @@ import org.joda.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.medtek.constant.APPConstant.ERROR_NULL;
 import static com.example.medtek.constant.APPConstant.IMAGE_AVATAR;
 import static com.example.medtek.constant.APPConstant.NO_CONNECTION;
 import static com.example.medtek.constant.APPConstant.SERVER_BROKEN;
@@ -260,7 +259,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onError(Throwable t) {
                 Log.d(TAG(MainActivity.class), "Error");
-                showToastyError(MainActivity.this, ERROR_NULL);
+                showToastyError(MainActivity.this, t.getMessage());
             }
         });
     }
@@ -274,27 +273,29 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSuccess(GetJanjiListResponse result) {
                 List<AppointmentModel> appointmentModels = new ArrayList<>(result.getData());
-//                FOR TEMP
                 getDataHistoryChats(appointmentModels);
                 chatFragment.addDataSchedule(result.getData());
             }
 
             @Override
             public void onError(Throwable t) {
-                Log.d(TAG(MainActivity.class), "Error");
-                showToastyError(MainActivity.this, ERROR_NULL);
+                Log.d(TAG(MainActivity.class), "Error: " + t.getMessage());
+                showToastyError(MainActivity.this, t.getMessage());
+                getDataSchedule();
             }
 
             @Override
             public void onNoConnection() {
                 Log.d(TAG(MainActivity.class), "No Connection");
                 showToastyError(MainActivity.this, NO_CONNECTION);
+                getDataSchedule();
             }
 
             @Override
             public void onServerBroken() {
                 Log.d(TAG(MainActivity.class), "Server Broken");
                 showToastyError(MainActivity.this, SERVER_BROKEN);
+                getDataSchedule();
             }
         });
     }
@@ -321,7 +322,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onError(Throwable t) {
                 Log.d(TAG(MainActivity.class), t.getMessage());
-                showToastyError(MainActivity.this, ERROR_NULL);
+                showToastyError(MainActivity.this, t.getMessage());
             }
 
 
@@ -364,7 +365,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onError(Throwable t) {
                     Log.d(TAG(MainActivity.class), t.getMessage());
-                    showToastyError(MainActivity.this, ERROR_NULL);
+                    showToastyError(MainActivity.this, t.getMessage());
                 }
 
                 @Override
@@ -401,7 +402,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onError(Throwable t) {
                     Log.d(TAG(MainActivity.class), t.getMessage());
-                    showToastyError(MainActivity.this, ERROR_NULL);
+                    showToastyError(MainActivity.this, t.getMessage());
                 }
 
                 @Override
@@ -521,7 +522,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onError(Throwable t) {
                 Log.d(TAG(MainActivity.class), t.getMessage());
-                showToastyError(MainActivity.this, ERROR_NULL);
+                showToastyError(MainActivity.this, t.getMessage());
                 getConversationList(janjiListResponses, conversationList, sizeConversationList);
             }
 

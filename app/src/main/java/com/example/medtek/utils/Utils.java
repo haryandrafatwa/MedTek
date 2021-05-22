@@ -48,9 +48,7 @@ import java.util.concurrent.TimeUnit;
 import es.dmoral.toasty.Toasty;
 
 import static com.example.medtek.BuildConfig.BASE_URL;
-import static com.example.medtek.constant.APPConstant.CHANNEL_JANJI;
 import static com.example.medtek.constant.APPConstant.CHANNEL_VIDEO_CHAT;
-import static com.example.medtek.constant.APPConstant.CHANNEL_VOICE_CHAT;
 import static com.example.medtek.constant.APPConstant.ERROR_NULL;
 import static com.example.medtek.constant.APPConstant.LOGIN_DOKTER;
 import static com.example.medtek.constant.APPConstant.LOGIN_PASIEN;
@@ -418,6 +416,12 @@ public class Utils {
                 });
                 break;
         }
+    }
+
+    public static void showToastyError(Context context, String cause) {
+        App.getInstance().runOnUiThread(() -> {
+            Toasty.error(context, context.getString(R.string.error_null_desc_with_cause).replace("__cause__", cause)).show();
+        });
     }
 
     public static String getPath(ChatType type) {

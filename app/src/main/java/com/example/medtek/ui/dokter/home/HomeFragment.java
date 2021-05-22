@@ -14,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -86,6 +87,7 @@ public class HomeFragment extends Fragment {
     private Socket socket;
     private String CHANNEL_MESSAGES;
     private boolean status;
+    private boolean isOnAttach = false;
 
     private DateTimeFormatter day, dayFormat;
 
@@ -117,28 +119,35 @@ public class HomeFragment extends Fragment {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.isSuccessful()){
-                    try {
-                        String s = response.body().string();
-                        JSONObject obj = new JSONObject(s);
-                        idDokter = obj.getInt("id");
-                        tv_nama_user.setText(obj.getString("name"));
-                        JSONArray jsonArray = new JSONArray(obj.getString("image"));
-                        if (jsonArray.length() == 0){
-                            civ_dokter.setImageDrawable(getActivity().getDrawable(R.drawable.ic_dokter));
-                        }else{
-                            String path = BASE_URL+jsonArray.getJSONObject(0).getString("path");
-                            if (jsonArray.getJSONObject(0).getString("path").equals("/storage/Pasien.svg")){
-                                civ_dokter.setImageDrawable(getActivity().getDrawable(R.drawable.ic_dokter));
-                            }else{
-                                Picasso.get().load(path).into(civ_dokter);
+                    if (response.body() != null) {
+                        try {
+                            if (isOnAttach) {
+                                String s = response.body().string();
+                                JSONObject obj = new JSONObject(s);
+                                idDokter = obj.getInt("id");
+                                tv_nama_user.setText(obj.getString("name"));
+                                JSONArray jsonArray = new JSONArray(obj.getString("image"));
+                                if (jsonArray.length() == 0){
+                                    civ_dokter.setImageDrawable(getActivity().getDrawable(R.drawable.ic_dokter));
+                                }else{
+                                    String path = BASE_URL+jsonArray.getJSONObject(0).getString("path");
+                                    if (jsonArray.getJSONObject(0).getString("path").equals("/storage/Pasien.svg")){
+                                        civ_dokter.setImageDrawable(getActivity().getDrawable(R.drawable.ic_dokter));
+                                    }else{
+                                        Picasso.get().load(path).into(civ_dokter);
+                                    }
+                                }
+
+                                startSocket();
                             }
+                        } catch (JSONException | IOException e) {
+                            e.printStackTrace();
                         }
-
-                        startSocket();
-
-                    } catch (JSONException | IOException e) {
-                        e.printStackTrace();
+                    } else {
+                        callUser.clone().enqueue(this);
                     }
+                } else {
+                    callUser.clone().enqueue(this);
                 }
             }
 
@@ -155,132 +164,134 @@ public class HomeFragment extends Fragment {
                 try{
                     if (response.isSuccessful()){
                         if (response.body()!=null){
-                            String s = response.body().string();
-                            JSONObject jsonObject = new JSONObject(s);
-                            if (jsonObject.getJSONArray("data").length() == 0){
-                                civ_pasien.setImageDrawable(getActivity().getDrawable(R.drawable.ic_forbidden));
-                                tv_nama_pasien.setText(getString(R.string.tidakadajanji));
-                                tv_detail_janji.setVisibility(View.GONE);
-                                ib_next.setVisibility(View.GONE);
-                            }else if (jsonObject.getJSONArray("data").length() == 1){
-                                JSONObject janji = jsonObject.getJSONArray("data").getJSONObject(0);
-                                tglJanji = LocalDate.parse(janji.getString("tglJanji"));
-                                Call<ResponseBody> getPasien = RetrofitClient.getInstance().getApi().getPasienId(janji.getInt("idPasien"));
-                                getPasien.enqueue(new Callback<ResponseBody>() {
-                                    @Override
-                                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                        try {
-                                            if (response.isSuccessful()){
-                                                if (response.body() != null){
-                                                    String s = response.body().string();
-                                                    JSONObject json = new JSONObject(s);
-                                                    JSONArray jsonArray = json.getJSONObject("data").getJSONArray("image");
-                                                    String path = BASE_URL+jsonArray.getJSONObject(1).getString("path");
-                                                    if (jsonArray.getJSONObject(0).getString("path").equals("/storage/Pasien.png")){
-                                                        civ_pasien.setImageDrawable(getActivity().getDrawable(R.drawable.ic_pasien));
-                                                    }else{
-                                                        Picasso.get().load(path).into(civ_pasien);
+                            if (isOnAttach) {
+                                String s = response.body().string();
+                                JSONObject jsonObject = new JSONObject(s);
+                                if (jsonObject.getJSONArray("data").length() == 0){
+                                    civ_pasien.setImageDrawable(getActivity().getDrawable(R.drawable.ic_forbidden));
+                                    tv_nama_pasien.setText(getString(R.string.tidakadajanji));
+                                    tv_detail_janji.setVisibility(View.GONE);
+                                    ib_next.setVisibility(View.GONE);
+                                }else if (jsonObject.getJSONArray("data").length() == 1){
+                                    JSONObject janji = jsonObject.getJSONArray("data").getJSONObject(0);
+                                    tglJanji = LocalDate.parse(janji.getString("tglJanji"));
+                                    Call<ResponseBody> getPasien = RetrofitClient.getInstance().getApi().getPasienId(janji.getInt("idPasien"));
+                                    getPasien.enqueue(new Callback<ResponseBody>() {
+                                        @Override
+                                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                            try {
+                                                if (response.isSuccessful()){
+                                                    if (response.body() != null){
+                                                        String s = response.body().string();
+                                                        JSONObject json = new JSONObject(s);
+                                                        JSONArray jsonArray = json.getJSONObject("data").getJSONArray("image");
+                                                        String path = BASE_URL+jsonArray.getJSONObject(1).getString("path");
+                                                        if (jsonArray.getJSONObject(0).getString("path").equals("/storage/Pasien.png")){
+                                                            civ_pasien.setImageDrawable(getActivity().getDrawable(R.drawable.ic_pasien));
+                                                        }else{
+                                                            Picasso.get().load(path).into(civ_pasien);
+                                                        }
                                                     }
                                                 }
-                                            }
-                                        } catch (IOException | JSONException e) {
-                                            e.printStackTrace();
+                                            } catch (IOException | JSONException e) {
+                                                e.printStackTrace();
 //                                            callJanji.clone().enqueue(this);
+                                            }
                                         }
-                                    }
 
-                                    @Override
-                                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                        @Override
+                                        public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-                                    }
-                                });
+                                        }
+                                    });
 
-                                tv_nama_pasien.setText(janji.getJSONObject("pasien").getString("name"));
-                                if (tglJanji.isEqual(LocalDate.now())){
-                                    tv_detail_janji.setText("Hari Ini, "+tglJanji.format(dayFormat));
-                                }else if(tglJanji.isEqual(LocalDate.now().plusDays(1))){
-                                    tv_detail_janji.setText("Besok, "+tglJanji.format(dayFormat));
-                                }else{
-                                    tv_detail_janji.setText(tglJanji.format(day)+", "+tglJanji.format(dayFormat));
-                                }
-                            }else{
-                                for (int i = 0; i < jsonObject.getJSONArray("data").length(); i++) {
-                                    JSONObject janji = jsonObject.getJSONArray("data").getJSONObject(i);
-                                    if (i==0){
-                                        tglJanji = LocalDate.parse(janji.getString("tglJanji"));
-                                        idJanji = janji.getInt("id");
+                                    tv_nama_pasien.setText(janji.getJSONObject("pasien").getString("name"));
+                                    if (tglJanji.isEqual(LocalDate.now())){
+                                        tv_detail_janji.setText("Hari Ini, "+tglJanji.format(dayFormat));
+                                    }else if(tglJanji.isEqual(LocalDate.now().plusDays(1))){
+                                        tv_detail_janji.setText("Besok, "+tglJanji.format(dayFormat));
                                     }else{
-                                        LocalDate date = LocalDate.parse(janji.getString("tglJanji"));
-                                        if (date.isBefore(tglJanji)){
-                                            tglJanji = date;
+                                        tv_detail_janji.setText(tglJanji.format(day)+", "+tglJanji.format(dayFormat));
+                                    }
+                                }else{
+                                    for (int i = 0; i < jsonObject.getJSONArray("data").length(); i++) {
+                                        JSONObject janji = jsonObject.getJSONArray("data").getJSONObject(i);
+                                        if (i==0){
+                                            tglJanji = LocalDate.parse(janji.getString("tglJanji"));
                                             idJanji = janji.getInt("id");
+                                        }else{
+                                            LocalDate date = LocalDate.parse(janji.getString("tglJanji"));
+                                            if (date.isBefore(tglJanji)){
+                                                tglJanji = date;
+                                                idJanji = janji.getInt("id");
+                                            }
                                         }
                                     }
-                                }
-                                Call<ResponseBody> getJanji = RetrofitClient.getInstance().getApi().getJanjiId("Bearer "+access,idJanji);
-                                getJanji.enqueue(new Callback<ResponseBody>() {
-                                    @Override
-                                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                        try {
-                                            if (response.isSuccessful()) {
-                                                if (response.body() != null) {
-                                                    String s = response.body().string();
-                                                    JSONObject jsonObject = new JSONObject(s);
-                                                    JSONObject janji = jsonObject.getJSONObject("data");
-                                                    Call<ResponseBody> getPasien = RetrofitClient.getInstance().getApi().getPasienId(janji.getInt("idPasien"));
-                                                    getPasien.enqueue(new Callback<ResponseBody>() {
-                                                        @Override
-                                                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                                            try {
-                                                                if (response.isSuccessful()){
-                                                                    if (response.body() != null){
-                                                                        String s = response.body().string();
-                                                                        JSONObject json = new JSONObject(s);
-                                                                        JSONArray jsonArray = json.getJSONObject("data").getJSONArray("image");
-                                                                        if (jsonArray.length() == 0){
-                                                                            civ_pasien.setImageDrawable(getActivity().getDrawable(R.drawable.ic_pasien));
-                                                                        }else{
-                                                                            String path = BASE_URL+jsonArray.getJSONObject(0).getString("path");
-                                                                            if (jsonArray.getJSONObject(0).getString("path").equals("/storage/Pasien.png")){
+                                    Call<ResponseBody> getJanji = RetrofitClient.getInstance().getApi().getJanjiId("Bearer "+access,idJanji);
+                                    getJanji.enqueue(new Callback<ResponseBody>() {
+                                        @Override
+                                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                            try {
+                                                if (response.isSuccessful()) {
+                                                    if (response.body() != null) {
+                                                        String s = response.body().string();
+                                                        JSONObject jsonObject = new JSONObject(s);
+                                                        JSONObject janji = jsonObject.getJSONObject("data");
+                                                        Call<ResponseBody> getPasien = RetrofitClient.getInstance().getApi().getPasienId(janji.getInt("idPasien"));
+                                                        getPasien.enqueue(new Callback<ResponseBody>() {
+                                                            @Override
+                                                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                                                try {
+                                                                    if (response.isSuccessful()){
+                                                                        if (response.body() != null){
+                                                                            String s = response.body().string();
+                                                                            JSONObject json = new JSONObject(s);
+                                                                            JSONArray jsonArray = json.getJSONObject("data").getJSONArray("image");
+                                                                            if (jsonArray.length() == 0){
                                                                                 civ_pasien.setImageDrawable(getActivity().getDrawable(R.drawable.ic_pasien));
                                                                             }else{
-                                                                                Picasso.get().load(path).into(civ_pasien);
+                                                                                String path = BASE_URL+jsonArray.getJSONObject(0).getString("path");
+                                                                                if (jsonArray.getJSONObject(0).getString("path").equals("/storage/Pasien.png")){
+                                                                                    civ_pasien.setImageDrawable(getActivity().getDrawable(R.drawable.ic_pasien));
+                                                                                }else{
+                                                                                    Picasso.get().load(path).into(civ_pasien);
+                                                                                }
                                                                             }
                                                                         }
                                                                     }
+                                                                } catch (IOException | JSONException e) {
+                                                                    e.printStackTrace();
                                                                 }
-                                                            } catch (IOException | JSONException e) {
-                                                                e.printStackTrace();
                                                             }
+
+                                                            @Override
+                                                            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                                                            }
+                                                        });
+
+                                                        tv_nama_pasien.setText(janji.getJSONObject("pasien").getString("name"));
+                                                        if (tglJanji.isEqual(LocalDate.now())){
+                                                            tv_detail_janji.setText("Hari Ini, "+tglJanji.format(dayFormat));
+                                                        }else if(tglJanji.isEqual(LocalDate.now().plusDays(1))){
+                                                            tv_detail_janji.setText("Besok, "+tglJanji.format(dayFormat));
+                                                        }else{
+                                                            tv_detail_janji.setText(tglJanji.format(day)+", "+tglJanji.format(dayFormat));
                                                         }
 
-                                                        @Override
-                                                        public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-                                                        }
-                                                    });
-
-                                                    tv_nama_pasien.setText(janji.getJSONObject("pasien").getString("name"));
-                                                    if (tglJanji.isEqual(LocalDate.now())){
-                                                        tv_detail_janji.setText("Hari Ini, "+tglJanji.format(dayFormat));
-                                                    }else if(tglJanji.isEqual(LocalDate.now().plusDays(1))){
-                                                        tv_detail_janji.setText("Besok, "+tglJanji.format(dayFormat));
-                                                    }else{
-                                                        tv_detail_janji.setText(tglJanji.format(day)+", "+tglJanji.format(dayFormat));
                                                     }
-
                                                 }
+                                            } catch (JSONException | IOException e) {
+                                                e.printStackTrace();
                                             }
-                                        } catch (JSONException | IOException e) {
-                                            e.printStackTrace();
                                         }
-                                    }
 
-                                    @Override
-                                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                        @Override
+                                        public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-                                    }
-                                });
+                                        }
+                                    });
+                                }
                             }
                         }
                     }
@@ -530,4 +541,15 @@ public class HomeFragment extends Fragment {
         fragmentTransaction.commit();
     }
 
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        isOnAttach = true;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        isOnAttach = false;
+    }
 }

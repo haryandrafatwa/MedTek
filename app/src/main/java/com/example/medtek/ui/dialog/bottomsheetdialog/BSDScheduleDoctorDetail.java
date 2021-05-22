@@ -35,7 +35,6 @@ import org.joda.time.LocalTime;
 import java.util.ArrayList;
 
 import static com.example.medtek.constant.APPConstant.BELUM_DIMULAI;
-import static com.example.medtek.constant.APPConstant.ERROR_NULL;
 import static com.example.medtek.constant.APPConstant.MENUNGGU_DIANTRIAN;
 import static com.example.medtek.constant.APPConstant.NO_CONNECTION;
 import static com.example.medtek.constant.APPConstant.SEDANG_BERLANSUNG;
@@ -187,7 +186,7 @@ public class BSDScheduleDoctorDetail extends BaseBottomSheetDialog {
             @Override
             public void onError(Throwable t) {
                 Log.d(TAG(BSDScheduleDoctorDetail.class), "Error");
-                showToastyError(getActivity(), ERROR_NULL);
+                showToastyError(getActivity(), t.getMessage());
             }
 
             @Override
@@ -214,7 +213,7 @@ public class BSDScheduleDoctorDetail extends BaseBottomSheetDialog {
             @Override
             public void onError(Throwable t) {
                 Log.d(TAG(BSDScheduleDoctorDetail.class), "Error");
-                showToastyError(getActivity(), ERROR_NULL);
+                showToastyError(getActivity(), t.getMessage());
             }
 
             @Override
@@ -241,7 +240,7 @@ public class BSDScheduleDoctorDetail extends BaseBottomSheetDialog {
             @Override
             public void onError(Throwable t) {
                 Log.d(TAG(BSDScheduleDoctorDetail.class), "Error");
-                showToastyError(getActivity(), ERROR_NULL);
+                showToastyError(getActivity(), t.getMessage());
             }
 
             @Override

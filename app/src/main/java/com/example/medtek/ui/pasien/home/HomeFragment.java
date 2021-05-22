@@ -159,6 +159,7 @@ public class HomeFragment extends Fragment {
     private boolean isDokterDone = false;
     private boolean isHospitalDone = false;
     private boolean isArtikelDone = false;
+    private boolean isOnAttach = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -590,29 +591,31 @@ public class HomeFragment extends Fragment {
                                     }
                                 }
                                 if (!kota.isEmpty() && mListHospital.size() < 5){
-                                    double distance = -1.0;
-                                    Locale locale = new Locale("in", "ID");
-                                    Geocoder geocoder = new Geocoder(getActivity(), locale);
+                                    if (isOnAttach) {
+                                        double distance = -1.0;
+                                        Locale locale = new Locale("in", "ID");
+                                        Geocoder geocoder = new Geocoder(getContext(), locale);
 
-                                    List<Address> addressesD = geocoder.getFromLocationName(name,1);
-                                    if (addressesD.size() > 0) {
-                                        double dLat = addressesD.get(0).getLatitude();
-                                        double dLong = addressesD.get(0).getLongitude();
-                                        double longDiff = sLong - dLong;
-                                        distance = Math.sin(sLat*Math.PI/180.0)*Math.sin(dLat*Math.PI/180.0) + Math.cos(sLat*Math.PI/180.0)*Math.cos(dLat*Math.PI/180.0)*Math.cos(longDiff*Math.PI/180.0);
-                                        distance = Math.acos(distance);
-                                        distance = distance*180.0/Math.PI;
-                                        distance = distance*60*1.1515;
-                                        distance = distance*1.609344;
-                                    }
-                                    String jenis="";
-                                    if (obj.getString("jenis").equalsIgnoreCase("umum")){
-                                        jenis = getActivity().getString(R.string.rsumum);
-                                    }else if (obj.getString("jenis").equalsIgnoreCase("spesialisasi")){
-                                        jenis = getActivity().getString(R.string.rsspesial);
-                                    }
-                                    if (distance < 20 && distance >= 0){
-                                        mListHospital.add(new HospitalModel(name, no_telp, jalanRs, no_bangunanRs, rtrwRs, kelurahanRs, kecamatanRs, kotaRs, "Provinsi", infoRs,jenis,hospitalImage,id,distance, mListDokterHospital));
+                                        List<Address> addressesD = geocoder.getFromLocationName(name,1);
+                                        if (addressesD.size() > 0) {
+                                            double dLat = addressesD.get(0).getLatitude();
+                                            double dLong = addressesD.get(0).getLongitude();
+                                            double longDiff = sLong - dLong;
+                                            distance = Math.sin(sLat*Math.PI/180.0)*Math.sin(dLat*Math.PI/180.0) + Math.cos(sLat*Math.PI/180.0)*Math.cos(dLat*Math.PI/180.0)*Math.cos(longDiff*Math.PI/180.0);
+                                            distance = Math.acos(distance);
+                                            distance = distance*180.0/Math.PI;
+                                            distance = distance*60*1.1515;
+                                            distance = distance*1.609344;
+                                        }
+                                        String jenis="";
+                                        if (obj.getString("jenis").equalsIgnoreCase("umum")){
+                                            jenis = getActivity().getString(R.string.rsumum);
+                                        }else if (obj.getString("jenis").equalsIgnoreCase("spesialisasi")){
+                                            jenis = getActivity().getString(R.string.rsspesial);
+                                        }
+                                        if (distance < 20 && distance >= 0){
+                                            mListHospital.add(new HospitalModel(name, no_telp, jalanRs, no_bangunanRs, rtrwRs, kelurahanRs, kecamatanRs, kotaRs, "Provinsi", infoRs,jenis,hospitalImage,id,distance, mListDokterHospital));
+                                        }
                                     }
                                 }
                             }
@@ -923,37 +926,40 @@ public class HomeFragment extends Fragment {
     }
 
     private void disabledShimmer() {
-        if (!access.equals("") && !refresh.equals("")) {
-            if (isWalletDone && isUserDone && isDokterDone && isHospitalDone && isArtikelDone) {
-                rl_content.setVisibility(View.VISIBLE);
-                ll_loader.setVisibility(View.GONE);
+        if (isOnAttach) {
+            if (!access.equals("") && !refresh.equals("")) {
+                if (isWalletDone && isUserDone && isDokterDone && isHospitalDone && isArtikelDone) {
+                    rl_content.setVisibility(View.VISIBLE);
+                    ll_loader.setVisibility(View.GONE);
 
-                showUser();
-                showSearch();
-                showWallet();
-                showDokter();
-                showHospital();
-                showArtikel();
+                    showUser();
+                    showSearch();
+                    showWallet();
+                    showDokter();
+                    showHospital();
+                    showArtikel();
 
-                shimmerFrameLayout.stopShimmer();
-            }
-        } else {
-            if (isDokterDone && isHospitalDone && isArtikelDone) {
-                rl_content.setVisibility(View.VISIBLE);
-                ll_loader.setVisibility(View.GONE);
+                    shimmerFrameLayout.stopShimmer();
+                }
+            } else {
+                if (isDokterDone && isHospitalDone && isArtikelDone) {
+                    rl_content.setVisibility(View.VISIBLE);
+                    ll_loader.setVisibility(View.GONE);
 
-                showSearch();
-                showDokter();
-                showHospital();
-                showArtikel();
+                    showSearch();
+                    showDokter();
+                    showHospital();
+                    showArtikel();
 
-                shimmerFrameLayout.stopShimmer();
+                    shimmerFrameLayout.stopShimmer();
+                }
             }
         }
     }
 
     private void showWallet() {
         // wallet
+
         ll_wallet.setBackground(getActivity().getDrawable(R.drawable.bg_home_all_rounded));
         ll_wallet_title.setBackground(getActivity().getDrawable(R.drawable.bg_home_top_rounded));
         tv_saldo.setBackground(null);
@@ -1040,5 +1046,17 @@ public class HomeFragment extends Fragment {
                 getAllHospital();
             }
         }
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        isOnAttach = true;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        isOnAttach = false;
     }
 }

@@ -30,7 +30,6 @@ import org.joda.time.LocalTime;
 
 import static com.example.medtek.BuildConfig.BASE_URL;
 import static com.example.medtek.constant.APPConstant.BELUM_DIMULAI;
-import static com.example.medtek.constant.APPConstant.ERROR_NULL;
 import static com.example.medtek.constant.APPConstant.IMAGE_AVATAR;
 import static com.example.medtek.constant.APPConstant.MENUNGGU_DIANTRIAN;
 import static com.example.medtek.constant.APPConstant.NO_CONNECTION;
@@ -180,7 +179,7 @@ public class BSDSchedulePatientDetail extends BaseBottomSheetDialog {
             public void onError(Throwable t) {
                 isLoading(false);
                 Log.d(TAG(BSDSchedulePatientDetail.class), "Error");
-                showToastyError(getActivity(), ERROR_NULL);
+                showToastyError(getActivity(), t.getMessage());
             }
 
             @Override
