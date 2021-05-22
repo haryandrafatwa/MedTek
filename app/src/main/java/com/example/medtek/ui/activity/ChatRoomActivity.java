@@ -237,6 +237,9 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
         imagesCountNow = 0;
         count = 0;
         isEndChats = false;
+
+        // FOR TEMP
+//        SocketUtil.getInstance().setChannelVideoChat(chatsModel.getIdJanji());
     }
 
     //Register EventBus
@@ -302,6 +305,7 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
                     JanjiModel janjiUpdate = (JanjiModel) newEvent;
                     Log.d(TAG, "idStatus: " + janjiUpdate.getJanji().getIdStatus());
                     if (janjiUpdate.getJanji().getIdStatus() == SUDAH_SELESAI) {
+//                        FOR TEMP
                         endSession();
                     }
                 } else if (newEvent instanceof String) {
@@ -849,6 +853,7 @@ public class ChatRoomActivity extends SingleActivity implements View.OnClickList
                     if (videosPath != null && videosPath.size() > 0) videosPath.clear();
                     videosPath = data.getStringArrayListExtra(VideoPicker.EXTRA_VIDEO_PATH);
                     loadVideoPreview();
+                    break;
                 case Picker.PICK_FILE:
                     if (filePicker == null) {
                         filePicker = new FilePicker(this);

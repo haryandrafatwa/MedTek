@@ -106,31 +106,39 @@ public class    LoginPasienActivity extends AppCompatActivity {
                         call.enqueue(new Callback<ResponseBody>() {
                             @Override
                             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                try {
-                                    btn_clone.setVisibility(View.GONE);
-                                    String s = response.body().string();
-                                    JSONObject obj = new JSONObject(s);
-                                    if (obj.has("message")){
-                                        Log.d("MedTekMedTekMedTek",obj.getString("message"));
-                                        if (obj.getString("message").equals("User not verified.")){
-                                            Toasty.error(LoginPasienActivity.this,getString(R.string.unverified)).show();
-                                        }else if (obj.getString("message").equals("User not found.")){
-                                            Toasty.error(LoginPasienActivity.this,getString(R.string.emailtidakditemukan)).show();
-                                        }else{
-                                            Toasty.error(LoginPasienActivity.this,getString(R.string.wrongpassword)).show();
-                                        }
-                                    }else {
-                                        Log.d("MedTekMedTekMedTek", s);
-                                        String token = obj.getString("access_token");
-                                        String refresh_token = obj.getString("refresh_token");
+                                if (response.isSuccessful()) {
+                                    if (response.body() != null) {
+                                        try {
+                                            btn_clone.setVisibility(View.GONE);
+                                            String s = response.body().string();
+                                            JSONObject obj = new JSONObject(s);
+                                            if (obj.has("message")){
+                                                Log.d("MedTekMedTekMedTek",obj.getString("message"));
+                                                if (obj.getString("message").equals("User not verified.")){
+                                                    Toasty.error(LoginPasienActivity.this,getString(R.string.unverified)).show();
+                                                }else if (obj.getString("message").equals("User not found.")){
+                                                    Toasty.error(LoginPasienActivity.this,getString(R.string.emailtidakditemukan)).show();
+                                                }else{
+                                                    Toasty.error(LoginPasienActivity.this,getString(R.string.wrongpassword)).show();
+                                                }
+                                            }else {
+                                                Log.d("MedTekMedTekMedTek", s);
+                                                String token = obj.getString("access_token");
+                                                String refresh_token = obj.getString("refresh_token");
 //                                        saveData(LoginPasienActivity.this,token,refresh_token);
 
-                                        String token_type = obj.getString("token_type");
-                                        int expires_in = obj.getInt("expires_in");
-                                        checkRoleUser(new AuthTokenResponse(token_type, expires_in, token, refresh_token));
+                                                String token_type = obj.getString("token_type");
+                                                int expires_in = obj.getInt("expires_in");
+                                                checkRoleUser(new AuthTokenResponse(token_type, expires_in, token, refresh_token));
+                                            }
+                                        } catch (JSONException | IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    } else {
+                                        call.clone().enqueue(this);
                                     }
-                                } catch (JSONException | IOException e) {
-                                    e.printStackTrace();
+                                } else {
+                                    call.clone().enqueue(this);
                                 }
                             }
 
@@ -298,16 +306,19 @@ public class    LoginPasienActivity extends AppCompatActivity {
             @Override
             public void onError(Throwable t) {
                 Log.d(TAG(LoginPasienActivity.class), "Error");
+                checkRoleUser(response);
             }
 
             @Override
             public void onNoConnection() {
                 Log.d(TAG(LoginPasienActivity.class), "No Connection");
+                checkRoleUser(response);
             }
 
             @Override
             public void onServerBroken() {
                 Log.d(TAG(LoginPasienActivity.class), "Server Broken");
+                checkRoleUser(response);
             }
         });
     }

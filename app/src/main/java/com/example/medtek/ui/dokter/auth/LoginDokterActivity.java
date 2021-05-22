@@ -137,7 +137,11 @@ public class LoginDokterActivity extends AppCompatActivity {
                                         } catch (JSONException | IOException e) {
                                             e.printStackTrace();
                                         }
+                                    } else {
+                                        call.clone().enqueue(this);
                                     }
+                                } else {
+                                    call.clone().enqueue(this);
                                 }
                             }
 
@@ -302,17 +306,20 @@ public class LoginDokterActivity extends AppCompatActivity {
 
             @Override
             public void onError(Throwable t) {
-                Log.d(TAG(LoginDokterActivity.class), "Error");
+                Log.d(TAG(LoginPasienActivity.class), "Error");
+                checkRoleUser(response);
             }
 
             @Override
             public void onNoConnection() {
-                Log.d(TAG(LoginDokterActivity.class), "No Connection");
+                Log.d(TAG(LoginPasienActivity.class), "No Connection");
+                checkRoleUser(response);
             }
 
             @Override
             public void onServerBroken() {
-                Log.d(TAG(LoginDokterActivity.class), "Server Broken");
+                Log.d(TAG(LoginPasienActivity.class), "Server Broken");
+                checkRoleUser(response);
             }
         });
     }
