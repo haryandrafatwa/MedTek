@@ -138,45 +138,39 @@ public class OthersFragment extends Fragment {
                             isVerified = true;
                         }
 
+                        if (obj.getInt("role_id") != 1){
+                            ll_wallet.setVisibility(View.GONE);
+                        }
+
                         ll_wallet.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                if (isVerified){
+                                /*if (isVerified){
                                     WalletFragment walletFragment = new WalletFragment();
                                     setFragment(walletFragment,"FragmentWallet");
                                 }else{
                                     Toasty.info(getActivity(),getString(R.string.silahkanlakukanverifikasi),Toasty.LENGTH_LONG).show();
-                                }
+                                }*/
+                                Toasty.info(getActivity(),"Under Maintenance!",Toasty.LENGTH_LONG).show();
                             }
                         });
 
-                        JSONArray jsonArray = new JSONArray(obj.getString("image"));
-                        if (jsonArray.length() == 0){
+                        String path="";
+                        JSONArray jsonArrayImage = obj.getJSONArray("image");
+                        if (jsonArrayImage.length() !=0){
+                            for (int j = 0; j < jsonArrayImage.length(); j++) {
+                                JSONObject imageObj = jsonArrayImage.getJSONObject(j);
+                                if (imageObj.getInt("type_id") == 1) {
+                                    path = BASE_URL + imageObj.getString("path");
+                                    break;
+                                }
+                            }
+                            Picasso.get().load(path).into(civ_user);
+                        }else{
                             if (obj.getInt("role_id") == 1){
                                 civ_user.setImageDrawable(getActivity().getDrawable(R.drawable.ic_pasien));
                             }else{
                                 civ_user.setImageDrawable(getActivity().getDrawable(R.drawable.ic_dokter));
-                            }
-                        }else{
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                JSONObject imageObj = jsonArray.getJSONObject(i);
-                                if (imageObj.getInt("type_id") == 1){
-                                    if (imageObj.getString("path").equalsIgnoreCase("/storage/Pasien.png")){
-                                        civ_user.setImageDrawable(getActivity().getDrawable(R.drawable.ic_pasien));
-                                    }else if (imageObj.getString("path").equalsIgnoreCase("/storage/Dokter.png")){
-                                        civ_user.setImageDrawable(getActivity().getDrawable(R.drawable.ic_dokter));
-                                    }else{
-                                        String path = BASE_URL+jsonArray.getJSONObject(0).getString("path");
-                                        Picasso.get().load(path).into(civ_user);
-                                        break;
-                                    }
-                                }else{
-                                    if (obj.getInt("role_id") == 1){
-                                        civ_user.setImageDrawable(getActivity().getDrawable(R.drawable.ic_pasien));
-                                    }else{
-                                        civ_user.setImageDrawable(getActivity().getDrawable(R.drawable.ic_dokter));
-                                    }
-                                }
                             }
                         }
 

@@ -862,6 +862,7 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
     }*/
 
     private void initializeDialogSuccess(){
+        progressDialog.dismiss();
         Dialog dialog = new Dialog(getActivity(),R.style.CustomAlertDialog);
         LayoutInflater inflater = getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.dialog_payment_success,null);
@@ -962,7 +963,6 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
             @Override
             public void onClick(View v) {
                 dialog.cancel();
-                progressDialog.dismiss();
                 FragmentManager fm = getActivity().getSupportFragmentManager();
                 for(int i = 0; i < fm.getBackStackEntryCount()-1; ++i) {
                     fm.popBackStack();

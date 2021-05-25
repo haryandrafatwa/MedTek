@@ -69,7 +69,7 @@ public class HomeFragment extends Fragment {
     private ChipNavigationBar bottomBar;
     private TextView tv_date_today, tv_nama_user, tv_nama_pasien, tv_detail_janji, tv_detail_konfirmasi;
     private CircleImageView civ_dokter, civ_pasien;
-    private LinearLayout layout_pasien;
+    private LinearLayout layout_pasien, layout_info;
     private ImageButton ib_next;
 
     private String access;
@@ -126,16 +126,23 @@ public class HomeFragment extends Fragment {
                                 JSONObject obj = new JSONObject(s);
                                 idDokter = obj.getInt("id");
                                 tv_nama_user.setText(obj.getString("name"));
-                                JSONArray jsonArray = new JSONArray(obj.getString("image"));
-                                if (jsonArray.length() == 0){
-                                    civ_dokter.setImageDrawable(getActivity().getDrawable(R.drawable.ic_dokter));
-                                }else{
-                                    String path = BASE_URL+jsonArray.getJSONObject(0).getString("path");
-                                    if (jsonArray.getJSONObject(0).getString("path").equals("/storage/Pasien.svg")){
-                                        civ_dokter.setImageDrawable(getActivity().getDrawable(R.drawable.ic_dokter));
-                                    }else{
-                                        Picasso.get().load(path).into(civ_dokter);
+                                String path="";
+                                JSONArray jsonArrayImage = obj.getJSONArray("image");
+                                if (jsonArrayImage.length() !=0){
+                                    for (int j = 0; j < jsonArrayImage.length(); j++) {
+                                        JSONObject imageObj = jsonArrayImage.getJSONObject(j);
+                                        if (imageObj.getInt("type_id") == 1) {
+                                            path = BASE_URL + imageObj.getString("path");
+                                            break;
+                                        }
                                     }
+                                }else{
+                                    path = BASE_URL+"/storage/Dokter.png";
+                                }
+                                Picasso.get().load(path).into(civ_dokter);
+
+                                if (obj.getString("nomor_rekening") == null){
+                                    layout_info.setVisibility(View.VISIBLE);
                                 }
 
                                 startSocket();
@@ -404,6 +411,7 @@ public class HomeFragment extends Fragment {
         ib_next = getActivity().findViewById(R.id.ib_next);
         tv_detail_konfirmasi = getActivity().findViewById(R.id.tv_seekonfirmasi);
         rl_empty_antrian = getActivity().findViewById(R.id.layout_empty_konfirmasi_queue);
+        layout_info = getActivity().findViewById(R.id.info_no_rekening_null);
 
         recyclerView = getActivity().findViewById(R.id.rv_menunggu_konfirmasi);
 

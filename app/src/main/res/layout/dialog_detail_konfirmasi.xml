@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/bg_dialog_inset_16"
     android:backgroundTint="@android:color/white">
 
@@ -66,6 +68,18 @@
                 android:textColor="@android:color/black"/>
 
         </LinearLayout>
+
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:id="@+id/riv_ktp"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:scaleType="centerCrop"
+            android:layout_marginTop="@dimen/margin_16"
+            android:layout_marginHorizontal="@dimen/margin_16"
+            app:riv_border_width="0.5dip"
+            app:riv_border_color="#80000000"
+            app:riv_corner_radius="12dip"
+            android:visibility="gone"/>
 
         <LinearLayout
             android:layout_width="match_parent"

@@ -191,7 +191,7 @@ public interface APIInterface {
     );
 
     @Headers({"Accept:application/json"})
-    @POST("edit-avatar/")
+    @POST("edit-avatar")
     @Multipart
     Call<ResponseBody> uploadAvatar(
             @Header("Authorization") String token,

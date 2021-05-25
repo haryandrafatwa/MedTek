@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.icu.text.SimpleDateFormat;
 import android.os.Environment;
 import android.text.method.LinkMovementMethod;
@@ -33,6 +34,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.medtek.R;
 import com.example.medtek.model.dokter.JanjiModel;
 import com.example.medtek.network.RetrofitClient;
+import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -79,6 +81,7 @@ public class MenungguKonfirmasiAdapter extends RecyclerView.Adapter<MenungguKonf
     private final FragmentActivity mActivity;
     private String access, refresh, ktp;
     private Bitmap bmp;
+    private boolean status = false;
 
     public MenungguKonfirmasiAdapter(List<JanjiModel> mList, Context mContext, FragmentActivity mActivity){
         this.mList = mList;
@@ -416,12 +419,60 @@ public class MenungguKonfirmasiAdapter extends RecyclerView.Adapter<MenungguKonf
         dialog.setContentView(dialogView);
         dialog.setCancelable(false);
         dialog.setTitle(null);
+        RoundedImageView roundedImageView = dialogView.findViewById(R.id.riv_ktp);
+
+        Call<ResponseBody> callKTP = RetrofitClient.getInstance().getApi().getKTP("Bearer "+access);
+        callKTP.enqueue(new Callback<ResponseBody>()
+        {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        // display the image data in a ImageView or save it
+                        try {
+                            byte[] bytes = response.body().bytes();
+//                            Bitmap bmp = BitmapFactory.decodeStream(response.body().byteStream());
+                            bmp = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        Log.e("RESPONSEBODY","ISNULL!");
+                        callKTP.clone().enqueue(this);
+                    }
+                }else{
+                    try {
+                        Log.e("RESPONSEBODY","ERROR: "+response.errorBody().string());
+                        callKTP.clone().enqueue(this);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e("RESPONSEBODY","ERROR: "+t.getMessage());
+                callKTP.clone().enqueue(this);
+            }
+        });
 
         TextView tv_ktp_pasien = dialogView.findViewById(R.id.tv_ktp_pasien);
         tv_ktp_pasien.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.e("TAG", "onClick: "+ktp );
+                if (!status){
+                    status = true;
+                    if (bmp != null){
+                        roundedImageView.setImageBitmap(bmp);
+                        roundedImageView.setVisibility(View.VISIBLE);
+                        tv_ktp_pasien.setText("Tutup");
+                    }
+                }else{
+                    status = false;
+                    tv_ktp_pasien.setText("Lihat KTP Pasien");
+                    roundedImageView.setVisibility(View.GONE);
+                }
             }
         });
 

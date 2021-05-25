@@ -87,7 +87,7 @@ public class EditProfileFragment extends Fragment {
     private DatePickerDialog datePickerDialog;
 
     private CircleImageView circleImageView,civ_temp;
-    private EditText et_nama, et_email, et_tgl, et_noHp;
+    private EditText et_nama, et_email, et_tgl, et_noHp, et_noRekening;
     private TextView male, female,isverify;
     private Button btn_simpan;
 
@@ -100,9 +100,9 @@ public class EditProfileFragment extends Fragment {
     private String postPath;
     private RequestBody requestBody;
 
-    private String access, refresh, tglLahir, jenis_kelamin, noHp, name, email;
+    private String access, refresh, tglLahir, jenis_kelamin, noHp, name, email, noRekening;
     private int counter=0;
-    private String updateTgl, updateName, updateNoHp, updateJK;
+    private String updateTgl, updateName, updateNoHp, updateJK, updateNoRekening;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -224,14 +224,27 @@ public class EditProfileFragment extends Fragment {
                                 noHp = "-";
                                 et_noHp.setText("-");
                             }
-                            JSONArray jsonArray = new JSONArray(user.getString("image"));
-                            String userImagePath;
-                            if (jsonArray.getJSONObject(0).getString("path").equals("/storage/Pasien.png") || jsonArray.length() == 0){
-                                userImagePath = "/storage/Pasien.png";
+                            if (user.getString("nomor_rekening") != "null"){
+                                noRekening = user.getString("nomor_rekening");
+                                et_noRekening.setText(user.getString("nomor_rekening"));
                             }else{
-                                userImagePath = jsonArray.getJSONObject(0).getString("path");
+                                noRekening = "-";
+                                et_noRekening.setText("-");
                             }
-                            Picasso.get().load(BASE_URL+userImagePath).into(circleImageView);
+                            String path="";
+                            JSONArray jsonArrayImage = user.getJSONArray("image");
+                            if (jsonArrayImage.length() !=0){
+                                for (int j = 0; j < jsonArrayImage.length(); j++) {
+                                    JSONObject imageObj = jsonArrayImage.getJSONObject(j);
+                                    if (imageObj.getInt("type_id") == 1) {
+                                        path = BASE_URL + imageObj.getString("path");
+                                        break;
+                                    }
+                                }
+                            }else{
+                                path = BASE_URL+"/storage/Dokter.png";
+                            }
+                            Picasso.get().load(path).into(circleImageView);
                             if (user.getString("jenis_kelamin").equalsIgnoreCase("Pria")){
                                 male.setTextColor(Color.WHITE);
                                 male.setBackground(getResources().getDrawable(R.drawable.bg_male));
@@ -315,6 +328,26 @@ public class EditProfileFragment extends Fragment {
             public void afterTextChanged(Editable s) {
             }
         });
+        et_noRekening.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (!noRekening.equalsIgnoreCase(s.toString())){
+                    counter+=1;
+                    btn_simpan.setEnabled(true);
+                    updateNoRekening = s.toString();
+                }else{
+                    btn_simpan.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
 
         male.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -365,6 +398,8 @@ public class EditProfileFragment extends Fragment {
                     jsonParams.put("notelp",updateNoHp);
                     noHp = updateNoHp;
                 }
+                jsonParams.put("nomor_rekening",updateNoRekening);
+                noRekening = updateNoRekening;
                 jsonParams.put("email",email);
 
                 RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"),(new JSONObject(jsonParams)).toString());
@@ -465,6 +500,7 @@ public class EditProfileFragment extends Fragment {
         et_email = getActivity().findViewById(R.id.et_email);
         et_noHp = getActivity().findViewById(R.id.et_no_hp);
         et_tgl = getActivity().findViewById(R.id.et_tgl);
+        et_noRekening = getActivity().findViewById(R.id.et_no_rekening);
         male = getActivity().findViewById(R.id.tv_male);
         female = getActivity().findViewById(R.id.tv_female);
         btn_simpan = getActivity().findViewById(R.id.btn_simpan);
@@ -568,12 +604,22 @@ public class EditProfileFragment extends Fragment {
             uploadAvatar.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    try {
-                        String s = response.body().string();
-                        JSONObject jsonObject = new JSONObject(s);
-                        Log.e("RESPONSEBODY",s);
-                    } catch (IOException | JSONException e) {
-                        e.printStackTrace();
+                    if (response.body() != null){
+                        if (response.isSuccessful()){
+                            try {
+                                String s = response.body().string();
+                                JSONObject jsonObject = new JSONObject(s);
+                                Log.e("RESPONSEBODY",s);
+                            } catch (IOException | JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }else{
+                            try {
+                                Log.e("RESPONSEBODY",response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
                 }
 

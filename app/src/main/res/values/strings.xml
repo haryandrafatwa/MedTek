@@ -158,6 +158,7 @@
     <string name="jk">Jenis Kelamin</string>
     <string name="tgl">Tanggal Lahir</string>
     <string name="no_hp">Nomor Telepon</string>
+    <string name="no_rekening">Nomor Rekening</string>
     <string name="male">Pria</string>
     <string name="female">Wanita</string>
     <string name="cari">Cari</string>
@@ -213,6 +214,7 @@
     <string name="inputdetailspasien">Masukkan detail pasien</string>
     <string name="inputdetailsjanji">Masukkan detail janji</string>
     <string name="inputinfo">Silakan masukkan detail yang sama dengan disebutkan dalam kartu ID pasien.</string>
+    <string name="infonorekeningnull">Silahkan tambahkan nomor rekening anda pada halaman edit profile. Jika tidak, akun anda tidak dapat dilihat oleh pasien.</string>
     <string name="inputdetail">Silakan masukkan keluhan yang Anda rasakan agar Dokter memahaminya. Dapat berupa riwayat penyakit Anda atau pengobatan sebelumnya.</string>
     <string name="uploadidcard">Unggah kartu ID</string>
     <string name="uploadsupportfile">Unggah file pendukung</string>

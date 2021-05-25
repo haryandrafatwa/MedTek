@@ -260,13 +260,44 @@
 
             </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/no_rekening"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_below="@id/nohp"
+                android:layout_marginTop="8dp"
+                android:layout_marginHorizontal="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/no_rekening"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="@color/textColorGray"
+                    android:labelFor="@id/et_no_hp"/>
+
+                <EditText
+                    android:id="@+id/et_no_rekening"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:textColor="@color/colorPrimary"
+                    android:fontFamily="@font/roboto_regular"
+                    android:inputType="phone"
+                    android:autofillHints="@string/no_hp"
+                    android:paddingTop="4dp"/>
+
+            </LinearLayout>
+
             <Button
                 android:id="@+id/btn_simpan"
                 android:theme="@style/buttonStyle"
                 android:layout_width="match_parent"
                 android:background="@drawable/bg_button_selector"
                 android:layout_height="42dp"
-                android:layout_below="@id/nohp"
+                android:layout_below="@id/no_rekening"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginVertical="16dp"
                 android:text="@string/simpan"
