@@ -95,6 +95,7 @@
     <string name="formattidakvalid">*Format tidak valid</string>
     <string name="verifikasiakunanda">Verifikasi akun anda</string>
     <string name="silahkanupload">Silahkan upload SIP (Surat Izin Praktik) anda untuk memverifikasi kebenaran akun ini</string>
+    <string name="silahkanuploadKTP">Silahkan upload KTP (Kartu Tanda Penduduk) anda untuk memverifikasi kebenaran akun ini</string>
     <string name="silahkanuploadbuktitrf">Silahkan upload bukti transfer anda. Proses ini guna untuk memvalidasi bahwa anda sudah benar-benar transfer.</string>
     <string name="unggahfoto">Unggah Foto</string>
     <string name="passwordsama">Password harus sama</string>

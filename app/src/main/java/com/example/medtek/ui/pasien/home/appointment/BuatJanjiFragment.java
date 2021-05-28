@@ -541,7 +541,11 @@ public class BuatJanjiFragment extends Fragment {
                 Locale locale = new Locale("in", "ID");
                 DateTimeFormatter halfDateFormat = DateTimeFormatter.ofPattern("dd MMM",locale);
                 LocalDate localDate = LocalDate.of(year,monthOfYear+1,dayOfMonth);
-                day = strDays[datePicker.get(Calendar.DAY_OF_WEEK)-1];
+                int temp = datePicker.get(Calendar.DAY_OF_WEEK);
+                if (temp == 1){
+                    temp = 8;
+                }
+                day = strDays[temp-1];
                 date = localDate.format(halfDateFormat);
                 btnNext.setEnabled(false);
 
@@ -613,6 +617,7 @@ public class BuatJanjiFragment extends Fragment {
 
                 for (int i = 0; i < days.size(); i++) {
                     if (strDays[days.get(i)[0]].equalsIgnoreCase(day)){
+                        Log.e(TAG, "onDateSet: "+ strDays[days.get(i)[0]] +" >< "+day);
                         for (int j = days.get(i)[1]; j <= days.get(i)[2]; j++) {
                             if (j>=8 && j <= 11){
                                 morningTime.add(j);

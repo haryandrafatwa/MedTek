@@ -49,7 +49,8 @@ public interface APIInterface {
             @Query("email") String email,
             @Query("password") String password,
             @Query("password_confirmation") String password_confirmation,
-            @Part MultipartBody.Part SIP
+            @Part MultipartBody.Part SIP,
+            @Part MultipartBody.Part KTP
     );
 
     @Headers({"Accept:application/json"})

@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.icu.text.SimpleDateFormat;
 import android.os.Environment;
 import android.text.method.LinkMovementMethod;
@@ -61,6 +62,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
 import okhttp3.ResponseBody;
@@ -189,7 +191,7 @@ public class MenungguKonfirmasiAdapter extends RecyclerView.Adapter<MenungguKonf
                                         LocalDate now1 = LocalDate.now();
                                         Period diff1 = Period.between(l1, now1);
 //                                        Log.e("TAG", "onClick: "+ sisa.split("Keluhan")[0]);
-                                        initializeDialogDetail(model.getId(),data.getString("name"), tgl, pukul,String.valueOf(diff1.getYears()),
+                                        initializeDialogDetail(model.getIdPasien(),model.getId(),data.getString("name"), tgl, pukul,String.valueOf(diff1.getYears()),
                                                String.valueOf( data.getInt("berat_badan")),String.valueOf(data.getInt("tinggi_badan")),String.valueOf(data.getInt("lingkar_tubuh")),
                                                 keluhan, ktp, model.getFilePath());
                                     } catch (JSONException | ParseException e) {
@@ -412,7 +414,7 @@ public class MenungguKonfirmasiAdapter extends RecyclerView.Adapter<MenungguKonf
         dialog.show();
     }
 
-    private void initializeDialogDetail(int idJanji, String namaPasien, String tgl, String pukul, String umur, String berat, String tinggi, String lingkar, String keluhan, String ktp, String filePath){
+    private void initializeDialogDetail(int idPasien, int idJanji, String namaPasien, String tgl, String pukul, String umur, String berat, String tinggi, String lingkar, String keluhan, String ktp, String filePath){
         Dialog dialog = new Dialog(mActivity,R.style.CustomAlertDialog);
         LayoutInflater inflater = mActivity.getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.dialog_detail_konfirmasi,null);
@@ -421,57 +423,79 @@ public class MenungguKonfirmasiAdapter extends RecyclerView.Adapter<MenungguKonf
         dialog.setTitle(null);
         RoundedImageView roundedImageView = dialogView.findViewById(R.id.riv_ktp);
 
-        Call<ResponseBody> callKTP = RetrofitClient.getInstance().getApi().getKTP("Bearer "+access);
-        callKTP.enqueue(new Callback<ResponseBody>()
-        {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (response.isSuccessful()) {
-                    if (response.body() != null) {
-                        // display the image data in a ImageView or save it
-                        try {
-                            byte[] bytes = response.body().bytes();
-//                            Bitmap bmp = BitmapFactory.decodeStream(response.body().byteStream());
-                            bmp = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        Log.e("RESPONSEBODY","ISNULL!");
-                        callKTP.clone().enqueue(this);
-                    }
-                }else{
-                    try {
-                        Log.e("RESPONSEBODY","ERROR: "+response.errorBody().string());
-                        callKTP.clone().enqueue(this);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.e("RESPONSEBODY","ERROR: "+t.getMessage());
-                callKTP.clone().enqueue(this);
-            }
-        });
+        SweetAlertDialog pDialog = new SweetAlertDialog(mActivity, SweetAlertDialog.PROGRESS_TYPE);
+        pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+        pDialog.setTitleText("Mohon tunggu ...");
+        pDialog.setCancelable(false);
 
         TextView tv_ktp_pasien = dialogView.findViewById(R.id.tv_ktp_pasien);
         tv_ktp_pasien.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!status){
-                    status = true;
-                    if (bmp != null){
-                        roundedImageView.setImageBitmap(bmp);
-                        roundedImageView.setVisibility(View.VISIBLE);
-                        tv_ktp_pasien.setText("Tutup");
-                    }
-                }else{
-                    status = false;
-                    tv_ktp_pasien.setText("Lihat KTP Pasien");
-                    roundedImageView.setVisibility(View.GONE);
+                pDialog.show();
+                File ktpFile = new File(Environment.getExternalStorageDirectory(), "/Download/MedTek/janji/"+idJanji+"/"+ktp);
+                if (!ktpFile.exists()){
+                    Call<ResponseBody> callKTP = RetrofitClient.getInstance().getApi().getPasienKTP("Bearer "+access,idPasien);
+                    callKTP.enqueue(new Callback<ResponseBody>(){
+                        @Override
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            if (response.isSuccessful()) {
+                                if (response.body() != null) {
+                                    // display the image data in a ImageView or save it
+                                    try {
+                                        byte[] bytes = response.body().bytes();
+                                        ktpFile.getParentFile().mkdirs();
+                                        InputStream input = new ByteArrayInputStream(bytes);
+                                        OutputStream output = new FileOutputStream(ktpFile);
+                                        try {
+                                            try {
+                                                byte[] buffer = new byte[4 * 1024]; // or other buffer size
+                                                int read;
+
+                                                while ((read = input.read(buffer)) != -1) {
+                                                    output.write(buffer, 0, read);
+                                                }
+                                                output.flush();
+                                            } finally {
+                                                output.close();
+                                            }
+                                        } catch (Exception e) {
+                                            e.printStackTrace(); // handle exception, define IOException and others
+                                        }
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                } else {
+                                    Log.e("RESPONSEBODY","ISNULL!");
+                                    callKTP.clone().enqueue(this);
+                                }
+                            }else{
+                                try {
+                                    Log.e("RESPONSEBODY","ERROR: "+response.errorBody().string());
+                                    callKTP.clone().enqueue(this);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+                            Log.e("RESPONSEBODY","ERROR: "+t.getMessage());
+                            callKTP.clone().enqueue(this);
+                        }
+                    });
+                }
+                Intent target = new Intent(Intent.ACTION_VIEW);
+                target.setDataAndType(FileProvider.getUriForFile(mActivity,mActivity.getApplicationContext().getPackageName()+".fileprovider",ktpFile),"image/*");
+                target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                target.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                Intent intent = Intent.createChooser(target, "Open File");
+                try {
+                    mActivity.startActivity(intent);
+                    pDialog.dismiss();
+                } catch (ActivityNotFoundException e) {
+                    // Instruct the user to install a PDF reader here, or something
                 }
             }
         });

@@ -323,8 +323,11 @@ public class DetailDokterFragment extends Fragment {
                                                                                             bundle.putString("date",date);
                                                                                             bundle.putString("snapToken",snapToken);
                                                                                             bundle.putString("lastFragment","DetailDokter");
-
-                                                                                            bundle.putString("time",detail_janji.split("Pukul")[1].split("\n")[0]);
+                                                                                            if(detail_janji.contains("Pukul")){
+                                                                                                bundle.putString("time",detail_janji.split("Pukul")[1].split("\n")[0]);
+                                                                                            }else{
+                                                                                                bundle.putString("time","-");
+                                                                                            }
                                                                                             bundle.putString("detailJanji",detail_janji);
                                                                                             progressDialog.dismiss();
                                                                                             Log.e(TAG, "onResponse: idJanji ->"+idJanji);

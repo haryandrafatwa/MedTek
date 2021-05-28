@@ -244,6 +244,7 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
                                                                     details.add(itemDetails);
                                                                     TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
                                                                     request.setItemDetails(details);
+                                                                    progressDialog.dismiss();
                                                                     MidtransSDK.getInstance().setTransactionRequest(request);
                                                                     MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
                                                                 }else{

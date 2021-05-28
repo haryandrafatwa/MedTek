@@ -10,256 +10,323 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <RelativeLayout
-            android:id="@+id/header"
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmerLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_home_bottom_rounded"
-            android:padding="16dp">
-
-            <RelativeLayout
-                android:id="@+id/rl_header"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="visible">
-
-                <RelativeLayout
-                    android:id="@+id/greetings"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <LinearLayout
-                        android:id="@+id/greeting"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/civ_user"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/tv_date_today"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textColor="@android:color/white"
-                            android:textSize="14sp"/>
-
-                        <TextView
-                            android:id="@+id/tv_nama_user"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textColor="@android:color/white"
-                            android:paddingStart="0dp"
-                            android:paddingEnd="@dimen/margin_8"
-                            android:textSize="24sp"
-                            android:textStyle="bold"
-                            android:ellipsize="end"
-                            android:maxLines="1"/>
-
-                    </LinearLayout>
-
-                    <de.hdodenhof.circleimageview.CircleImageView
-                        android:id="@+id/civ_user"
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
-                        android:layout_alignParentEnd="true"/>
-
-                </RelativeLayout>
-
-                <TextView
-                    android:id="@+id/janjikamuselanjutnya"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/janjibesok"
-                    android:layout_below="@id/greetings"
-                    android:layout_gravity="center_vertical"
-                    android:textColor="@color/mdtp_white"
-                    android:textSize="14sp"/>
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/janjikamuselanjutnya"
-                    android:background="@drawable/bg_search"
-                    android:layout_marginTop="4dp"
-                    android:padding="16dp">
-
-                    <de.hdodenhof.circleimageview.CircleImageView
-                        android:id="@+id/civ_pasien"
-                        android:layout_width="46dp"
-                        android:layout_height="46dp"/>
-
-                    <LinearLayout
-                        android:id="@+id/layout_pasien"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/ib_next"
-                        android:layout_toEndOf="@id/civ_pasien">
-
-                        <TextView
-                            android:id="@+id/tv_nama_pasien"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/search"
-                            android:layout_gravity="center_vertical"
-                            android:textColor="@android:color/white"
-                            android:layout_marginStart="16dp"
-                            android:textSize="14sp"/>
-
-                        <TextView
-                            android:id="@+id/tv_tgl_janji"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/search"
-                            android:layout_gravity="center_vertical"
-                            android:textColor="#FFA5A9"
-                            android:layout_marginStart="16dp"
-                            android:layout_marginTop="2dp"
-                            android:textSize="12sp"/>
-
-                    </LinearLayout>
-
-                    <ImageButton
-                        android:id="@+id/ib_next"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:contentDescription="@string/selanjutnya"
-                        android:background="@drawable/ic_chevron_right"
-                        android:backgroundTint="@android:color/white"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"/>
-
-                </RelativeLayout>
-
-            </RelativeLayout>
-
-            <ProgressBar
-                android:id="@+id/pb_header"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:indeterminateTint="@android:color/white"
-                android:visibility="gone"/>
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/rekomendasi_rs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/header"
-            android:layout_marginTop="16dp">
+            android:layout_height="wrap_content">
 
             <LinearLayout
-                android:id="@+id/info_no_rekening_null"
+                android:id="@+id/layout_loader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingHorizontal="@dimen/margin_32"
-                android:paddingVertical="@dimen/margin_8"
-                android:background="@drawable/bg_input_info_rounded"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginBottom="@dimen/margin_16"
-                android:visibility="gone">
+                android:paddingBottom="@dimen/margin_16"
+                android:orientation="vertical">
 
-                <ImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/ic_info"
-                    android:backgroundTint="#B3944F"
-                    android:layout_gravity="center"
-                    android:contentDescription="@string/drrsloc"/>
+                <include layout="@layout/placeholder_header_home_dokter"/>
 
-                <com.codesgood.views.JustifiedTextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/infonorekeningnull"
-                    android:fontFamily="@font/roboto_regular"
-                    android:textColor="#80000000"
-                    android:textSize="12sp"
-                    android:ellipsize="end"
-                    android:maxLines="3"
-                    android:layout_marginStart="@dimen/margin_16"/>
+                    android:orientation="horizontal"
+                    android:weightSum="12"
+                    android:layout_marginTop="@dimen/margin_16"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="8"
+                        android:layout_height="wrap_content"
+                        android:background="@color/shimmer_color"
+                        android:layout_marginStart="@dimen/margin_16"
+                        android:layout_marginEnd="@dimen/margin_8"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        app:autoSizeTextType="uniform"
+                        app:autoSizeMinTextSize="16sp"
+                        app:autoSizeMaxTextSize="100sp"
+                        app:autoSizeStepGranularity="10sp"
+                        android:textColor="@color/colorPrimary"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="4"
+                        android:layout_height="wrap_content"
+                        android:textSize="18sp"
+                        android:gravity="center_vertical|end"
+                        android:layout_marginEnd="@dimen/margin_16"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="@color/colorAccent"
+                        android:background="@color/shimmer_color"
+                        android:visibility="visible"/>
+
+                </LinearLayout>
+
+                <include layout="@layout/placeholder_item_antrian"/>
+                <include layout="@layout/placeholder_item_antrian"/>
+                <include layout="@layout/placeholder_item_antrian"/>
 
             </LinearLayout>
 
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
+        <RelativeLayout
+            android:id="@+id/layout_visible"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone">
+
             <RelativeLayout
-                android:id="@+id/st_rekrs"
+                android:id="@+id/header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:layout_below="@id/info_no_rekening_null">
+                android:background="@drawable/bg_home_bottom_rounded"
+                android:padding="16dp">
 
-                <TextView
-                    android:id="@+id/tv_rekrs"
+                <RelativeLayout
+                    android:id="@+id/rl_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible">
+
+                    <RelativeLayout
+                        android:id="@+id/greetings"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <LinearLayout
+                            android:id="@+id/greeting"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_toStartOf="@id/civ_user"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tv_date_today"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textColor="@android:color/white"
+                                android:textSize="14sp"/>
+
+                            <TextView
+                                android:id="@+id/tv_nama_user"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textColor="@android:color/white"
+                                android:paddingStart="0dp"
+                                android:paddingEnd="@dimen/margin_8"
+                                android:textSize="24sp"
+                                android:textStyle="bold"
+                                android:ellipsize="end"
+                                android:maxLines="1"/>
+
+                        </LinearLayout>
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/civ_user"
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:layout_alignParentEnd="true"/>
+
+                    </RelativeLayout>
+
+                    <TextView
+                        android:id="@+id/janjikamuselanjutnya"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/janjibesok"
+                        android:layout_below="@id/greetings"
+                        android:layout_gravity="center_vertical"
+                        android:textColor="@color/mdtp_white"
+                        android:textSize="14sp"/>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/janjikamuselanjutnya"
+                        android:background="@drawable/bg_search"
+                        android:layout_marginTop="4dp"
+                        android:padding="16dp">
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/civ_pasien"
+                            android:layout_width="46dp"
+                            android:layout_height="46dp"/>
+
+                        <LinearLayout
+                            android:id="@+id/layout_pasien"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_centerVertical="true"
+                            android:layout_toStartOf="@id/ib_next"
+                            android:layout_toEndOf="@id/civ_pasien">
+
+                            <TextView
+                                android:id="@+id/tv_nama_pasien"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/search"
+                                android:layout_gravity="center_vertical"
+                                android:textColor="@android:color/white"
+                                android:layout_marginStart="16dp"
+                                android:textSize="14sp"/>
+
+                            <TextView
+                                android:id="@+id/tv_tgl_janji"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/search"
+                                android:layout_gravity="center_vertical"
+                                android:textColor="#FFA5A9"
+                                android:layout_marginStart="16dp"
+                                android:layout_marginTop="2dp"
+                                android:textSize="12sp"/>
+
+                        </LinearLayout>
+
+                        <ImageButton
+                            android:id="@+id/ib_next"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:contentDescription="@string/selanjutnya"
+                            android:background="@drawable/ic_chevron_right"
+                            android:backgroundTint="@android:color/white"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"/>
+
+                    </RelativeLayout>
+
+                </RelativeLayout>
+
+                <ProgressBar
+                    android:id="@+id/pb_header"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/menunggukonfirmasi"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/colorPrimary"
-                    android:layout_toStartOf="@id/tv_seekonfirmasi"
-                    android:layout_alignParentStart="true"/>
-
-                <TextView
-                    android:id="@+id/tv_seekonfirmasi"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/lihatsemua"
-                    android:textSize="12sp"
-                    android:fontFamily="@font/roboto_medium"
-                    android:textColor="@color/colorAccent"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
+                    android:layout_centerInParent="true"
+                    android:indeterminateTint="@android:color/white"
                     android:visibility="gone"/>
 
             </RelativeLayout>
 
             <RelativeLayout
+                android:id="@+id/rekomendasi_rs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/st_rekrs">
+                android:layout_below="@id/header"
+                android:layout_marginTop="16dp">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_menunggu_konfirmasi"
+                <LinearLayout
+                    android:id="@+id/info_no_rekening_null"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="visible"
-                    android:orientation="vertical"
-                    tools:listitem="@layout/item_antrian_konfirmasi"
-                    tools:itemCount="4"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-
-                <RelativeLayout
-                    android:id="@+id/layout_empty_konfirmasi_queue"
-                    android:layout_width="match_parent"
-                    android:layout_height="140dp"
-                    android:background="@drawable/bg_recycler_item"
-                    android:layout_marginHorizontal="@dimen/margin_16"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="16dp"
-                    android:elevation="4dp"
-                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="@dimen/margin_32"
+                    android:paddingVertical="@dimen/margin_8"
+                    android:background="@drawable/bg_input_info_rounded"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginBottom="@dimen/margin_16"
                     android:visibility="gone">
 
-                    <de.hdodenhof.circleimageview.CircleImageView
-                        android:id="@+id/civ_empty"
-                        android:layout_width="70dp"
-                        android:layout_height="70dp"
-                        android:layout_centerHorizontal="true"
-                        android:background="@drawable/ic_list"/>
-
-                    <TextView
-                        android:id="@+id/tv_hospital_empty"
+                    <ImageButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/textColorDark"
+                        android:background="@drawable/ic_info"
+                        android:backgroundTint="#B3944F"
+                        android:layout_gravity="center"
+                        android:contentDescription="@string/drrsloc"/>
+
+                    <com.codesgood.views.JustifiedTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/infonorekeningnull"
+                        android:fontFamily="@font/roboto_regular"
+                        android:textColor="#80000000"
+                        android:textSize="12sp"
+                        android:ellipsize="end"
+                        android:maxLines="3"
+                        android:layout_marginStart="@dimen/margin_16"/>
+
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:id="@+id/st_rekrs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_below="@id/info_no_rekening_null">
+
+                    <TextView
+                        android:id="@+id/tv_rekrs"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/menunggukonfirmasi"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimary"
+                        android:layout_toStartOf="@id/tv_seekonfirmasi"
+                        android:layout_alignParentStart="true"/>
+
+                    <TextView
+                        android:id="@+id/tv_seekonfirmasi"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/lihatsemua"
+                        android:textSize="12sp"
                         android:fontFamily="@font/roboto_medium"
-                        android:layout_below="@id/civ_empty"
-                        android:layout_centerHorizontal="true"
-                        android:text="@string/tidakadakonfirmasi"
-                        android:layout_marginTop="@dimen/margin_8"/>
+                        android:textColor="@color/colorAccent"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:visibility="gone"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/st_rekrs">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_menunggu_konfirmasi"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="visible"
+                        android:orientation="vertical"
+                        tools:listitem="@layout/item_antrian_konfirmasi"
+                        tools:itemCount="4"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+                    <RelativeLayout
+                        android:id="@+id/layout_empty_konfirmasi_queue"
+                        android:layout_width="match_parent"
+                        android:layout_height="140dp"
+                        android:background="@drawable/bg_recycler_item"
+                        android:layout_marginHorizontal="@dimen/margin_16"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="16dp"
+                        android:elevation="4dp"
+                        android:gravity="center"
+                        android:visibility="gone">
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/civ_empty"
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
+                            android:layout_centerHorizontal="true"
+                            android:background="@drawable/ic_list"/>
+
+                        <TextView
+                            android:id="@+id/tv_hospital_empty"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/textColorDark"
+                            android:fontFamily="@font/roboto_medium"
+                            android:layout_below="@id/civ_empty"
+                            android:layout_centerHorizontal="true"
+                            android:text="@string/tidakadakonfirmasi"
+                            android:layout_marginTop="@dimen/margin_8"/>
+
+                    </RelativeLayout>
 
                 </RelativeLayout>
 

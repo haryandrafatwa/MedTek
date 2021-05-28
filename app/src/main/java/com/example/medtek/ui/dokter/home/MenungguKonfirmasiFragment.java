@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -21,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.medtek.R;
 import com.example.medtek.model.dokter.JanjiModel;
 import com.example.medtek.network.RetrofitClient;
+import com.facebook.shimmer.ShimmerFrameLayout;
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 
 import org.json.JSONArray;
@@ -46,6 +48,8 @@ public class MenungguKonfirmasiFragment extends Fragment {
     private RecyclerView.LayoutManager mLayoutManager;
     private MenungguKonfirmasiAdapter mAdapter;
     private RecyclerView recyclerView;
+    private LinearLayout ll_loader;
+    private ShimmerFrameLayout shimmerFrameLayout;
 
     private String access, refresh;
     private ChipNavigationBar bottomBar;
@@ -114,6 +118,9 @@ public class MenungguKonfirmasiFragment extends Fragment {
                                 }
                             }
                             initRecyclerViewItem();
+                            recyclerView.setVisibility(View.VISIBLE);
+                            ll_loader.setVisibility(View.GONE);
+                            shimmerFrameLayout.stopShimmer();
                         }
                     }
                 } catch (IOException | JSONException e) {
@@ -137,9 +144,11 @@ public class MenungguKonfirmasiFragment extends Fragment {
         setToolbar();
 
         bottomBar = getActivity().findViewById(R.id.bottomBar);
-        bottomBar.setVisibility(View.VISIBLE);
+        bottomBar.setVisibility(View.GONE);
 
         recyclerView = getActivity().findViewById(R.id.rv_antrian_konfirmasi);
+        shimmerFrameLayout = getActivity().findViewById(R.id.shimmerLayout);
+        ll_loader = getActivity().findViewById(R.id.layout_loader);
 
     }
 

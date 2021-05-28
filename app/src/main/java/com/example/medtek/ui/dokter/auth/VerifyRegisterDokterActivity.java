@@ -1,6 +1,7 @@
 package com.example.medtek.ui.dokter.auth;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,7 +37,9 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import es.dmoral.toasty.Toasty;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -47,20 +51,23 @@ import retrofit2.Response;
 public class VerifyRegisterDokterActivity extends AppCompatActivity {
 
     private String nama_lengkap,email,password;
-    private RelativeLayout upload_image;
+    private RelativeLayout upload_image_sip, upload_image_ktp;
     private Button daftar;
-    private RoundedImageView roundedImageView;
+    private RoundedImageView riv_sip, riv_ktp;
     private Toolbar toolbar;
+    private SweetAlertDialog pDialog;
 
-    private static final int GALLERY = 22 ;
+    private static final int GALLERY_SIP = 20 ;
+    private static final int GALLERY_KTP = 21 ;
+    private static final int CAMERA_SIP = 30;
+    private static final int CAMERA_KTP = 31;
     private static final String APP_TAG = "MedTek";
-    private static final int CAMERAA = 33;
-    private final String photoFileName = "ic_user.png";
-    private Uri filePath;
-    private File finalFile;
-    private String postPath;
+    private final String photoFileName = DateFormat.format("MM-dd-yy hh-mm-ss", new Date()).toString();
+    private Uri filePath,ktpPath;
+    private File finalFile, ktpFile;
+    private String postPath, ktpPostPath;
 
-    private RequestBody requestBody;
+    private RequestBody requestBodySIP, requestBodyKTP;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +81,7 @@ public class VerifyRegisterDokterActivity extends AppCompatActivity {
 
         initialize();
 
-        upload_image.setOnClickListener(new View.OnClickListener() {
+        upload_image_sip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(VerifyRegisterDokterActivity.this,R.style.BottomSheetDialogTheme);
@@ -83,14 +90,14 @@ public class VerifyRegisterDokterActivity extends AppCompatActivity {
                 bottomSheetView.findViewById(R.id.layout_camera).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        dispatchTakePictureIntent();
+                        dispatchTakePictureIntent("SIP");
                         bottomSheetDialog.cancel();
                     }
                 });
                 bottomSheetView.findViewById(R.id.layout_gallery).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        choosePhotoFromGallery();
+                        choosePhotoFromGallery("SIP");
                         bottomSheetDialog.cancel();
                     }
                 });
@@ -99,29 +106,66 @@ public class VerifyRegisterDokterActivity extends AppCompatActivity {
                 bottomSheetDialog.show();
             }
         });
-        roundedImageView.setOnClickListener(new View.OnClickListener() {
+        riv_sip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                upload_image.performClick();
+                upload_image_sip.performClick();
+            }
+        });
+
+        upload_image_ktp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(VerifyRegisterDokterActivity.this,R.style.BottomSheetDialogTheme);
+                View bottomSheetView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.bottom_sheet_take_image,(RelativeLayout)findViewById(R.id.bottomSheetContainer));
+
+                bottomSheetView.findViewById(R.id.layout_camera).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dispatchTakePictureIntent("KTP");
+                        bottomSheetDialog.cancel();
+                    }
+                });
+                bottomSheetView.findViewById(R.id.layout_gallery).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        choosePhotoFromGallery("KTP");
+                        bottomSheetDialog.cancel();
+                    }
+                });
+
+                bottomSheetDialog.setContentView(bottomSheetView);
+                bottomSheetDialog.show();
+            }
+        });
+        riv_ktp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                upload_image_ktp.performClick();
             }
         });
 
         daftar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (filePath==null){
+                pDialog.show();
+                if (postPath==null || ktpPostPath == null){
+                    pDialog.dismiss();
                     Toasty.error(VerifyRegisterDokterActivity.this,getResources().getString(R.string.silahkanunggahfoto)).show();
                 }else{
 
                     File file = new File(postPath);
+                    File ktpFile = new File (ktpPostPath);
 
-                    MultipartBody.Part part = MultipartBody.Part.createFormData("SIP",file.getName(),requestBody);
+                    MultipartBody.Part part = MultipartBody.Part.createFormData("SIP",file.getName(),requestBodySIP);
+                    MultipartBody.Part ktpPart = MultipartBody.Part.createFormData("ktp",ktpFile.getName(),requestBodyKTP);
 
-                    Call<JSONObject> call = RetrofitClient.getInstance().getApi().register_dokter(nama_lengkap,email,password,password,part);
+                    Call<JSONObject> call = RetrofitClient.getInstance().getApi().register_dokter(nama_lengkap,email,password,password,part,ktpPart);
                     call.enqueue(new Callback<JSONObject>() {
                         @Override
                         public void onResponse(Call<JSONObject> call, Response<JSONObject> response) {
                             if (response.isSuccessful()){
+                                pDialog.dismiss();
                                 initializeDialogSuccess();
                             }else{
                                 Log.d("errorRegist", response.message());
@@ -151,26 +195,36 @@ public class VerifyRegisterDokterActivity extends AppCompatActivity {
     }
 
     private void initialize(){
-        upload_image = findViewById(R.id.upload_image);
+        upload_image_sip = findViewById(R.id.upload_image_sip);
+        upload_image_ktp = findViewById(R.id.upload_image_ktp);
         daftar = findViewById(R.id.btn_daftar_verify);
-        roundedImageView = findViewById(R.id.riv_upload_image);
+        riv_sip = findViewById(R.id.riv_upload_image_sip);
+        riv_ktp = findViewById(R.id.riv_upload_image_ktp);
         toolbar = findViewById(R.id.toolbar);
         setToolbar();
+        setSweetAlert();
+    }
+
+    private void setSweetAlert(){
+        pDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
+        pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+        pDialog.setTitleText("Mohon tunggu ...");
+        pDialog.setCancelable(false);
     }
 
     private void initializeDialogSuccess(){
-        android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(this,R.style.CustomAlertDialog);
+        Dialog dialog = new Dialog(this,R.style.CustomAlertDialog);
         LayoutInflater inflater = getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.dialog_daftar_dokter_berhasil,null);
-        dialogView.setBackgroundColor(Color.TRANSPARENT);
-        dialog.setView(dialogView);
+        dialogView.setBackground(getDrawable(R.drawable.dialog_background));
+        dialog.setContentView(dialogView);
         dialog.setCancelable(false);
         dialog.setTitle(null);
 
-        dialog.setPositiveButton(getResources().getString(R.string.oke), new DialogInterface.OnClickListener() {
+        dialogView.findViewById(R.id.btnNext).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
+            public void onClick(View v) {
+                dialog.dismiss();
                 Intent intent = new Intent(VerifyRegisterDokterActivity.this, WelcomePageActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
@@ -181,16 +235,27 @@ public class VerifyRegisterDokterActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void dispatchTakePictureIntent() {
+    private void dispatchTakePictureIntent(String event) {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 1);
         } else {
-            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            finalFile = getPhotoFileUri(photoFileName);
-            filePath = FileProvider.getUriForFile(this, "com.example.medtek.fileprovider", finalFile);
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, filePath);
-            if (intent.resolveActivity(this.getPackageManager()) != null) {
-                startActivityForResult(intent, CAMERAA);
+            if(event.equalsIgnoreCase("SIP")){
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                finalFile = getPhotoFileUri(photoFileName);
+                filePath = FileProvider.getUriForFile(this, "com.example.medtek.fileprovider", finalFile);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, filePath);
+                if (intent.resolveActivity(this.getPackageManager()) != null) {
+                    startActivityForResult(intent, CAMERA_SIP);
+                }
+            }else{
+
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                ktpFile = getPhotoFileUri(photoFileName);
+                ktpPath = FileProvider.getUriForFile(this, "com.example.medtek.fileprovider", ktpFile);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, ktpPath);
+                if (intent.resolveActivity(this.getPackageManager()) != null) {
+                    startActivityForResult(intent, CAMERA_KTP);
+                }
             }
         }
 
@@ -199,32 +264,57 @@ public class VerifyRegisterDokterActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == GALLERY && resultCode == RESULT_OK) {
+        if (requestCode == GALLERY_SIP && resultCode == RESULT_OK) {
 
             try {
                 filePath = data.getData();
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), filePath);
-                roundedImageView.setImageBitmap(bitmap);
-                roundedImageView.setVisibility(View.VISIBLE);
-                upload_image.setVisibility(View.GONE);
+                riv_sip.setImageBitmap(bitmap);
+                riv_sip.setVisibility(View.VISIBLE);
+                upload_image_sip.setVisibility(View.GONE);
                 postPath = new File(FileUtil.getPath(filePath,VerifyRegisterDokterActivity.this)).getPath();
-                requestBody = RequestBody.create(MediaType.parse("image/*"),new File(FileUtil.getPath(filePath,VerifyRegisterDokterActivity.this)));
+                requestBodySIP = RequestBody.create(MediaType.parse("image/*"),new File(FileUtil.getPath(filePath,VerifyRegisterDokterActivity.this)));
             }
             catch (IOException e)
             {
                 e.printStackTrace();
             }
-        }
-
-        if (requestCode == CAMERAA && resultCode == RESULT_OK) {
+        }else if (requestCode == CAMERA_SIP && resultCode == RESULT_OK) {
 
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), filePath);
-                roundedImageView.setImageBitmap(bitmap);
-                roundedImageView.setVisibility(View.VISIBLE);
-                upload_image.setVisibility(View.GONE);
+                riv_sip.setImageBitmap(bitmap);
+                riv_sip.setVisibility(View.VISIBLE);
+                upload_image_sip  .setVisibility(View.GONE);
                 postPath = filePath.getPath();
-                requestBody = RequestBody.create(MediaType.parse("image/*"),getPhotoFileUri(new File(filePath.getPath()).getName()));
+                requestBodySIP = RequestBody.create(MediaType.parse("image/*"),getPhotoFileUri(new File(filePath.getPath()).getName()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else if (requestCode == GALLERY_KTP && resultCode == RESULT_OK) {
+
+            try {
+                ktpPath = data.getData();
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), ktpPath);
+                riv_ktp.setImageBitmap(bitmap);
+                riv_ktp.setVisibility(View.VISIBLE);
+                upload_image_ktp.setVisibility(View.GONE);
+                ktpPostPath = new File(FileUtil.getPath(ktpPath,VerifyRegisterDokterActivity.this)).getPath();
+                requestBodyKTP = RequestBody.create(MediaType.parse("image/*"),new File(FileUtil.getPath(ktpPath,VerifyRegisterDokterActivity.this)));
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }else if (requestCode == CAMERA_KTP && resultCode == RESULT_OK) {
+
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), ktpPath);
+                riv_ktp.setImageBitmap(bitmap);
+                riv_ktp.setVisibility(View.VISIBLE);
+                upload_image_ktp  .setVisibility(View.GONE);
+                ktpPostPath = ktpPath.getPath();
+                requestBodyKTP = RequestBody.create(MediaType.parse("image/*"),getPhotoFileUri(new File(ktpPath.getPath()).getName()));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -245,7 +335,7 @@ public class VerifyRegisterDokterActivity extends AppCompatActivity {
     }
 
     //method utk menampilkan galeri foto user
-    private void choosePhotoFromGallery() {
+    private void choosePhotoFromGallery(String event) {
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
@@ -256,7 +346,11 @@ public class VerifyRegisterDokterActivity extends AppCompatActivity {
                 Intent intent = new Intent();
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), GALLERY);
+                if (event.equalsIgnoreCase("SIP")){
+                    startActivityForResult(Intent.createChooser(intent, "Select Picture"), GALLERY_SIP);
+                }else{
+                    startActivityForResult(Intent.createChooser(intent, "Select Picture"), GALLERY_KTP);
+                }
             }
         }
     }

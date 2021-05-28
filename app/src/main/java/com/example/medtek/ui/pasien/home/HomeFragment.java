@@ -349,43 +349,47 @@ public class HomeFragment extends Fragment {
                                 }else{
                                     isVerified = 0;
                                 }
-                                String path = "";
 
-                                JSONArray jsonArrayImage = new JSONArray(jo.getString("image"));
-                                for (int j = 0; j < jsonArrayImage.length(); j++) {
-                                    JSONObject imageObj = jsonArrayImage.getJSONObject(j);
-                                    if (imageObj.getInt("type_id") == 1) {
-                                        path = BASE_URL + imageObj.getString("path");
-                                        break;
-                                    }
-                                    Log.d(TAG(HomeFragment.class), "pathImage:" + path);
-                                }
-                                JSONObject rsObject = new JSONObject(jo.getString("hospital"));
-                                String rs_name = rsObject.getString("name");
-                                JSONObject alamatObject = new JSONObject(jo.getString("alamat"));
-                                String kelurahan = alamatObject.getString("kelurahan");
-                                String kota = alamatObject.getString("kota");
-                                String rs_loc = kelurahan+", "+kota;
+                                if (!jo.isNull("hospital")){
+                                    JSONObject rsObject = jo.getJSONObject("hospital");
+                                    String path = "";
 
-                                JSONObject specObj = new JSONObject(jo.getString("specialization"));
-                                String spec = specObj.getString("specialization");
-                                int harga = jo.getInt("harga");
-                                int id = jo.getInt("id");
-                                int lamakerja =  (jo.isNull("lama_kerja")) ? 0 : Integer.valueOf(jo.getString("lama_kerja"));
-                                float rating = Float.valueOf(jo.getString("rating"));
-                                if (isVerified == 1){
-                                    mListDokter.add(new DokterModel(id,name,email,spec,rs_name,rs_loc,path,harga,rating,isVerified,lamakerja));
-                                    mAdapterADokter.notifyDataSetChanged();
-                                }
-                                rv_dokter.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                                    @Override
-                                    public void onGlobalLayout() {
-                                        if(recyclerViewReadyCallback != null){
-                                            recyclerViewReadyCallback.onLayoutReady();
+                                    JSONArray jsonArrayImage = new JSONArray(jo.getString("image"));
+                                    for (int j = 0; j < jsonArrayImage.length(); j++) {
+                                        JSONObject imageObj = jsonArrayImage.getJSONObject(j);
+                                        if (imageObj.getInt("type_id") == 1) {
+                                            path = BASE_URL + imageObj.getString("path");
+                                            break;
                                         }
-                                        rv_dokter.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                                        Log.d(TAG(HomeFragment.class), "pathImage:" + path);
                                     }
-                                });
+
+                                    String rs_name = rsObject.getString("name");
+                                    JSONObject alamatObject = new JSONObject(jo.getString("alamat"));
+                                    String kelurahan = alamatObject.getString("kelurahan");
+                                    String kota = alamatObject.getString("kota");
+                                    String rs_loc = kelurahan+", "+kota;
+
+                                    JSONObject specObj = new JSONObject(jo.getString("specialization"));
+                                    String spec = specObj.getString("specialization");
+                                    int harga = jo.getInt("harga");
+                                    int id = jo.getInt("id");
+                                    int lamakerja =  (jo.isNull("lama_kerja")) ? 0 : Integer.valueOf(jo.getString("lama_kerja"));
+                                    float rating = Float.valueOf(jo.getString("rating"));
+                                    if (isVerified == 1){
+                                        mListDokter.add(new DokterModel(id,name,email,spec,rs_name,rs_loc,path,harga,rating,isVerified,lamakerja));
+                                        mAdapterADokter.notifyDataSetChanged();
+                                    }
+                                    rv_dokter.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                                        @Override
+                                        public void onGlobalLayout() {
+                                            if(recyclerViewReadyCallback != null){
+                                                recyclerViewReadyCallback.onLayoutReady();
+                                            }
+                                            rv_dokter.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                                        }
+                                    });
+                                }
                             }
                             isDokterDone = true;
                             disabledShimmer();
@@ -517,7 +521,7 @@ public class HomeFragment extends Fragment {
                 bundle.putString("Phone",phone);
                 nominalFragment.setArguments(bundle);
                 setFragment(nominalFragment,"FragmentNominal");*/
-                Toasty.info(getActivity(),"Under Maintenance!",Toasty.LENGTH_LONG).show();
+                getAlertMaintenance();
             }
         });
 
@@ -528,6 +532,41 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        ib_withdraw.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getAlertMaintenance();
+            }
+        });
+
+        tv_withdraw.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ib_withdraw.performClick();
+            }
+        });
+
+        ib_history.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getAlertMaintenance();
+            }
+        });
+
+        tv_history.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ib_history.performClick();
+            }
+        });
+
+    }
+
+    private void getAlertMaintenance(){
+        new SweetAlertDialog(getActivity(), SweetAlertDialog.WARNING_TYPE)
+                .setTitleText("Under Maintenance!")
+                .setContentText("Fitur masih dalam proses pengembangan.")
+                .show();
     }
 
     public void getAllHospital() {
@@ -731,8 +770,8 @@ public class HomeFragment extends Fragment {
                                                         .show();
                                             }else if (jsonObject.getString("message").equalsIgnoreCase("Janji Queued")){
                                                 CHANNEL_MESSAGES = drName+" telah mengkonfirmasi janji anda, mohon tunggu.";
-                                                new SweetAlertDialog(getActivity(), SweetAlertDialog.SUCCESS_TYPE)
-                                                        .setTitleText("Janji Diterima!")
+                                                SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(App.getContext(), SweetAlertDialog.SUCCESS_TYPE);
+                                                sweetAlertDialog.setTitleText("Janji Diterima!")
                                                         .setContentText("Janji anda telah diterima, silahkan menunggu antrian pada halaman chat")
                                                         .setConfirmButtonBackgroundColor(Color.parseColor("#2196F3"))
                                                         .show();

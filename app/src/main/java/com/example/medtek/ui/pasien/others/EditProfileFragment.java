@@ -90,6 +90,7 @@ public class EditProfileFragment extends Fragment {
     private EditText et_nama, et_email, et_tgl, et_noHp, et_noRekening;
     private TextView male, female,isverify;
     private Button btn_simpan;
+    private LinearLayout ll_noRekening;
 
     private static final int GALLERY = 22 ;
     private static final String APP_TAG = "MedTek";
@@ -196,6 +197,11 @@ public class EditProfileFragment extends Fragment {
                             email = user.getString("email");
                             et_nama.setText(user.getString("name"));
                             et_email.setText(user.getString("email"));
+                            if (user.getInt("role_id") == 1){
+                                ll_noRekening.setVisibility(View.GONE);
+                            }else{
+                                ll_noRekening.setVisibility(View.VISIBLE);
+                            }
                             if (!user.isNull("email_verified_at")){
                                 isverify.setText(R.string.terverifikasi);
                                 isverify.setBackground(getResources().getDrawable(R.drawable.bg_button_red));
@@ -505,6 +511,7 @@ public class EditProfileFragment extends Fragment {
         female = getActivity().findViewById(R.id.tv_female);
         btn_simpan = getActivity().findViewById(R.id.btn_simpan);
         isverify = getActivity().findViewById(R.id.is_verify);
+        ll_noRekening = getActivity().findViewById(R.id.no_rekening);
 
         et_tgl.setFocusable(false);
         et_tgl.setOnClickListener(new View.OnClickListener() {

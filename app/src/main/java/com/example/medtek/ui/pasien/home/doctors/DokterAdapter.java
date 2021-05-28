@@ -58,9 +58,13 @@ public class DokterAdapter extends RecyclerView.Adapter<DokterAdapter.ViewHolder
         lf.setMargins(margin_rl, 0, 0, 0);
         ll.setMargins(0, 0, margin_rl_end, 0);
 
-        if (position==(getItemCount()-1)){
-            holder.relativeLayout.setLayoutParams(ll);
-        } else if(position==0){
+        if(getItemCount() > 1){
+            if (position==(getItemCount()-1)){
+                holder.relativeLayout.setLayoutParams(ll);
+            } else if(position==0){
+                holder.relativeLayout.setLayoutParams(lf);
+            }
+        }else{
             holder.relativeLayout.setLayoutParams(lf);
         }
 
@@ -69,7 +73,7 @@ public class DokterAdapter extends RecyclerView.Adapter<DokterAdapter.ViewHolder
         final Transformation transformation = new RoundedCornersTransformation(radius, margin);
 
         if (!model.getImage_url().isEmpty()){
-            Picasso.get().load(model.getImage_url()).transform(transformation).into(holder.civ_dokter);
+            Picasso.get().load(model.getImage_url()).into(holder.civ_dokter);
         }else{
             holder.civ_dokter.setImageDrawable(mActivity.getDrawable(R.drawable.ic_dokter));
         }
