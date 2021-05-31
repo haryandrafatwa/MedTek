@@ -8,6 +8,7 @@
     <color name="textColorGray">#8D8182</color>
     <color name="textColorGrayBlue">#666773</color>
     <color name="textColorLightGray">#D2D2D2</color>
+    <color name="hint_color">#808080</color>
     <color name="textColorDark">#212121</color>
     <color name="textColorLightRed">#E19B9E</color>
     <color name="textColorDarkRed">#B2151B</color>

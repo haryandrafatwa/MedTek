@@ -87,10 +87,9 @@ public class EditProfileFragment extends Fragment {
     private DatePickerDialog datePickerDialog;
 
     private CircleImageView circleImageView,civ_temp;
-    private EditText et_nama, et_email, et_tgl, et_noHp, et_noRekening;
+    private EditText et_nama, et_email, et_tgl, et_noHp;
     private TextView male, female,isverify;
     private Button btn_simpan;
-    private LinearLayout ll_noRekening;
 
     private static final int GALLERY = 22 ;
     private static final String APP_TAG = "MedTek";
@@ -101,9 +100,9 @@ public class EditProfileFragment extends Fragment {
     private String postPath;
     private RequestBody requestBody;
 
-    private String access, refresh, tglLahir, jenis_kelamin, noHp, name, email, noRekening;
+    private String access, refresh, tglLahir, jenis_kelamin, noHp, name, email;
     private int counter=0;
-    private String updateTgl, updateName, updateNoHp, updateJK, updateNoRekening;
+    private String updateTgl, updateName, updateNoHp, updateJK;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -197,11 +196,6 @@ public class EditProfileFragment extends Fragment {
                             email = user.getString("email");
                             et_nama.setText(user.getString("name"));
                             et_email.setText(user.getString("email"));
-                            if (user.getInt("role_id") == 1){
-                                ll_noRekening.setVisibility(View.GONE);
-                            }else{
-                                ll_noRekening.setVisibility(View.VISIBLE);
-                            }
                             if (!user.isNull("email_verified_at")){
                                 isverify.setText(R.string.terverifikasi);
                                 isverify.setBackground(getResources().getDrawable(R.drawable.bg_button_red));
@@ -229,13 +223,6 @@ public class EditProfileFragment extends Fragment {
                             }else{
                                 noHp = "-";
                                 et_noHp.setText("-");
-                            }
-                            if (user.getString("nomor_rekening") != "null"){
-                                noRekening = user.getString("nomor_rekening");
-                                et_noRekening.setText(user.getString("nomor_rekening"));
-                            }else{
-                                noRekening = "-";
-                                et_noRekening.setText("-");
                             }
                             String path="";
                             JSONArray jsonArrayImage = user.getJSONArray("image");
@@ -334,26 +321,6 @@ public class EditProfileFragment extends Fragment {
             public void afterTextChanged(Editable s) {
             }
         });
-        et_noRekening.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (!noRekening.equalsIgnoreCase(s.toString())){
-                    counter+=1;
-                    btn_simpan.setEnabled(true);
-                    updateNoRekening = s.toString();
-                }else{
-                    btn_simpan.setEnabled(false);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
 
         male.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -404,8 +371,6 @@ public class EditProfileFragment extends Fragment {
                     jsonParams.put("notelp",updateNoHp);
                     noHp = updateNoHp;
                 }
-                jsonParams.put("nomor_rekening",updateNoRekening);
-                noRekening = updateNoRekening;
                 jsonParams.put("email",email);
 
                 RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"),(new JSONObject(jsonParams)).toString());
@@ -506,12 +471,10 @@ public class EditProfileFragment extends Fragment {
         et_email = getActivity().findViewById(R.id.et_email);
         et_noHp = getActivity().findViewById(R.id.et_no_hp);
         et_tgl = getActivity().findViewById(R.id.et_tgl);
-        et_noRekening = getActivity().findViewById(R.id.et_no_rekening);
         male = getActivity().findViewById(R.id.tv_male);
         female = getActivity().findViewById(R.id.tv_female);
         btn_simpan = getActivity().findViewById(R.id.btn_simpan);
         isverify = getActivity().findViewById(R.id.is_verify);
-        ll_noRekening = getActivity().findViewById(R.id.no_rekening);
 
         et_tgl.setFocusable(false);
         et_tgl.setOnClickListener(new View.OnClickListener() {

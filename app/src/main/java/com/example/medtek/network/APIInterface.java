@@ -149,6 +149,12 @@ public interface APIInterface {
     Call<ResponseBody> getAllHospital();
 
     @Headers({"Accept:application/json"})
+    @GET("specialization")
+    Call<ResponseBody> getSpecializationList(
+            @Header("Authorization") String token
+    );
+
+    @Headers({"Accept:application/json"})
     @GET("get-hospital/{id}")
     Call<ResponseBody> getHospitalId(
             @Path("id") int id

@@ -66,6 +66,7 @@ public class OthersFragment extends Fragment {
 
     private String access, refresh;
     private boolean isVerified;
+    private int role_id;
 
     private RelativeLayout rl_profile;
     private ProgressBar pb_profile;
@@ -138,6 +139,8 @@ public class OthersFragment extends Fragment {
                             isVerified = true;
                         }
 
+                        role_id = obj.getInt("role_id");
+
                         if (obj.getInt("role_id") != 1){
                             ll_wallet.setVisibility(View.GONE);
                         }
@@ -205,8 +208,13 @@ public class OthersFragment extends Fragment {
         ib_edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EditProfileFragment editProfileFragment = new EditProfileFragment();
-                setFragment(editProfileFragment,"FragmentEditProfile");
+                if (role_id == 1){
+                    EditProfileFragment editProfileFragment = new EditProfileFragment();
+                    setFragment(editProfileFragment,"FragmentEditProfile");
+                }else{
+                    com.example.medtek.ui.dokter.others.EditProfileFragment editProfileFragment = new com.example.medtek.ui.dokter.others.EditProfileFragment();
+                    setFragment(editProfileFragment,"FragmentEditProfile");
+                }
             }
         });
 

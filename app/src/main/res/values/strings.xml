@@ -1,4 +1,18 @@
 <resources>
+
+    <string-array name="list_spesialisasi">
+        <item>Pilih Spesialisasi</item>
+        <item>Kardiologi Intervensi</item>
+        <item>Aritmia dan elektrofisiologi</item>
+        <item>Kardiologi Pediatri</item>
+        <item>Pencitraan Kardiovaskuler</item>
+        <item>Kardiologi Klinik</item>
+        <item>Rehabilitas dan Prevensi</item>
+        <item>Vaskuler</item>
+        <item>Perawatan Jantung Akut</item>
+        <item>Ahli Jantung Umum</item>
+    </string-array>
+
     <string name="app_name">MedTek</string>
     <string name="hai">Hai, selamat datang</string>
     <string name="hi">Hai,</string>
@@ -158,8 +172,16 @@
     <string name="email">Email</string>
     <string name="jk">Jenis Kelamin</string>
     <string name="tgl">Tanggal Lahir</string>
+    <string name="tgl_hint">Pilih Tanggal Lahir</string>
     <string name="no_hp">Nomor Telepon</string>
     <string name="no_rekening">Nomor Rekening</string>
+    <string name="pendidikan_terakhir">Pendidikan Terakhir</string>
+    <string name="notelp_hint">08XX-XXXX-XXXX</string>
+    <string name="norek_hint">900XXXXXXXX</string>
+    <string name="pendidikan_terakhir_hint">S2 Ilmu Kedokteran Universitas Indonesia</string>
+    <string name="pengalaman_kerja_hint">2 Tahun</string>
+    <string name="pengalaman_kerja">Pengalaman Kerja</string>
+    <string name="harga_konsultasi">Biaya Konsultasi</string>
     <string name="male">Pria</string>
     <string name="female">Wanita</string>
     <string name="cari">Cari</string>
