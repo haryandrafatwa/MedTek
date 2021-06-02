@@ -26,6 +26,7 @@ import com.codesgood.views.JustifiedTextView;
 import com.example.medtek.R;
 import com.example.medtek.network.RetrofitClient;
 import com.example.medtek.ui.activity.WelcomePageActivity;
+import com.example.medtek.ui.dokter.others.JadwalSayaFragment;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 import com.squareup.picasso.Picasso;
@@ -59,8 +60,8 @@ public class OthersFragment extends Fragment {
 
     private TextView tv_nama, tv_email,tv_app_version;
     private Button btn_logout;
-    private ImageButton ib_edit,ib_cek_verified, ib_wallet;
-    private LinearLayout layout_nilai_kami,layout_invite_friends, ll_wallet;
+    private ImageButton ib_edit,ib_cek_verified, ib_wallet, ib_jadwal;
+    private LinearLayout layout_nilai_kami,layout_invite_friends, ll_wallet, ll_jadwal;
     private ChipNavigationBar bottomNavigationView;
     private CircleImageView civ_user;
 
@@ -143,6 +144,7 @@ public class OthersFragment extends Fragment {
 
                         if (obj.getInt("role_id") != 1){
                             ll_wallet.setVisibility(View.GONE);
+                            ll_jadwal.setVisibility(View.VISIBLE);
                         }
 
                         ll_wallet.setOnClickListener(new View.OnClickListener() {
@@ -155,6 +157,14 @@ public class OthersFragment extends Fragment {
                                     Toasty.info(getActivity(),getString(R.string.silahkanlakukanverifikasi),Toasty.LENGTH_LONG).show();
                                 }*/
                                 Toasty.info(getActivity(),"Under Maintenance!",Toasty.LENGTH_LONG).show();
+                            }
+                        });
+
+                        ll_jadwal.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                JadwalSayaFragment jadwalSayaFragment = new JadwalSayaFragment();
+                                setFragment(jadwalSayaFragment,"JadwalSayaFragment");
                             }
                         });
 
@@ -267,6 +277,13 @@ public class OthersFragment extends Fragment {
             }
         });
 
+        ib_jadwal.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ll_jadwal.performClick();
+            }
+        });
+
     }
 
     private void initialize(){
@@ -279,6 +296,7 @@ public class OthersFragment extends Fragment {
         ib_edit = getActivity().findViewById(R.id.ib_edit);
         ib_cek_verified = getActivity().findViewById(R.id.btn_cek_verified);
         ib_wallet = getActivity().findViewById(R.id.ib_wallet);
+        ib_jadwal = getActivity().findViewById(R.id.ib_jadwal);
 
         bottomNavigationView = getActivity().findViewById(R.id.bottomBar);
         bottomNavigationView.setVisibility(View.VISIBLE);
@@ -290,6 +308,7 @@ public class OthersFragment extends Fragment {
         rl_profile = getActivity().findViewById(R.id.rl_profile);
         pb_profile = getActivity().findViewById(R.id.pb_profile);
         ll_wallet = getActivity().findViewById(R.id.layout_wallet);
+        ll_jadwal = getActivity().findViewById(R.id.layout_jadwal);
 
         startEcho();
 
@@ -344,7 +363,7 @@ public class OthersFragment extends Fragment {
 
     private void setFragment(Fragment fragment, String TAG) {
         FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frameFragment,fragment).addToBackStack(TAG);
+        fragmentTransaction.replace(R.id.frameFragment,fragment,TAG).addToBackStack(TAG);
         fragmentTransaction.commit();
     }
 
