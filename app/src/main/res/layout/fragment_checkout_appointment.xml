@@ -70,7 +70,8 @@
                     android:id="@+id/layout_loader"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="visible">
 
                     <include layout="@layout/placeholder_buat_janji_header"/>
                     <include layout="@layout/placeholder_buat_janji_checkout"/>
@@ -411,109 +412,328 @@
 
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/dompetsaya"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/walletsaya"
-                    android:layout_marginTop="16dp"
-                    android:layout_below="@id/layout_ringkasan_pembayaran"
-                    android:textSize="18sp"
-                    android:fontFamily="@font/roboto_medium"
-                    android:textColor="@color/colorAccent"
-                    android:layout_marginStart="@dimen/margin_16"/>
-
                 <LinearLayout
-                    android:id="@+id/layout_dompet_saya"
+                    android:id="@+id/layout_pembayaran"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_below="@id/dompetsaya"
-                    android:layout_marginHorizontal="@dimen/margin_16"
-                    android:layout_marginTop="@dimen/margin_8"
-                    android:background="@drawable/bg_form_input"
-                    android:elevation="4dp">
+                    android:layout_below="@id/layout_ringkasan_pembayaran"
+                    android:layout_marginBottom="@dimen/margin_16">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/tv_payment_methods"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:weightSum="12"
+                        android:text="@string/payment_method"
                         android:layout_marginTop="16dp"
-                        android:layout_marginHorizontal="@dimen/margin_16">
+                        android:textSize="18sp"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="@color/colorAccent"
+                        android:layout_marginStart="@dimen/margin_16"/>
+
+                    <LinearLayout
+                        android:id="@+id/layout_metode_pembayaran"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_below="@id/tv_payment_methods"
+                        android:layout_marginHorizontal="@dimen/margin_16"
+                        android:layout_marginTop="@dimen/margin_8"
+                        android:background="@drawable/bg_form_input"
+                        android:elevation="4dp"
+                        android:weightSum="12">
 
                         <TextView
+                            android:id="@+id/tv_choose_payment"
                             android:layout_width="0dp"
+                            android:layout_weight="11"
                             android:layout_height="wrap_content"
-                            android:layout_weight="6"
-                            android:text="@string/saldo"
+                            android:text="@string/pilih_payment_method"
+                            android:layout_marginVertical="16dp"
+                            android:textSize="18sp"
                             android:fontFamily="@font/roboto_medium"
-                            android:textColor="@color/colorAccent"/>
+                            android:textColor="@color/hint_color"
+                            android:layout_marginStart="@dimen/margin_16"
+                            android:visibility="visible"/>
 
-                        <TextView
-                            android:id="@+id/tv_saldo"
+                        <LinearLayout
+                            android:id="@+id/layout_other_choosed"
                             android:layout_width="0dp"
+                            android:layout_weight="11"
                             android:layout_height="wrap_content"
-                            android:layout_weight="6"
-                            android:text="@string/ringkasanbuatjanji"
-                            android:fontFamily="@font/roboto_regular"
-                            android:textColor="#B3944F"
-                            android:gravity="end"/>
+                            android:orientation="horizontal"
+                            android:layout_marginStart="@dimen/margin_16"
+                            android:layout_marginVertical="16dp"
+                            android:visibility="gone">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:padding="@dimen/margin_8"
+                                android:background="@drawable/bg_ic"
+                                android:layout_gravity="center_vertical"
+                                android:gravity="center_vertical"
+                                android:backgroundTint="@color/textColorLightGray">
+                                <ImageButton
+                                    android:layout_width="@dimen/margin_16"
+                                    android:layout_height="@dimen/margin_16"
+                                    android:background="@drawable/ic_transfer"/>
+                            </LinearLayout>
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_weight="11"
+                                android:layout_height="wrap_content"
+                                android:text="@string/bank_transfer_and_other"
+                                android:textSize="18sp"
+                                android:layout_gravity="center_vertical"
+                                android:gravity="center_vertical"
+                                android:fontFamily="@font/roboto_medium"
+                                android:textColor="@color/black"
+                                android:layout_marginStart="@dimen/margin_16"/>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/layout_wallet_choosed"
+                            android:layout_width="0dp"
+                            android:layout_weight="11"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginStart="@dimen/margin_16"
+                            android:layout_marginVertical="16dp"
+                            android:visibility="gone">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:padding="@dimen/margin_8"
+                                android:background="@drawable/bg_ic"
+                                android:backgroundTint="@color/textColorLightGray">
+                                <ImageButton
+                                    android:layout_width="@dimen/margin_16"
+                                    android:layout_height="@dimen/margin_16"
+                                    android:background="@drawable/ic_wallet"/>
+                            </LinearLayout>
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_weight="11"
+                                android:layout_height="wrap_content"
+                                android:text="@string/wallet_saldo"
+                                android:textSize="18sp"
+                                android:layout_gravity="center_vertical"
+                                android:fontFamily="@font/roboto_medium"
+                                android:textColor="@color/black"
+                                android:layout_marginStart="@dimen/margin_16"/>
+
+                        </LinearLayout>
+
+                        <ImageButton
+                            android:id="@+id/ib_chevron"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/ic_chevron_down"
+                            android:backgroundTint="@color/hint_color"
+                            android:layout_gravity="center_vertical"/>
 
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/layout_item_metode_pembayaran"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:weightSum="12"
-                        android:layout_marginTop="@dimen/margin_16"
-                        android:layout_marginHorizontal="@dimen/margin_16">
+                        android:orientation="vertical"
+                        android:layout_marginHorizontal="@dimen/margin_16"
+                        android:background="@drawable/bg_form_input_rounded_bottom"
+                        android:elevation="4dp"
+                        android:paddingVertical="8dp"
+                        android:paddingHorizontal="@dimen/margin_16"
+                        android:visibility="gone">
 
-                        <TextView
-                            android:layout_width="0dp"
+                        <LinearLayout
+                            android:id="@+id/layout_choose_wallet"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="6"
-                            android:text="@string/totalpembayaran"
-                            android:fontFamily="@font/roboto_medium"
-                            android:textColor="@color/colorAccent"/>
+                            android:orientation="horizontal">
 
-                        <TextView
-                            android:id="@+id/tv_total_pembayaran_2"
-                            android:layout_width="0dp"
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:padding="@dimen/margin_8"
+                                android:background="@drawable/bg_ic"
+                                android:backgroundTint="@color/textColorLightGray">
+                                <ImageButton
+                                    android:layout_width="@dimen/margin_16"
+                                    android:layout_height="@dimen/margin_16"
+                                    android:background="@drawable/ic_wallet"/>
+                            </LinearLayout>
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_weight="11"
+                                android:layout_height="wrap_content"
+                                android:text="@string/wallet_saldo"
+                                android:textSize="18sp"
+                                android:layout_gravity="center_vertical"
+                                android:fontFamily="@font/roboto_medium"
+                                android:textColor="@color/black"
+                                android:layout_marginStart="@dimen/margin_16"/>
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="0.5dp"
+                            android:background="@color/textColorGray"
+                            android:layout_marginVertical="@dimen/margin_8"/>
+
+                        <LinearLayout
+                            android:id="@+id/layout_choose_other"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="6"
-                            android:text="@string/ringkasanbuatjanji"
-                            android:fontFamily="@font/roboto_regular"
-                            android:textColor="@color/colorAccent"
-                            android:gravity="end"/>
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:padding="@dimen/margin_8"
+                                android:background="@drawable/bg_ic"
+                                android:backgroundTint="@color/textColorLightGray">
+                                <ImageButton
+                                    android:layout_width="@dimen/margin_16"
+                                    android:layout_height="@dimen/margin_16"
+                                    android:background="@drawable/ic_transfer"/>
+                            </LinearLayout>
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_weight="11"
+                                android:layout_height="wrap_content"
+                                android:text="@string/bank_transfer_and_other"
+                                android:textSize="18sp"
+                                android:layout_gravity="center_vertical"
+                                android:fontFamily="@font/roboto_medium"
+                                android:textColor="@color/black"
+                                android:layout_marginStart="@dimen/margin_16"/>
+
+                        </LinearLayout>
 
                     </LinearLayout>
 
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/dompet_visible"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_below="@id/layout_pembayaran"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/dompetsaya"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/walletsaya"
+                        android:textSize="18sp"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="@color/colorAccent"
+                        android:layout_marginStart="@dimen/margin_16"/>
+
                     <LinearLayout
+                        android:id="@+id/layout_dompet_saya"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:weightSum="12"
-                        android:layout_margin="@dimen/margin_16">
+                        android:orientation="vertical"
+                        android:layout_below="@id/dompetsaya"
+                        android:layout_marginHorizontal="@dimen/margin_16"
+                        android:layout_marginTop="@dimen/margin_8"
+                        android:background="@drawable/bg_form_input"
+                        android:elevation="4dp">
 
-                        <TextView
-                            android:layout_width="0dp"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="6"
-                            android:text="@string/sisasaldo"
-                            android:fontFamily="@font/roboto_medium"
-                            android:textColor="@color/colorAccent"/>
+                            android:orientation="horizontal"
+                            android:weightSum="12"
+                            android:layout_marginTop="16dp"
+                            android:layout_marginHorizontal="@dimen/margin_16">
 
-                        <TextView
-                            android:id="@+id/tv_sisa_saldo"
-                            android:layout_width="0dp"
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="6"
+                                android:text="@string/saldo"
+                                android:fontFamily="@font/roboto_medium"
+                                android:textColor="@color/colorAccent"/>
+
+                            <TextView
+                                android:id="@+id/tv_saldo"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="6"
+                                android:text="@string/ringkasanbuatjanji"
+                                android:fontFamily="@font/roboto_regular"
+                                android:textColor="#B3944F"
+                                android:gravity="end"/>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="6"
-                            android:text="@string/ringkasanbuatjanji"
-                            android:fontFamily="@font/roboto_bold"
-                            android:textColor="@color/colorAccent"
-                            android:gravity="end"/>
+                            android:orientation="horizontal"
+                            android:weightSum="12"
+                            android:layout_marginTop="@dimen/margin_16"
+                            android:layout_marginHorizontal="@dimen/margin_16">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="6"
+                                android:text="@string/totalpembayaran"
+                                android:fontFamily="@font/roboto_medium"
+                                android:textColor="@color/colorAccent"/>
+
+                            <TextView
+                                android:id="@+id/tv_total_pembayaran_2"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="6"
+                                android:text="@string/ringkasanbuatjanji"
+                                android:fontFamily="@font/roboto_regular"
+                                android:textColor="@color/colorAccent"
+                                android:gravity="end"/>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:weightSum="12"
+                            android:layout_margin="@dimen/margin_16">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="6"
+                                android:text="@string/sisasaldo"
+                                android:fontFamily="@font/roboto_medium"
+                                android:textColor="@color/colorAccent"/>
+
+                            <TextView
+                                android:id="@+id/tv_sisa_saldo"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="6"
+                                android:text="@string/ringkasanbuatjanji"
+                                android:fontFamily="@font/roboto_bold"
+                                android:textColor="@color/colorAccent"
+                                android:gravity="end"/>
+
+                        </LinearLayout>
 
                     </LinearLayout>
 
@@ -524,13 +744,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="42dp"
                     android:background="@drawable/bg_button_selector"
-                    android:layout_below="@id/layout_dompet_saya"
+                    android:layout_below="@id/dompet_visible"
                     android:layout_margin="16dp"
                     android:textAllCaps="false"
                     android:textColor="@android:color/white"
                     android:fontFamily="@font/roboto_medium"
                     android:textSize="18sp"
-                    android:text="@string/paynow"/>
+                    android:text="@string/paynow"
+                    android:visibility="gone"/>
 
             </RelativeLayout>
 

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content" android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_16"
+        android:padding="@dimen/margin_16"
+        android:background="@drawable/bg_recycler_item"
+        android:elevation="4dp"
+        android:id="@+id/rl_recycler">
+
+        <TextView
+            android:id="@+id/tv_id_day"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/error_circle"
+            android:backgroundTint="@color/colorPrimary"
+            android:textColor="@color/colorPrimary"
+            android:gravity="center"
+            android:textSize="@dimen/text_24"
+            android:fontFamily="@font/roboto_medium"
+            android:layout_centerVertical="true"/>
+
+        <LinearLayout
+            android:id="@+id/layout_pasien"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_toStartOf="@id/layout_action"
+            android:layout_toEndOf="@id/tv_id_day"
+            android:layout_centerVertical="true"
+            android:layout_marginHorizontal="@dimen/margin_8">
+
+            <TextView
+                android:id="@+id/tv_nama_day"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorPrimary"
+                android:fontFamily="@font/roboto_medium"
+                android:textSize="@dimen/text_small_18"
+                android:ellipsize="end"
+                android:maxLines="1"/>
+
+            <TextView
+                android:id="@+id/tv_detail_jadwal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/textColorGray"
+                android:textSize="@dimen/text_small_16"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:fontFamily="@font/roboto_regular"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:layout_marginEnd="@dimen/margin_8">
+
+                <ImageButton
+                    android:id="@+id/ib_hapus"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:background="@drawable/ic_delete_black"
+                    android:contentDescription="@string/mdtp_cancel"
+                    android:backgroundTint="@color/colorPrimary"/>
+
+                <TextView
+                    android:id="@+id/tv_hapus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/hapus"
+                    android:textColor="@color/colorPrimary"
+                    android:fontFamily="@font/roboto_regular"
+                    android:textSize="12sp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_gravity="center"
+                android:gravity="center">
+
+                <ImageButton
+                    android:id="@+id/ib_edit"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:background="@drawable/ic_edit"
+                    android:contentDescription="@string/mdtp_cancel"
+                    android:backgroundTint="@color/colorAccent"/>
+
+                <TextView
+                    android:id="@+id/tv_edit_jadwal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ubah"
+                    android:textColor="@color/colorAccent"
+                    android:fontFamily="@font/roboto_regular"
+                    android:textSize="12sp"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+</RelativeLayout>

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Layout;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -69,7 +70,7 @@ public class HomeFragment extends Fragment {
     private RecyclerViewReadyCallback recyclerViewReadyCallback;
 
     private ChipNavigationBar bottomBar;
-    private TextView tv_date_today, tv_nama_user, tv_nama_pasien, tv_detail_janji, tv_detail_konfirmasi;
+    private TextView tv_date_today, tv_nama_user, tv_nama_pasien, tv_detail_janji, tv_detail_konfirmasi, tv_info;
     private CircleImageView civ_dokter, civ_pasien;
     private LinearLayout layout_pasien, layout_info, layout_loader;
     private ShimmerFrameLayout shimmerFrameLayout;
@@ -149,9 +150,25 @@ public class HomeFragment extends Fragment {
                                 }
                                 Picasso.get().load(path).into(civ_dokter);
                                 String noRek = obj.getString("nomor_rekening");
+                                String lulusan = obj.getString("lulusan");
+                                String lama_kerja = obj.getString("lama_kerja");
                                 if (noRek.equalsIgnoreCase("null")){
                                     layout_info.setVisibility(View.VISIBLE);
+                                    tv_info.setText(R.string.infonodata);
                                 }
+                                if (lulusan.equalsIgnoreCase("null")){
+                                    layout_info.setVisibility(View.VISIBLE);
+                                    tv_info.setText(R.string.infonodata);
+                                }
+                                if (lama_kerja.equalsIgnoreCase("null")){
+                                    layout_info.setVisibility(View.VISIBLE);
+                                    tv_info.setText(R.string.infonodata);
+                                }
+                                if (obj.getJSONArray("jadwal").length() < 1){
+                                    layout_info.setVisibility(View.VISIBLE);
+                                    tv_info.setText(R.string.infonojadwal);
+                                }
+
                                 isLoadUser = true;
                                 shimmerSet();
                                 startSocket();
@@ -354,6 +371,7 @@ public class HomeFragment extends Fragment {
         tv_date_today = getActivity().findViewById(R.id.tv_date_today);
         tv_nama_user = getActivity().findViewById(R.id.tv_nama_user);
         tv_nama_pasien = getActivity().findViewById(R.id.tv_nama_pasien);
+        tv_info = getActivity().findViewById(R.id.info_text);
         tv_detail_janji = getActivity().findViewById(R.id.tv_tgl_janji);
         civ_dokter = getActivity().findViewById(R.id.civ_user);
         civ_pasien = getActivity().findViewById(R.id.civ_pasien);

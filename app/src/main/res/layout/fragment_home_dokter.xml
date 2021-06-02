@@ -237,13 +237,15 @@
                         android:contentDescription="@string/drrsloc"/>
 
                     <com.codesgood.views.JustifiedTextView
+                        android:id="@+id/info_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/infonorekeningnull"
+                        android:text="@string/infonodata"
                         android:fontFamily="@font/roboto_regular"
                         android:textColor="#80000000"
                         android:textSize="12sp"
                         android:ellipsize="end"
+                        android:justificationMode="inter_word"
                         android:maxLines="3"
                         android:layout_marginStart="@dimen/margin_16"/>
 

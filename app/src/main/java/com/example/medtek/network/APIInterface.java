@@ -25,9 +25,11 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.HTTP;
 import retrofit2.http.Header;
 import retrofit2.http.HeaderMap;
 import retrofit2.http.Headers;
@@ -181,6 +183,25 @@ public interface APIInterface {
     );
 
     @Headers({"Accept:application/json"})
+    @POST("jadwal")
+    @FormUrlEncoded
+    Call<ResponseBody> addJadwal(
+            @Header("Authorization") String token,
+            @Field("idDokter") int idDokter,
+            @Field("day") String day,
+            @Field("startHour") String startHour,
+            @Field("endHour") String endHour
+    );
+
+    @Headers({"Accept:application/json"})
+    @HTTP(method = "DELETE",path = "jadwal/{id}",hasBody = true)
+    Call<ResponseBody> deleteJadwal(
+            @Header("Authorization") String token,
+            @Path("id") int id,
+            @Body RequestBody requestBody
+    );
+
+    @Headers({"Accept:application/json"})
     @POST("janji-file/{id}")
     @Multipart
     Call<ResponseBody> uploadFile(
@@ -260,6 +281,15 @@ public interface APIInterface {
     Call<ResponseBody> payment(
             @Header("Authorization") String token,
             @Field("idJanji") int idJanji
+    );
+
+    @Headers({"Accept:application/json"})
+    @POST("payment/snap")
+    @FormUrlEncoded
+    Call<ResponseBody> paymentWallet(
+            @Header("Authorization") String token,
+            @Field("idJanji") int idJanji,
+            @Field("wallet") boolean wallet
     );
 
     @Headers({"Accept:application/json"})

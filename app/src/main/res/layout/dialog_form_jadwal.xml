@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/bg_dialog_inset_16"
+    android:backgroundTint="@android:color/white">
+
+    <LinearLayout
+        android:id="@+id/layout_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_16"
+            android:layout_marginHorizontal="@dimen/margin_16">
+
+            <TextView
+                android:id="@+id/tv_nama_pasien"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/tambah_jadwal_konsultasi"
+                android:fontFamily="@font/roboto_medium"
+                android:textSize="20sp"
+                android:layout_toStartOf="@id/ib_close"
+                android:textColor="@android:color/black"/>
+
+            <ImageButton
+                android:id="@+id/ib_close"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_clear"
+                android:backgroundTint="@color/colorPrimary"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:contentDescription="@string/keluar"/>
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_spesialisasi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="@dimen/margin_16"
+            android:layout_marginHorizontal="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/hari_konsultasi"
+                android:textSize="14sp"
+                android:fontFamily="@font/roboto_medium"
+                android:textColor="@color/textColorGray"
+                android:labelFor="@id/sp_spesialisasi"/>
+
+            <Spinner
+                android:id="@+id/sp_hari"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_spinner"
+                android:popupBackground="@drawable/bg_dialog"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_rentang"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="@dimen/margin_16"
+            android:layout_marginHorizontal="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/rentang_waktu"
+                android:textSize="14sp"
+                android:fontFamily="@font/roboto_medium"
+                android:textColor="@color/textColorGray"
+                android:labelFor="@id/sp_spesialisasi"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_weight="12">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="2"
+                    android:layout_height="wrap_content"
+                    android:text="@string/waktu_mulai"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="@color/textColorGray"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:labelFor="@id/sp_spesialisasi"/>
+
+                <EditText
+                    android:id="@+id/et_mulai_dari"
+                    android:layout_width="0dp"
+                    android:layout_weight="4"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_xs_14"
+                    android:textColor="@color/colorPrimary"
+                    android:fontFamily="@font/roboto_regular"
+                    android:inputType="time"
+                    android:gravity="center"
+                    android:focusable="false"
+                    android:cursorVisible="false"
+                    android:maxLength="13"
+                    android:hint="@string/hint_pagi"
+                    android:paddingTop="4dp"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="2"
+                    android:layout_height="wrap_content"
+                    android:text="@string/waktu_selesai"
+                    android:textSize="14sp"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="@color/textColorGray"
+                    android:labelFor="@id/sp_spesialisasi"/>
+
+                <EditText
+                    android:id="@+id/et_mulai_selesai"
+                    android:layout_width="0dp"
+                    android:layout_weight="4"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_xs_14"
+                    android:textColor="@color/colorPrimary"
+                    android:fontFamily="@font/roboto_regular"
+                    android:inputType="time"
+                    android:gravity="center"
+                    android:focusable="false"
+                    android:maxLength="13"
+                    android:cursorVisible="false"
+                    android:hint="@string/hint_malam"
+                    android:paddingTop="4dp"/>
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_simpan"
+                android:theme="@style/buttonStyle"
+                android:layout_width="match_parent"
+                android:background="@drawable/bg_button_selector"
+                android:layout_height="36dp"
+                android:layout_marginVertical="16dp"
+                android:text="@string/tambah"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

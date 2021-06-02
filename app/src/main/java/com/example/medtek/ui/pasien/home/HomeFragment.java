@@ -349,6 +349,7 @@ public class HomeFragment extends Fragment {
                                 }else{
                                     isVerified = 0;
                                 }
+                                if (jo.getJSONArray("jadwal").length()>0){
 
                                 if (!jo.isNull("hospital")){
                                     JSONObject rsObject = jo.getJSONObject("hospital");
@@ -389,6 +390,7 @@ public class HomeFragment extends Fragment {
                                             rv_dokter.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                                         }
                                     });
+                                }
                                 }
                             }
                             isDokterDone = true;

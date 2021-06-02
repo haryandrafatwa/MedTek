@@ -1,16 +1,14 @@
 <resources>
 
-    <string-array name="list_spesialisasi">
-        <item>Pilih Spesialisasi</item>
-        <item>Kardiologi Intervensi</item>
-        <item>Aritmia dan elektrofisiologi</item>
-        <item>Kardiologi Pediatri</item>
-        <item>Pencitraan Kardiovaskuler</item>
-        <item>Kardiologi Klinik</item>
-        <item>Rehabilitas dan Prevensi</item>
-        <item>Vaskuler</item>
-        <item>Perawatan Jantung Akut</item>
-        <item>Ahli Jantung Umum</item>
+    <string-array name="hari">
+        <item>Pilih hari konsultasi</item>
+        <item>Senin</item>
+        <item>Selasa</item>
+        <item>Rabu</item>
+        <item>Kamis</item>
+        <item>Jumat</item>
+        <item>Sabtu</item>
+        <item>Minggu</item>
     </string-array>
 
     <string name="app_name">MedTek</string>
@@ -84,6 +82,11 @@
     <string name="pilihjadwal">Pilih jadwal</string>
     <string name="riwayat">Riwayat</string>
     <string name="wallet">Wallet</string>
+    <string name="wallet_saldo">Saldo Dompetku</string>
+    <string name="bank_transfer_and_other">Transfer antar bank atau lainnya</string>
+    <string name="pilih_payment_method">Pilih metode pembayaran</string>
+    <string name="payment_method">Metode pembayaran</string>
+    <string name="jadwal_saya">Jadwal Saya</string>
     <string name="invitefriend">Undang Teman</string>
     <string name="translate">Ubah Bahasa</string>
     <string name="bantuan">Bantuan</string>
@@ -186,6 +189,14 @@
     <string name="female">Wanita</string>
     <string name="cari">Cari</string>
     <string name="spesialisasi">Spesialisasi</string>
+    <string name="hari_konsultasi">Hari Konsultasi</string>
+    <string name="rentang_waktu">Rentang Waktu</string>
+    <string name="waktu_mulai">Mulai</string>
+    <string name="waktu_selesai">Selesai</string>
+    <string name="tambah">Tambah</string>
+    <string name="hint_pagi">08.00</string>
+    <string name="hapus">Hapus</string>
+    <string name="hint_malam">22.00</string>
     <string name="semualokasi">Semua Lokasi</string>
     <string name="simpan">Simpan</string>
     <string name="bacaanharian">Artikel harian</string>
@@ -233,11 +244,13 @@
     <string name="dokterURL" translatable="false">http://192.168.137.1:8000/storage/Dokter.png</string>
     <string name="shareBody">Hai! Saya baru saja mendapatkan informasi kesehatan terbaik dari dokter MedTek! Klik link untuk konsultasi dengan dokter MedTek sekarang:</string>
     <string name="editjadwal">Edit jadwal</string>
+    <string name="ubah">Ubah</string>
     <string name="detailpasien">Detail pasien</string>
     <string name="inputdetailspasien">Masukkan detail pasien</string>
     <string name="inputdetailsjanji">Masukkan detail janji</string>
     <string name="inputinfo">Silakan masukkan detail yang sama dengan disebutkan dalam kartu ID pasien.</string>
-    <string name="infonorekeningnull">Silahkan tambahkan nomor rekening anda pada halaman edit profile. Jika tidak, akun anda tidak dapat dilihat oleh pasien.</string>
+    <string name="infonodata">Silahkan tambahkan data pribadi anda pada halaman edit profile. Jika tidak, akun anda tidak dapat dilihat oleh pasien.</string>
+    <string name="infonojadwal">Anda belum menambahkan jadwal konsultasi, silahkan tambahkan jadwal pada halaman jadwal saya.</string>
     <string name="inputdetail">Silakan masukkan keluhan yang Anda rasakan agar Dokter memahaminya. Dapat berupa riwayat penyakit Anda atau pengobatan sebelumnya.</string>
     <string name="uploadidcard">Unggah kartu ID</string>
     <string name="uploadsupportfile">Unggah file pendukung</string>
@@ -271,14 +284,18 @@
     <string name="tidakadajanji">Anda sedang tidak memiliki janji</string>
     <string name="tidakadakonfirmasi">Anda sedang tidak memiliki antrian konfirmasi</string>
     <string name="tidakadariwayattransaksi">Anda tidak memiliki riwayat transaksi</string>
+    <string name="tidakadajadwalkonsultasi">Anda belum menambahkan jadwal konsultasi anda</string>
     <string name="lp">Lingkar perut</string>
     <string name="tinggibadan">Tinggi badan (cm)</string>
     <string name="lingkarperut">Lingkar perut (cm)</string>
     <string name="pembayaranberhasil">Pembayaran Anda telah berhasil.</string>
     <string name="haraptunggu">Harap tunggu konfirmasi dari dokter.</string>
     <string name="konfirmasipasienkamu">Konfirmasi janji</string>
+    <string name="tambah_jadwal_konsultasi">Tambah Jadwal Konsultasi</string>
     <string name="apakahkamuyakin">Apakah anda yakin ingin menerima janji ini?</string>
     <string name="apakahkamuyakintolak">Apakah anda yakin ingin menolak janji ini?</string>
+    <string name="apakahkamuyakinhapusjadwal">Apakah anda yakin ingin menghapus jadwal ini?</string>
+    <string name="konf_hapus_jadwal">Konfirmasi Hapus Jadwal</string>
     <string name="denganmenerimaini">Dengan menerima janji ini, kamu setuju dengan <a href="http://www.google.com"><i>syarat</i></a> dan <a href="http://www.google.com"><i>ketentuan</i></a> pada aplikasi ini.</string>
 
     //Ghazi
