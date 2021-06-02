@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -307,11 +308,10 @@ public class MenungguKonfirmasiAdapter extends RecyclerView.Adapter<MenungguKonf
                                         Toasty.success(mActivity,"Janji berhasil diterima!",Toasty.LENGTH_LONG).show();
                                         dialog.cancel();
 
-                                        Fragment currentFragment = mActivity.getSupportFragmentManager().findFragmentByTag("FragmentHomeDokter");
-                                        FragmentTransaction fragmentTransaction = mActivity.getSupportFragmentManager().beginTransaction();
-                                        fragmentTransaction.detach(currentFragment);
-                                        fragmentTransaction.attach(currentFragment);
-                                        fragmentTransaction.commit();
+                                        FragmentManager fm = mActivity.getSupportFragmentManager();
+                                        for(int i = 0; i < fm.getBackStackEntryCount()-1; ++i) {
+                                            fm.popBackStack();
+                                        }
                                     }
                                 }else{
                                     Log.e("TAG", "onResponse: "+response.errorBody().string());
@@ -375,12 +375,10 @@ public class MenungguKonfirmasiAdapter extends RecyclerView.Adapter<MenungguKonf
                                     if (jsonObject.has("success")){
                                         Toasty.success(mActivity,"Janji berhasil ditolak!",Toasty.LENGTH_LONG).show();
                                         dialog.cancel();
-
-                                        Fragment currentFragment = mActivity.getSupportFragmentManager().findFragmentByTag("FragmentHomeDokter");
-                                        FragmentTransaction fragmentTransaction = mActivity.getSupportFragmentManager().beginTransaction();
-                                        fragmentTransaction.detach(currentFragment);
-                                        fragmentTransaction.attach(currentFragment);
-                                        fragmentTransaction.commit();
+                                        FragmentManager fm = mActivity.getSupportFragmentManager();
+                                        for(int i = 0; i < fm.getBackStackEntryCount()-1; ++i) {
+                                            fm.popBackStack();
+                                        }
                                     }else{
                                         Toasty.success(mActivity,jsonObject.getString("message"),Toasty.LENGTH_LONG).show();
                                     }
@@ -504,19 +502,13 @@ public class MenungguKonfirmasiAdapter extends RecyclerView.Adapter<MenungguKonf
         tv_file_pasien.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LinearLayout content = dialogView.findViewById(R.id.layout_content);
-                ProgressBar progressBar = dialogView.findViewById(R.id.progressbar);
-                content.setVisibility(View.INVISIBLE);
-                progressBar.setVisibility(View.VISIBLE);
-                if(filePath.length() >= 4){
-                    Log.e("TAG", "FilePath: "+filePath );
-                }else{
-                    Log.e("TAG", "FilePath: kosong" );
-                }
-                String filename = filePath.split("/")[4];
-                File file = new File(Environment.getExternalStorageDirectory(), "/Download/MedTek/janji/"+idJanji+"/"+filename);
-
-                if (!file.exists()){
+                if (filePath.length() >= 4){
+                    LinearLayout content = dialogView.findViewById(R.id.layout_content);
+                    ProgressBar progressBar = dialogView.findViewById(R.id.progressbar);
+                    content.setVisibility(View.INVISIBLE);
+                    progressBar.setVisibility(View.VISIBLE);
+                    String filename = filePath.split("/")[4];
+                    File file = new File(Environment.getExternalStorageDirectory(), "/Download/MedTek/janji/"+idJanji+"/"+filename);
                     Call<ResponseBody> getJanji = RetrofitClient.getInstance().getApi().getJanjiId("Bearer "+access,idJanji);
                     getJanji.enqueue(new Callback<ResponseBody>() {
                         @Override
@@ -586,6 +578,27 @@ public class MenungguKonfirmasiAdapter extends RecyclerView.Adapter<MenungguKonf
                                                     getImgFile.clone().enqueue(this);
                                                 }
                                             });
+                                            Intent target = new Intent(Intent.ACTION_VIEW);
+                                            if(filename.contains("png") || filename.contains("jpg") || filename.contains("jpeg")){
+                                                target.setDataAndType(FileProvider.getUriForFile(mActivity,mActivity.getApplicationContext().getPackageName()+".fileprovider",file),"image/*");
+                                            }else if (filename.contains("pdf")){
+                                                target.setDataAndType(FileProvider.getUriForFile(mActivity,mActivity.getApplicationContext().getPackageName()+".fileprovider",file),"application/pdf");
+                                            }else if (filename.contains("docx") || filename.contains("doc")){
+                                                target.setDataAndType(FileProvider.getUriForFile(mActivity,mActivity.getApplicationContext().getPackageName()+".fileprovider",file),"application/msword");
+                                            }else if (filename.contains("mp4")){
+                                                target.setDataAndType(FileProvider.getUriForFile(mActivity,mActivity.getApplicationContext().getPackageName()+".fileprovider",file),"video/*");
+                                            }
+                                            target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                                            target.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                                            Intent intent = Intent.createChooser(target, "Open File");
+                                            try {
+                                                mActivity.startActivity(intent);
+                                                content.setVisibility(View.VISIBLE);
+                                                progressBar.setVisibility(View.GONE);
+                                            } catch (ActivityNotFoundException e) {
+                                                // Instruct the user to install a PDF reader here, or something
+                                            }
                                         }
                                     }
                                 }
@@ -600,27 +613,8 @@ public class MenungguKonfirmasiAdapter extends RecyclerView.Adapter<MenungguKonf
                             getJanji.clone().enqueue(this);
                         }
                     });
-                }
-                Intent target = new Intent(Intent.ACTION_VIEW);
-                if(filename.contains("png") || filename.contains("jpg") || filename.contains("jpeg")){
-                    target.setDataAndType(FileProvider.getUriForFile(mActivity,mActivity.getApplicationContext().getPackageName()+".fileprovider",file),"image/*");
-                }else if (filename.contains("pdf")){
-                    target.setDataAndType(FileProvider.getUriForFile(mActivity,mActivity.getApplicationContext().getPackageName()+".fileprovider",file),"application/pdf");
-                }else if (filename.contains("docx") || filename.contains("doc")){
-                    target.setDataAndType(FileProvider.getUriForFile(mActivity,mActivity.getApplicationContext().getPackageName()+".fileprovider",file),"application/msword");
-                }else if (filename.contains("mp4")){
-                    target.setDataAndType(FileProvider.getUriForFile(mActivity,mActivity.getApplicationContext().getPackageName()+".fileprovider",file),"video/*");
-                }
-                target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                target.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-                Intent intent = Intent.createChooser(target, "Open File");
-                try {
-                    mActivity.startActivity(intent);
-                    content.setVisibility(View.VISIBLE);
-                    progressBar.setVisibility(View.GONE);
-                } catch (ActivityNotFoundException e) {
-                    // Instruct the user to install a PDF reader here, or something
+                }else{
+                    Toasty.info(mActivity,"Tidak ada file yang diunggah.",Toasty.LENGTH_LONG).show();
                 }
             }
         });
