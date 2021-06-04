@@ -284,12 +284,10 @@ public interface APIInterface {
     );
 
     @Headers({"Accept:application/json"})
-    @POST("payment/snap")
-    @FormUrlEncoded
+    @HTTP(method = "POST",path = "payment/snap",hasBody = true)
     Call<ResponseBody> paymentWallet(
             @Header("Authorization") String token,
-            @Field("idJanji") int idJanji,
-            @Field("wallet") boolean wallet
+            @Body RequestBody requestBody
     );
 
     @Headers({"Accept:application/json"})

@@ -13,6 +13,7 @@ import android.icu.text.NumberFormat;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
+import android.util.ArrayMap;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -27,6 +28,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -67,8 +69,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
@@ -81,6 +86,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static android.content.ContentValues.TAG;
 import static com.example.medtek.network.RetrofitClient.BASE_URL;
 import static com.example.medtek.utils.PropertyUtil.ACCESS_TOKEN;
 import static com.example.medtek.utils.PropertyUtil.REFRESH_TOKEN;
@@ -105,7 +111,7 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
     private TextView tv_choose_payment, tv_nama_dokter, tv_tgl_konsultasi, tv_jam_konsultasi, tv_harga, tv_total_harga, tv_saldo, tv_total_bayar, tv_sisa_saldo, tv_layanan, tv_kode_unik;
 
     private int saldo,idJanji, totalBayar,layananInt;
-    private String access, refresh, fName, lName, alamat, phone, email, snapToken, payMethod, detailJanji, day;
+    private String access, refresh, fName, lName, alamat, phone, email, snapToken, payMethod, detailJanji, day,metode;
     private SdkUIFlowBuilder sdkUIFlowBuilder;
 
     private Socket socket;
@@ -113,6 +119,7 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
     private final String CHANNEL_MESSAGES = "messages";
     private final String EVENT_MESSAGE_CREATED = "MessageCreated";
     private final String TAG = "msg";
+    private boolean status;
 
     private Uri docUri;
     private String filename;
@@ -139,505 +146,6 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
         initMidTrans("MERCHANT_BASE_URL");
         bundle = getArguments();
         snapToken = bundle.getString("snapToken");
-        Call<ResponseBody> callDokter = RetrofitClient.getInstance().getApi().getDokterId(bundle.getInt("id_dokter"));
-        callDokter.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                try {
-                    String s = response.body().string();
-                    JSONObject object = new JSONObject(s);
-                    JSONObject obj = new JSONObject(object.getString("data"));
-                    tv_dr_name.setText(obj.getString("name"));
-                    JSONObject specObj = new JSONObject(obj.getString("specialization"));
-                    String spec = specObj.getString("specialization");
-                    tv_dr_specialist.setText(spec);
-                    JSONObject rsObject = new JSONObject(obj.getString("hospital"));
-                    String rs_name = rsObject.getString("name");
-                    JSONObject alamatObject = new JSONObject(obj.getString("alamat"));
-                    String kelurahan = alamatObject.getString("kelurahan");
-                    String kecamatan = alamatObject.getString("kecamatan");
-                    String kota = alamatObject.getString("kota");
-                    String rs_loc = kecamatan+", "+kota;
-                    tv_dr_rs.setText(rs_name);
-                    tv_dr_rs_loc.setText(rs_loc);
-                    String path="";
-                    JSONArray jsonArrayImage = new JSONArray(obj.getString("image"));
-                    if (new JSONArray(obj.getString("image")).length() !=0){
-                        for (int j = 0; j < jsonArrayImage.length(); j++) {
-                            JSONObject imageObj = jsonArrayImage.getJSONObject(j);
-                            if (imageObj.getInt("type_id") == 1) {
-                                path = BASE_URL + imageObj.getString("path");
-                                break;
-                            }
-                        }
-                    }else{
-                        path = BASE_URL+"/storage/Dokter.png";
-                    }
-                    Picasso.get().load(path).into(circleImageView);
-                    Call<ResponseBody> callUser = RetrofitClient.getInstance().getApi().getUser("Bearer "+access);
-                    callUser.enqueue(new Callback<ResponseBody>() {
-                        @Override
-                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                            try {
-                                String s = response.body().string();
-                                JSONObject object = new JSONObject(s);
-                                String userName = obj.getString("name");
-                                String[] userNameArr = userName.split(" ");
-                                fName = userNameArr[0];
-                                lName = "";
-                                if (userNameArr.length > 1) {
-                                    lName = userName.split(" ")[1];
-                                }
-                                phone = object.getString("notelp");
-                                email = object.getString("email");
-                                JSONObject alamatObj = object.getJSONObject("alamat");
-                                alamat = alamatObj.getString("jalan")+", No. "+alamatObj.getString("nomor_bangunan")
-                                        +", RT/RW. "+alamatObj.getString("rtrw")+", "+alamatObj.getString("kelurahan")
-                                        +", "+alamatObj.getString("kecamatan")+", "+alamatObj.getString("kota");
-                                JSONObject walletObj = object.getJSONObject("wallet");
-                                saldo = walletObj.getInt("balance");
-                                String balance = NumberFormat.getInstance(Locale.ITALIAN).format(saldo);
-                                tv_saldo.setText("Rp"+balance);
-
-                                tv_nama_dokter.setText(bundle.getString("nama_dokter"));
-
-                                Locale locale = new Locale("in", "ID");
-                                DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("EEEE, dd MMMM YYYY",locale);
-                                LocalDate localDate = LocalDate.parse(bundle.getString("date"));
-
-                                tv_tgl_konsultasi.setText(localDate.format(dateFormat));
-                                tv_jam_konsultasi.setText(bundle.getString("time"));
-                                String harga = NumberFormat.getInstance(Locale.ITALIAN).format(bundle.getInt("harga"));
-                                String uniqueCode = NumberFormat.getInstance(Locale.ITALIAN).format(object.getInt("id"));
-
-                                DateTimeFormatter dayFormat = DateTimeFormatter.ofPattern("EEEE",locale);
-
-                                Call<ResponseBody> getServiceFee = RetrofitClient.getInstance().getApi().getServiceFee();
-                                getServiceFee.enqueue(new Callback<ResponseBody>() {
-                                    @Override
-                                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                        try {
-                                            if (response.isSuccessful()){
-                                                if (response.body() != null){
-                                                    String s = response.body().string();
-                                                    JSONObject jsonObject = new JSONObject(s);
-                                                    layananInt = jsonObject.getJSONObject("data").getInt("servicefee");
-                                                    totalBayar = object.getInt("id")+layananInt+bundle.getInt("harga");
-                                                    String layanan = NumberFormat.getInstance(Locale.ITALIAN).format(jsonObject.getJSONObject("data").getInt("servicefee"));
-                                                    tv_layanan.setText("Rp"+layanan);
-                                                    String total = NumberFormat.getInstance(Locale.ITALIAN).format(totalBayar);
-                                                    tv_total_harga.setText("Rp"+total);
-                                                    tv_total_bayar.setText("Rp"+total);
-                                                    tv_harga.setText("Rp"+harga);
-                                                    tv_kode_unik.setText("Rp"+uniqueCode);
-                                                    setDay(localDate.format(dayFormat).toLowerCase());
-                                                    setDetailJanji(localDate.format(dateFormat)+" Pukul "+bundle.getString("time")+"\n\nKeluhan:\n"+bundle.getString("detailJanji"));
-                                                    /*if (payMethod != null){
-                                                        if (payMethod.equalsIgnoreCase("others")){
-                                                            tv_sisa_saldo.setText("Saldo Tidak Mencukupi");
-                                                            tv_sisa_saldo.setTextColor(Color.parseColor("#E51B23"));
-                                                            btnNext.setText("Bayar Sekarang");
-                                                            btnNext.setOnClickListener(new View.OnClickListener() {
-                                                                @Override
-                                                                public void onClick(View v) {
-                                                                    progressDialog.show();
-                                                                    String detailJanji = localDate.format(dateFormat)+" Pukul "+bundle.getString("time")+"\n\nKeluhan:\n"+bundle.getString("detailJanji");
-                                                                    if (bundle.getString("lastFragment").equalsIgnoreCase("DetailDokter")){
-//                                                                    idJanji = bundle.getInt("id_janji");
-                                                                        setIdJanji(bundle.getInt("id_janji"));
-                                                                        ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Konsultasi dengan "+tv_dr_name.getText().toString());
-                                                                        ArrayList<ItemDetails> details = new ArrayList<>();
-                                                                        details.add(itemDetails);
-                                                                        TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
-                                                                        request.setItemDetails(details);
-                                                                        progressDialog.dismiss();
-                                                                        MidtransSDK.getInstance().setTransactionRequest(request);
-                                                                        MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
-                                                                    }else{
-                                                                        JanjiRequest request = new JanjiRequest(bundle.getInt("id_dokter"), bundle.getString("date"), detailJanji, localDate.format(dayFormat).toLowerCase());
-                                                                        Call<ResponseBody> buatJanji = RetrofitClient.getInstance().getApi().buatJanji("Bearer "+access, request);
-                                                                        buatJanji.enqueue(new Callback<ResponseBody>() {
-                                                                            @Override
-                                                                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                                                                try {
-                                                                                    if (response.isSuccessful()){
-                                                                                        if (response.body() != null){
-                                                                                            String s = response.body().string();
-                                                                                            JSONObject object = new JSONObject(s);
-                                                                                            if (object.has("success")){
-                                                                                                getView().setOnKeyListener(new View.OnKeyListener() {
-                                                                                                    @Override
-                                                                                                    public boolean onKey(View v, int keyCode, KeyEvent event) {
-                                                                                                        if (event.getAction() ==KeyEvent.ACTION_DOWN){
-                                                                                                            if( keyCode == KeyEvent.KEYCODE_BACK) {
-                                                                                                                FragmentManager manager = getActivity().getSupportFragmentManager();
-                                                                                                                manager.popBackStack();
-                                                                                                                manager.popBackStack();
-                                                                                                                manager.popBackStack();
-                                                                                                                return true;
-                                                                                                            }
-                                                                                                        }
-                                                                                                        return false;
-                                                                                                    }
-                                                                                                });
-                                                                                                toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                                                                                                    @Override
-                                                                                                    public void onClick(View v) {
-                                                                                                        FragmentManager manager = getActivity().getSupportFragmentManager();
-                                                                                                        manager.popBackStack();
-                                                                                                        manager.popBackStack();
-                                                                                                        manager.popBackStack();
-                                                                                                    }
-                                                                                                });
-                                                                                                JSONObject janjiSuccess = object.getJSONObject("data");
-                                                                                                setIdJanji(janjiSuccess.getInt("id"));
-                                                                                                if (bundle.getString("uri") != null) {
-                                                                                                    docUri = Uri.parse(bundle.getString("uri"));
-                                                                                                    String mimeType = getActivity().getContentResolver().getType(docUri);
-                                                                                                    try {
-                                                                                                        String fileName = getFileName(docUri);
-                                                                                                        File outputDir = getActivity().getCacheDir(); // context being the Activity pointer
-                                                                                                        File outputFile = File.createTempFile(fileName.split("\\.")[0], "." + fileName.split("\\.")[1], outputDir);
-
-                                                                                                        File fileCopy = copyToTempFile(docUri, outputFile);
-                                                                                                        RequestBody requestBody = RequestBody.create(MediaType.parse(mimeType), fileCopy);
-                                                                                                        MultipartBody.Part part = MultipartBody.Part.createFormData("file", fileName, requestBody);
-                                                                                                        Call<ResponseBody> uploadFile = RetrofitClient.getInstance().getApi().uploadFile("Bearer " + access, idJanji, part);
-                                                                                                        uploadFile.enqueue(new Callback<ResponseBody>() {
-                                                                                                            @Override
-                                                                                                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                                                                                                try {
-                                                                                                                    if (response.isSuccessful()) {
-                                                                                                                        if (response.body() != null) {
-                                                                                                                            String respons = response.body().string();
-                                                                                                                            JSONObject uploadObj = new JSONObject(respons);
-                                                                                                                            Log.e("TAG", "onActivityResult: " + respons);
-                                                                                                                            if (uploadObj.has("success")) {
-                                                                                                                                Call<ResponseBody> payment = RetrofitClient.getInstance().getApi().payment("Bearer "+access,idJanji);
-                                                                                                                                payment.enqueue(new Callback<ResponseBody>() {
-                                                                                                                                    @Override
-                                                                                                                                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                                                                                                                        if (response.body() != null){
-                                                                                                                                            try {
-                                                                                                                                                Log.e(TAG, "onResponse: "+response.body().string());
-                                                                                                                                                JSONObject responseObj = new JSONObject(response.body().string());
-                                                                                                                                                snapToken = responseObj.getString("token");
-                                                                                                                                                ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Konsultasi dengan "+tv_dr_name.getText().toString());
-                                                                                                                                                ArrayList<ItemDetails> details = new ArrayList<>();
-                                                                                                                                                details.add(itemDetails);
-                                                                                                                                                TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
-                                                                                                                                                request.setItemDetails(details);
-                                                                                                                                                progressDialog.dismiss();
-                                                                                                                                                MidtransSDK.getInstance().setTransactionRequest(request);
-                                                                                                                                                MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
-                                                                                                                                            } catch (IOException | JSONException e) {
-                                                                                                                                                e.printStackTrace();
-                                                                                                                                            }
-                                                                                                                                        }
-                                                                                                                                    }
-
-                                                                                                                                    @Override
-                                                                                                                                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                                                                                                                        payment.clone().enqueue(this);
-                                                                                                                                    }
-                                                                                                                                });
-                                                                                                                            }
-                                                                                                                        } else {
-                                                                                                                            String respons = response.errorBody().string();
-                                                                                                                            Log.e("TAG", "onActivityResult: " + respons);
-                                                                                                                        }
-                                                                                                                    } else {
-                                                                                                                        String respons = response.errorBody().string();
-                                                                                                                        Log.e("TAG", "onActivityResult: " + respons);
-                                                                                                                    }
-                                                                                                                } catch (IOException | JSONException e) {
-                                                                                                                    e.printStackTrace();
-                                                                                                                    Log.e("TAG", "onActivityResult: " + e.getMessage());
-                                                                                                                    uploadFile.clone().enqueue(this);
-                                                                                                                }
-                                                                                                            }
-
-                                                                                                            @Override
-                                                                                                            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                                                                                                Log.e("TAG", "Failure: " + t.getMessage());
-                                                                                                            }
-                                                                                                        });
-                                                                                                    } catch (Exception e) {
-                                                                                                        e.printStackTrace();
-                                                                                                    }
-                                                                                                }else{
-                                                                                                    Call<ResponseBody> payment = RetrofitClient.getInstance().getApi().payment("Bearer "+access,idJanji);
-                                                                                                    payment.enqueue(new Callback<ResponseBody>() {
-                                                                                                        @Override
-                                                                                                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                                                                                            if (response.body() != null){
-                                                                                                                try {
-                                                                                                                    JSONObject responseObj = new JSONObject(response.body().string());
-                                                                                                                    Log.e(TAG, "onResponse: "+response.body().string());
-                                                                                                                    snapToken = responseObj.getString("token");
-                                                                                                                    ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Konsultasi dengan "+tv_dr_name.getText().toString());
-                                                                                                                    ArrayList<ItemDetails> details = new ArrayList<>();
-                                                                                                                    details.add(itemDetails);
-                                                                                                                    TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
-                                                                                                                    request.setItemDetails(details);
-                                                                                                                    progressDialog.dismiss();
-                                                                                                                    MidtransSDK.getInstance().setTransactionRequest(request);
-                                                                                                                    MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
-                                                                                                                } catch (IOException | JSONException e) {
-                                                                                                                    e.printStackTrace();
-                                                                                                                }
-                                                                                                            }
-                                                                                                        }
-
-                                                                                                        @Override
-                                                                                                        public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                                                                                            payment.clone().enqueue(this);
-                                                                                                        }
-                                                                                                    });
-                                                                                                }
-                                                                                            }
-                                                                                        }
-                                                                                    }
-                                                                                }catch (IOException | JSONException e) {
-                                                                                    e.printStackTrace();
-                                                                                }
-                                                                            }
-
-                                                                            @Override
-                                                                            public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-                                                                            }
-                                                                        });
-                                                                    }
-                                                                }
-                                                            });
-                                                        }else{
-                                                            int sisa = saldo-totalBayar;
-                                                            String sisaSaldo = NumberFormat.getInstance(Locale.ITALIAN).format(sisa);
-                                                            Log.e(TAG, "onResponse: "+sisaSaldo+"; "+sisa );
-                                                            tv_sisa_saldo.setText("Rp"+sisaSaldo);
-                                                            btnNext.setText("Bayar Sekarang");
-                                                            btnNext.setOnClickListener(new View.OnClickListener() {
-                                                                @Override
-                                                                public void onClick(View v) {
-                                                                    progressDialog.show();
-                                                                    String detailJanji = localDate.format(dateFormat)+" Pukul "+bundle.getString("time")+"\n\nKeluhan:\n"+bundle.getString("detailJanji");
-                                                                    if (bundle.getString("lastFragment").equalsIgnoreCase("DetailDokter")){
-                                                                        setIdJanji(bundle.getInt("id_janji"));
-                                                                        Call<ResponseBody> bayarWallet = RetrofitClient.getInstance().getApi().bayar("Bearer "+access,idJanji);
-                                                                        bayarWallet.enqueue(new Callback<ResponseBody>() {
-                                                                            @Override
-                                                                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                                                                if (response.body() != null){
-                                                                                    if (response.isSuccessful()){
-                                                                                        try {
-                                                                                            String s = response.body().string();
-                                                                                            JSONObject bayarObj = new JSONObject(s);
-                                                                                            if (bayarObj.has("success")){
-                                                                                                initializeDialogSuccess();
-                                                                                            }
-                                                                                        } catch (IOException | JSONException e) {
-                                                                                            e.printStackTrace();
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-
-                                                                            @Override
-                                                                            public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-                                                                            }
-                                                                        });
-                                                                    }else{
-                                                                        JanjiRequest request = new JanjiRequest(bundle.getInt("id_dokter"), bundle.getString("date"), detailJanji, localDate.format(dayFormat).toLowerCase());
-                                                                        Call<ResponseBody> buatJanji = RetrofitClient.getInstance().getApi().buatJanji("Bearer "+access, request);
-                                                                        buatJanji.enqueue(new Callback<ResponseBody>() {
-                                                                            @Override
-                                                                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                                                                try {
-                                                                                    if (response.isSuccessful()){
-                                                                                        if (response.body() != null){
-                                                                                            String s = response.body().string();
-                                                                                            JSONObject object = new JSONObject(s);
-                                                                                            if (object.has("success")){
-                                                                                                getView().setOnKeyListener(new View.OnKeyListener() {
-                                                                                                    @Override
-                                                                                                    public boolean onKey(View v, int keyCode, KeyEvent event) {
-                                                                                                        if (event.getAction() ==KeyEvent.ACTION_DOWN){
-                                                                                                            if( keyCode == KeyEvent.KEYCODE_BACK) {
-                                                                                                                FragmentManager manager = getActivity().getSupportFragmentManager();
-                                                                                                                manager.popBackStack();
-                                                                                                                manager.popBackStack();
-                                                                                                                manager.popBackStack();
-                                                                                                                return true;
-                                                                                                            }
-                                                                                                        }
-                                                                                                        return false;
-                                                                                                    }
-                                                                                                });
-                                                                                                toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                                                                                                    @Override
-                                                                                                    public void onClick(View v) {
-                                                                                                        FragmentManager manager = getActivity().getSupportFragmentManager();
-                                                                                                        manager.popBackStack();
-                                                                                                        manager.popBackStack();
-                                                                                                        manager.popBackStack();
-                                                                                                    }
-                                                                                                });
-                                                                                                JSONObject janjiSuccess = object.getJSONObject("data");
-                                                                                                setIdJanji(janjiSuccess.getInt("id"));
-                                                                                                if (bundle.getString("uri") != null){
-                                                                                                    docUri = Uri.parse(bundle.getString("uri"));
-                                                                                                    String mimeType = getActivity().getContentResolver().getType(docUri);
-                                                                                                    try {
-                                                                                                        String fileName = getFileName(docUri);
-                                                                                                        File outputDir = getActivity().getCacheDir(); // context being the Activity pointer
-                                                                                                        File outputFile = File.createTempFile(fileName.split("\\.")[0], "."+fileName.split("\\.")[1], outputDir);
-
-                                                                                                        File fileCopy = copyToTempFile(docUri, outputFile);
-                                                                                                        RequestBody requestBody = RequestBody.create(MediaType.parse(mimeType),fileCopy);
-                                                                                                        MultipartBody.Part part = MultipartBody.Part.createFormData("file",fileName,requestBody);
-                                                                                                        Call<ResponseBody> uploadFile = RetrofitClient.getInstance().getApi().uploadFile("Bearer "+access, idJanji, part);
-                                                                                                        uploadFile.enqueue(new Callback<ResponseBody>() {
-                                                                                                            @Override
-                                                                                                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                                                                                                try {
-                                                                                                                    if (response.isSuccessful()){
-                                                                                                                        if (response.body() != null){
-                                                                                                                            String respons = response.body().string();
-                                                                                                                            JSONObject uploadObj = new JSONObject(respons);
-                                                                                                                            Log.e("TAG", "onActivityResult: "+respons);
-                                                                                                                            if (uploadObj.has("success")){
-                                                                                                                                Call<ResponseBody> bayarWallet = RetrofitClient.getInstance().getApi().bayar("Bearer "+access,idJanji);
-                                                                                                                                bayarWallet.enqueue(new Callback<ResponseBody>() {
-                                                                                                                                    @Override
-                                                                                                                                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                                                                                                                        if (response.body() != null){
-                                                                                                                                            if (response.isSuccessful()){
-                                                                                                                                                try {
-                                                                                                                                                    String s = response.body().string();
-                                                                                                                                                    JSONObject bayarObj = new JSONObject(s);
-                                                                                                                                                    if (bayarObj.has("success")){
-                                                                                                                                                        initializeDialogSuccess();
-                                                                                                                                                    }
-                                                                                                                                                } catch (IOException | JSONException e) {
-                                                                                                                                                    e.printStackTrace();
-                                                                                                                                                }
-                                                                                                                                            }
-                                                                                                                                        }
-                                                                                                                                    }
-
-                                                                                                                                    @Override
-                                                                                                                                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-                                                                                                                                    }
-                                                                                                                                });
-                                                                                                                            }
-                                                                                                                        }else{
-                                                                                                                            String respons = response.errorBody().string();
-                                                                                                                            Log.e("TAG", "onActivityResult: "+respons);
-                                                                                                                        }
-                                                                                                                    }else{
-                                                                                                                        String respons = response.errorBody().string();
-                                                                                                                        Log.e("TAG", "onActivityResult: "+respons);
-                                                                                                                    }
-                                                                                                                } catch (IOException | JSONException e) {
-                                                                                                                    e.printStackTrace();
-                                                                                                                    Log.e("TAG", "onActivityResult: "+e.getMessage());
-                                                                                                                    uploadFile.clone().enqueue(this);
-                                                                                                                }
-                                                                                                            }
-
-                                                                                                            @Override
-                                                                                                            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                                                                                                Log.e("TAG", "Failure: "+t.getMessage());
-                                                                                                            }
-                                                                                                        });
-                                                                                                    } catch (Exception e) {
-                                                                                                        e.printStackTrace();
-                                                                                                    }
-                                                                                                }else{
-                                                                                                    Call<ResponseBody> bayarWallet = RetrofitClient.getInstance().getApi().bayar("Bearer "+access,idJanji);
-                                                                                                    bayarWallet.enqueue(new Callback<ResponseBody>() {
-                                                                                                        @Override
-                                                                                                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                                                                                            if (response.body() != null){
-                                                                                                                if (response.isSuccessful()){
-                                                                                                                    try {
-                                                                                                                        String s = response.body().string();
-                                                                                                                        JSONObject bayarObj = new JSONObject(s);
-                                                                                                                        if (bayarObj.has("success")){
-                                                                                                                            progressDialog.dismiss();
-                                                                                                                            initializeDialogSuccess();
-                                                                                                                        }
-                                                                                                                    } catch (IOException | JSONException e) {
-                                                                                                                        e.printStackTrace();
-                                                                                                                    }
-                                                                                                                }
-                                                                                                            }
-                                                                                                        }
-
-                                                                                                        @Override
-                                                                                                        public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-                                                                                                        }
-                                                                                                    });
-                                                                                                }
-                                                                                            }
-                                                                                        }
-                                                                                    }
-                                                                                }catch (IOException | JSONException e) {
-                                                                                    e.printStackTrace();
-                                                                                }
-                                                                            }
-
-                                                                            @Override
-                                                                            public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-                                                                            }
-                                                                        });
-                                                                    }
-                                                                }
-                                                            });
-                                                        }
-                                                    }*/
-                                                }
-                                            }
-                                        } catch (IOException | JSONException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-                                    }
-                                });
-
-                                ll_loader.setVisibility(View.GONE);
-                                shimmerFrameLayout.stopShimmer();
-                                rl_content.setVisibility(View.VISIBLE);
-                            } catch (IOException | JSONException e) {
-                                e.printStackTrace();
-                                callUser.clone().enqueue(this);
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-                        }
-                    });
-                } catch (IOException | JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-            }
-        });
 
         ib_edit_jadwal.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -706,158 +214,244 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
                                 MidtransSDK.getInstance().setTransactionRequest(request);
                                 MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
                             }else{
-                                JanjiRequest request = new JanjiRequest(bundle.getInt("id_dokter"), bundle.getString("date"), detailJanji, day);
-                                Call<ResponseBody> buatJanji = RetrofitClient.getInstance().getApi().buatJanji("Bearer "+access, request);
-                                buatJanji.enqueue(new Callback<ResponseBody>() {
+                                Call<ResponseBody> getUserJanji = RetrofitClient.getInstance().getApi().getUserJanji("Bearer "+access);
+                                getUserJanji.enqueue(new Callback<ResponseBody>() {
                                     @Override
                                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                                         try {
-                                            if (response.isSuccessful()){
-                                                if (response.body() != null){
+                                            if (response.isSuccessful()) {
+                                                if (response.body() != null) {
                                                     String s = response.body().string();
                                                     JSONObject object = new JSONObject(s);
-                                                    if (object.has("success")){
-                                                        getView().setOnKeyListener(new View.OnKeyListener() {
+                                                    JSONArray objArr = object.getJSONArray("data");
+                                                    if (objArr.length() > 0){
+                                                        List<JSONObject> jsonValues = new ArrayList<JSONObject>();
+                                                        for (int i = 0; i < objArr.length(); i++) {
+                                                            jsonValues.add(objArr.getJSONObject(i));
+                                                        }
+                                                        Collections.sort(jsonValues, new Comparator<JSONObject>() {
                                                             @Override
-                                                            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                                                                if (event.getAction() ==KeyEvent.ACTION_DOWN){
-                                                                    if( keyCode == KeyEvent.KEYCODE_BACK) {
-                                                                        FragmentManager manager = getActivity().getSupportFragmentManager();
-                                                                        manager.popBackStack();
-                                                                        manager.popBackStack();
-                                                                        manager.popBackStack();
-                                                                        return true;
-                                                                    }
+                                                            public int compare(JSONObject o1, JSONObject o2) {
+                                                                int idA = 0;
+                                                                int idB = 0;
+                                                                try {
+                                                                    idA = o1.getInt("id");
+                                                                    idB = o2.getInt("id");
+                                                                } catch (JSONException e) {
+                                                                    e.printStackTrace();
                                                                 }
-                                                                return false;
+                                                                return -Integer.compare(idA,idB);
                                                             }
                                                         });
-                                                        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                                                        JSONArray sortedJanji = new JSONArray();
+                                                        for (int i = 0; i < objArr.length(); i++) {
+                                                            sortedJanji.put(jsonValues.get(i));
+                                                        }
+                                                        JSONObject janjiObj = sortedJanji.getJSONObject(0);
+                                                        JSONObject doctObj = janjiObj.getJSONObject("dokter");
+                                                        JSONArray transArr = janjiObj.getJSONArray("transaksi");
+                                                        idJanji = janjiObj.getInt("id");
+                                                        for (int j = 0; j < transArr.length(); j++) {
+                                                            JSONObject transObj = transArr.getJSONObject(j);
+                                                            if (!transObj.getBoolean("is_paid")){
+                                                                setStatus(false);
+                                                                snapToken = transObj.getString("snapToken");
+                                                                metode = transObj.getString("method");
+                                                            }else{
+                                                                setStatus(true);
+                                                            }
+                                                        }
+                                                    }else{
+                                                        setStatus(true);
+                                                    }
+                                                    if (status){
+                                                        JanjiRequest request = new JanjiRequest(bundle.getInt("id_dokter"), bundle.getString("date"), detailJanji, day);
+                                                        Call<ResponseBody> buatJanji = RetrofitClient.getInstance().getApi().buatJanji("Bearer "+access, request);
+                                                        buatJanji.enqueue(new Callback<ResponseBody>() {
                                                             @Override
-                                                            public void onClick(View v) {
-                                                                FragmentManager manager = getActivity().getSupportFragmentManager();
-                                                                manager.popBackStack();
-                                                                manager.popBackStack();
-                                                                manager.popBackStack();
-                                                            }
-                                                        });
-                                                        JSONObject janjiSuccess = object.getJSONObject("data");
-                                                        setIdJanji(janjiSuccess.getInt("id"));
-                                                        if (bundle.getString("uri") != null) {
-                                                            docUri = Uri.parse(bundle.getString("uri"));
-                                                            String mimeType = getActivity().getContentResolver().getType(docUri);
-                                                            try {
-                                                                String fileName = getFileName(docUri);
-                                                                File outputDir = getActivity().getCacheDir(); // context being the Activity pointer
-                                                                File outputFile = File.createTempFile(fileName.split("\\.")[0], "." + fileName.split("\\.")[1], outputDir);
+                                                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                                                try {
+                                                                    if (response.isSuccessful()){
+                                                                        if (response.body() != null){
+                                                                            String s = response.body().string();
+                                                                            JSONObject object = new JSONObject(s);
+                                                                            if (object.has("success")){
+                                                                                getView().setOnKeyListener(new View.OnKeyListener() {
+                                                                                    @Override
+                                                                                    public boolean onKey(View v, int keyCode, KeyEvent event) {
+                                                                                        if (event.getAction() ==KeyEvent.ACTION_DOWN){
+                                                                                            if( keyCode == KeyEvent.KEYCODE_BACK) {
+                                                                                                FragmentManager manager = getActivity().getSupportFragmentManager();
+                                                                                                manager.popBackStack();
+                                                                                                manager.popBackStack();
+                                                                                                manager.popBackStack();
+                                                                                                return true;
+                                                                                            }
+                                                                                        }
+                                                                                        return false;
+                                                                                    }
+                                                                                });
+                                                                                toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                                                                                    @Override
+                                                                                    public void onClick(View v) {
+                                                                                        FragmentManager manager = getActivity().getSupportFragmentManager();
+                                                                                        manager.popBackStack();
+                                                                                        manager.popBackStack();
+                                                                                        manager.popBackStack();
+                                                                                    }
+                                                                                });
+                                                                                JSONObject janjiSuccess = object.getJSONObject("data");
+                                                                                setIdJanji(janjiSuccess.getInt("id"));
+                                                                                if (bundle.getString("uri") != null) {
+                                                                                    docUri = Uri.parse(bundle.getString("uri"));
+                                                                                    String mimeType = getActivity().getContentResolver().getType(docUri);
+                                                                                    try {
+                                                                                        String fileName = getFileName(docUri);
+                                                                                        File outputDir = getActivity().getCacheDir(); // context being the Activity pointer
+                                                                                        File outputFile = File.createTempFile(fileName.split("\\.")[0], "." + fileName.split("\\.")[1], outputDir);
 
-                                                                File fileCopy = copyToTempFile(docUri, outputFile);
-                                                                RequestBody requestBody = RequestBody.create(MediaType.parse(mimeType), fileCopy);
-                                                                MultipartBody.Part part = MultipartBody.Part.createFormData("file", fileName, requestBody);
-                                                                Call<ResponseBody> uploadFile = RetrofitClient.getInstance().getApi().uploadFile("Bearer " + access, idJanji, part);
-                                                                uploadFile.enqueue(new Callback<ResponseBody>() {
-                                                                    @Override
-                                                                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                                                        try {
-                                                                            if (response.isSuccessful()) {
-                                                                                if (response.body() != null) {
-                                                                                    String respons = response.body().string();
-                                                                                    JSONObject uploadObj = new JSONObject(respons);
-                                                                                    Log.e("TAG", "onActivityResult: " + respons);
-                                                                                    if (uploadObj.has("success")) {
-                                                                                        Call<ResponseBody> payment = RetrofitClient.getInstance().getApi().paymentWallet("Bearer "+access,idJanji,true);
-                                                                                        payment.enqueue(new Callback<ResponseBody>() {
+                                                                                        File fileCopy = copyToTempFile(docUri, outputFile);
+                                                                                        RequestBody requestBody = RequestBody.create(MediaType.parse(mimeType), fileCopy);
+                                                                                        MultipartBody.Part part = MultipartBody.Part.createFormData("file", fileName, requestBody);
+                                                                                        Call<ResponseBody> uploadFile = RetrofitClient.getInstance().getApi().uploadFile("Bearer " + access, idJanji, part);
+                                                                                        uploadFile.enqueue(new Callback<ResponseBody>() {
                                                                                             @Override
                                                                                             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                                                                                if (response.body() != null){
-                                                                                                    try {
-                                                                                                        Log.e(TAG, "onResponse: "+response.body().string());
-                                                                                                        JSONObject responseObj = new JSONObject(response.body().string());
-                                                                                                        snapToken = responseObj.getString("token");
-                                                                                                        ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Konsultasi dengan "+tv_dr_name.getText().toString());
-                                                                                                        ArrayList<ItemDetails> details = new ArrayList<>();
-                                                                                                        details.add(itemDetails);
-                                                                                                        TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
-                                                                                                        request.setItemDetails(details);
-                                                                                                        progressDialog.dismiss();
-                                                                                                        MidtransSDK.getInstance().setTransactionRequest(request);
-                                                                                                        MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
-                                                                                                    } catch (IOException | JSONException e) {
-                                                                                                        e.printStackTrace();
+                                                                                                try {
+                                                                                                    if (response.isSuccessful()) {
+                                                                                                        if (response.body() != null) {
+                                                                                                            String respons = response.body().string();
+                                                                                                            JSONObject uploadObj = new JSONObject(respons);
+                                                                                                            Log.e("TAG", "onActivityResult: " + respons);
+                                                                                                            if (uploadObj.has("success")) {
+                                                                                                                Map<String, Object> jsonParams = new ArrayMap<>();
+                                                                                                                jsonParams.put("idJanji",idJanji);
+                                                                                                                jsonParams.put("wallet",true);
+                                                                                                                RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"),(new JSONObject(jsonParams)).toString());
+                                                                                                                Call<ResponseBody> payment = RetrofitClient.getInstance().getApi().paymentWallet("Bearer "+access,body);
+                                                                                                                payment.enqueue(new Callback<ResponseBody>() {
+                                                                                                                    @Override
+                                                                                                                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                                                                                                        if (response.body() != null){
+                                                                                                                            try {
+                                                                                                                                Log.e(TAG, "onResponse: "+response.body().string());
+                                                                                                                                JSONObject responseObj = new JSONObject(response.body().string());
+                                                                                                                                snapToken = responseObj.getString("token");
+                                                                                                                                ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Konsultasi dengan "+tv_dr_name.getText().toString());
+                                                                                                                                ArrayList<ItemDetails> details = new ArrayList<>();
+                                                                                                                                details.add(itemDetails);
+                                                                                                                                TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
+                                                                                                                                request.setItemDetails(details);
+                                                                                                                                progressDialog.dismiss();
+                                                                                                                                MidtransSDK.getInstance().setTransactionRequest(request);
+                                                                                                                                MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
+                                                                                                                            } catch (IOException | JSONException e) {
+                                                                                                                                e.printStackTrace();
+                                                                                                                            }
+                                                                                                                        }
+                                                                                                                    }
+
+                                                                                                                    @Override
+                                                                                                                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                                                                                                        payment.clone().enqueue(this);
+                                                                                                                    }
+                                                                                                                });
+                                                                                                            }
+                                                                                                        } else {
+                                                                                                            String respons = response.errorBody().string();
+                                                                                                            Log.e("TAG", "onActivityResult: " + respons);
+                                                                                                        }
+                                                                                                    } else {
+                                                                                                        String respons = response.errorBody().string();
+                                                                                                        Log.e("TAG", "onActivityResult: " + respons);
                                                                                                     }
+                                                                                                } catch (IOException | JSONException e) {
+                                                                                                    e.printStackTrace();
+                                                                                                    Log.e("TAG", "onActivityResult: " + e.getMessage());
+                                                                                                    uploadFile.clone().enqueue(this);
                                                                                                 }
                                                                                             }
 
                                                                                             @Override
                                                                                             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                                                                                payment.clone().enqueue(this);
+                                                                                                Log.e("TAG", "Failure: " + t.getMessage());
                                                                                             }
                                                                                         });
+                                                                                    } catch (Exception e) {
+                                                                                        e.printStackTrace();
                                                                                     }
-                                                                                } else {
-                                                                                    String respons = response.errorBody().string();
-                                                                                    Log.e("TAG", "onActivityResult: " + respons);
+                                                                                }else{
+                                                                                    Map<String, Object> jsonParams = new ArrayMap<>();
+                                                                                    jsonParams.put("idJanji",idJanji);
+                                                                                    jsonParams.put("wallet",true);
+                                                                                    RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"),(new JSONObject(jsonParams)).toString());
+                                                                                    Call<ResponseBody> payment = RetrofitClient.getInstance().getApi().paymentWallet("Bearer "+access,body);
+                                                                                    payment.enqueue(new Callback<ResponseBody>() {
+                                                                                        @Override
+                                                                                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                                                                            if (response.body() != null){
+                                                                                                try {
+                                                                                                    JSONObject responseObj = new JSONObject(response.body().string());
+                                                                                                    Log.e(TAG, "onResponse: "+response.body().string());
+                                                                                                    snapToken = responseObj.getString("token");
+                                                                                                    ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Konsultasi dengan "+tv_dr_name.getText().toString());
+                                                                                                    ArrayList<ItemDetails> details = new ArrayList<>();
+                                                                                                    details.add(itemDetails);
+                                                                                                    TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
+                                                                                                    request.setItemDetails(details);
+                                                                                                    progressDialog.dismiss();
+                                                                                                    MidtransSDK.getInstance().setTransactionRequest(request);
+                                                                                                    MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
+                                                                                                } catch (IOException | JSONException e) {
+                                                                                                    e.printStackTrace();
+                                                                                                }
+                                                                                            }
+                                                                                        }
+
+                                                                                        @Override
+                                                                                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                                                                            payment.clone().enqueue(this);
+                                                                                        }
+                                                                                    });
                                                                                 }
-                                                                            } else {
-                                                                                String respons = response.errorBody().string();
-                                                                                Log.e("TAG", "onActivityResult: " + respons);
                                                                             }
-                                                                        } catch (IOException | JSONException e) {
-                                                                            e.printStackTrace();
-                                                                            Log.e("TAG", "onActivityResult: " + e.getMessage());
-                                                                            uploadFile.clone().enqueue(this);
                                                                         }
                                                                     }
-
-                                                                    @Override
-                                                                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                                                        Log.e("TAG", "Failure: " + t.getMessage());
-                                                                    }
-                                                                });
-                                                            } catch (Exception e) {
-                                                                e.printStackTrace();
+                                                                }catch (IOException | JSONException e) {
+                                                                    e.printStackTrace();
+                                                                }
                                                             }
-                                                        }else{
-                                                            Call<ResponseBody> payment = RetrofitClient.getInstance().getApi().payment("Bearer "+access,idJanji);
-                                                            payment.enqueue(new Callback<ResponseBody>() {
-                                                                @Override
-                                                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                                                    if (response.body() != null){
-                                                                        try {
-                                                                            JSONObject responseObj = new JSONObject(response.body().string());
-                                                                            Log.e(TAG, "onResponse: "+response.body().string());
-                                                                            snapToken = responseObj.getString("token");
-                                                                            ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Konsultasi dengan "+tv_dr_name.getText().toString());
-                                                                            ArrayList<ItemDetails> details = new ArrayList<>();
-                                                                            details.add(itemDetails);
-                                                                            TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
-                                                                            request.setItemDetails(details);
-                                                                            progressDialog.dismiss();
-                                                                            MidtransSDK.getInstance().setTransactionRequest(request);
-                                                                            MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
-                                                                        } catch (IOException | JSONException e) {
-                                                                            e.printStackTrace();
-                                                                        }
-                                                                    }
-                                                                }
 
-                                                                @Override
-                                                                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                                                    payment.clone().enqueue(this);
-                                                                }
-                                                            });
-                                                        }
+                                                            @Override
+                                                            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                                                            }
+                                                        });
+                                                    }else{
+                                                        setIdJanji(bundle.getInt("id_janji"));
+                                                        ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Konsultasi dengan "+tv_dr_name.getText().toString());
+                                                        ArrayList<ItemDetails> details = new ArrayList<>();
+                                                        details.add(itemDetails);
+                                                        TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
+                                                        request.setItemDetails(details);
+                                                        progressDialog.dismiss();
+                                                        MidtransSDK.getInstance().setTransactionRequest(request);
+                                                        MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
                                                     }
+                                                }else{
+                                                    getUserJanji.clone().enqueue(this);
                                                 }
+                                            }else{
+                                                getUserJanji.clone().enqueue(this);
                                             }
-                                        }catch (IOException | JSONException e) {
+                                        } catch (IOException|JSONException e) {
                                             e.printStackTrace();
                                         }
                                     }
 
                                     @Override
                                     public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                                        getUserJanji.clone().enqueue(this);
                                     }
                                 });
                             }
@@ -1079,163 +673,384 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
                             MidtransSDK.getInstance().setTransactionRequest(request);
                             MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
                         }else{
-                            JanjiRequest request = new JanjiRequest(bundle.getInt("id_dokter"), bundle.getString("date"), detailJanji, day);
-                            Call<ResponseBody> buatJanji = RetrofitClient.getInstance().getApi().buatJanji("Bearer "+access, request);
-                            buatJanji.enqueue(new Callback<ResponseBody>() {
+                            Call<ResponseBody> getUserJanji = RetrofitClient.getInstance().getApi().getUserJanji("Bearer "+access);
+                            getUserJanji.enqueue(new Callback<ResponseBody>() {
                                 @Override
                                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                                     try {
-                                        if (response.isSuccessful()){
-                                            if (response.body() != null){
+                                        if (response.isSuccessful()) {
+                                            if (response.body() != null) {
                                                 String s = response.body().string();
                                                 JSONObject object = new JSONObject(s);
-                                                if (object.has("success")){
-                                                    getView().setOnKeyListener(new View.OnKeyListener() {
+                                                JSONArray objArr = object.getJSONArray("data");
+                                                if (objArr.length() > 0){
+                                                    List<JSONObject> jsonValues = new ArrayList<JSONObject>();
+                                                    for (int i = 0; i < objArr.length(); i++) {
+                                                        jsonValues.add(objArr.getJSONObject(i));
+                                                    }
+                                                    Collections.sort(jsonValues, new Comparator<JSONObject>() {
                                                         @Override
-                                                        public boolean onKey(View v, int keyCode, KeyEvent event) {
-                                                            if (event.getAction() ==KeyEvent.ACTION_DOWN){
-                                                                if( keyCode == KeyEvent.KEYCODE_BACK) {
-                                                                    FragmentManager manager = getActivity().getSupportFragmentManager();
-                                                                    manager.popBackStack();
-                                                                    manager.popBackStack();
-                                                                    manager.popBackStack();
-                                                                    return true;
-                                                                }
+                                                        public int compare(JSONObject o1, JSONObject o2) {
+                                                            int idA = 0;
+                                                            int idB = 0;
+                                                            try {
+                                                                idA = o1.getInt("id");
+                                                                idB = o2.getInt("id");
+                                                            } catch (JSONException e) {
+                                                                e.printStackTrace();
                                                             }
-                                                            return false;
+                                                            return -Integer.compare(idA,idB);
                                                         }
                                                     });
-                                                    toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                                                    JSONArray sortedJanji = new JSONArray();
+                                                    for (int i = 0; i < objArr.length(); i++) {
+                                                        sortedJanji.put(jsonValues.get(i));
+                                                    }
+                                                    JSONObject janjiObj = sortedJanji.getJSONObject(0);
+                                                    JSONObject doctObj = janjiObj.getJSONObject("dokter");
+                                                    JSONArray transArr = janjiObj.getJSONArray("transaksi");
+                                                    idJanji = janjiObj.getInt("id");
+                                                    for (int j = 0; j < transArr.length(); j++) {
+                                                        JSONObject transObj = transArr.getJSONObject(j);
+                                                        if (!transObj.getBoolean("is_paid")){
+                                                            setStatus(false);
+                                                            snapToken = transObj.getString("snapToken");
+                                                            metode = transObj.getString("method");
+                                                        }else{
+                                                            setStatus(true);
+                                                        }
+                                                    }
+                                                }else{
+                                                    setStatus(true);
+                                                }
+                                                if (status){
+                                                    JanjiRequest request = new JanjiRequest(bundle.getInt("id_dokter"), bundle.getString("date"), detailJanji, day);
+                                                    Call<ResponseBody> buatJanji = RetrofitClient.getInstance().getApi().buatJanji("Bearer "+access, request);
+                                                    buatJanji.enqueue(new Callback<ResponseBody>() {
                                                         @Override
-                                                        public void onClick(View v) {
-                                                            FragmentManager manager = getActivity().getSupportFragmentManager();
-                                                            manager.popBackStack();
-                                                            manager.popBackStack();
-                                                            manager.popBackStack();
-                                                        }
-                                                    });
-                                                    JSONObject janjiSuccess = object.getJSONObject("data");
-                                                    setIdJanji(janjiSuccess.getInt("id"));
-                                                    if (bundle.getString("uri") != null) {
-                                                        docUri = Uri.parse(bundle.getString("uri"));
-                                                        String mimeType = getActivity().getContentResolver().getType(docUri);
-                                                        try {
-                                                            String fileName = getFileName(docUri);
-                                                            File outputDir = getActivity().getCacheDir(); // context being the Activity pointer
-                                                            File outputFile = File.createTempFile(fileName.split("\\.")[0], "." + fileName.split("\\.")[1], outputDir);
+                                                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                                            try {
+                                                                if (response.isSuccessful()){
+                                                                    if (response.body() != null){
+                                                                        String s = response.body().string();
+                                                                        JSONObject object = new JSONObject(s);
+                                                                        if (object.has("success")){
+                                                                            getView().setOnKeyListener(new View.OnKeyListener() {
+                                                                                @Override
+                                                                                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                                                                                    if (event.getAction() ==KeyEvent.ACTION_DOWN){
+                                                                                        if( keyCode == KeyEvent.KEYCODE_BACK) {
+                                                                                            FragmentManager manager = getActivity().getSupportFragmentManager();
+                                                                                            manager.popBackStack();
+                                                                                            manager.popBackStack();
+                                                                                            manager.popBackStack();
+                                                                                            return true;
+                                                                                        }
+                                                                                    }
+                                                                                    return false;
+                                                                                }
+                                                                            });
+                                                                            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                                                                                @Override
+                                                                                public void onClick(View v) {
+                                                                                    FragmentManager manager = getActivity().getSupportFragmentManager();
+                                                                                    manager.popBackStack();
+                                                                                    manager.popBackStack();
+                                                                                    manager.popBackStack();
+                                                                                }
+                                                                            });
+                                                                            JSONObject janjiSuccess = object.getJSONObject("data");
+                                                                            setIdJanji(janjiSuccess.getInt("id"));
+                                                                            if (bundle.getString("uri") != null) {
+                                                                                docUri = Uri.parse(bundle.getString("uri"));
+                                                                                String mimeType = getActivity().getContentResolver().getType(docUri);
+                                                                                try {
+                                                                                    String fileName = getFileName(docUri);
+                                                                                    File outputDir = getActivity().getCacheDir(); // context being the Activity pointer
+                                                                                    File outputFile = File.createTempFile(fileName.split("\\.")[0], "." + fileName.split("\\.")[1], outputDir);
 
-                                                            File fileCopy = copyToTempFile(docUri, outputFile);
-                                                            RequestBody requestBody = RequestBody.create(MediaType.parse(mimeType), fileCopy);
-                                                            MultipartBody.Part part = MultipartBody.Part.createFormData("file", fileName, requestBody);
-                                                            Call<ResponseBody> uploadFile = RetrofitClient.getInstance().getApi().uploadFile("Bearer " + access, idJanji, part);
-                                                            uploadFile.enqueue(new Callback<ResponseBody>() {
-                                                                @Override
-                                                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                                                    try {
-                                                                        if (response.isSuccessful()) {
-                                                                            if (response.body() != null) {
-                                                                                String respons = response.body().string();
-                                                                                JSONObject uploadObj = new JSONObject(respons);
-                                                                                Log.e("TAG", "onActivityResult: " + respons);
-                                                                                if (uploadObj.has("success")) {
-                                                                                    Call<ResponseBody> payment = RetrofitClient.getInstance().getApi().payment("Bearer "+access,idJanji);
-                                                                                    payment.enqueue(new Callback<ResponseBody>() {
+                                                                                    File fileCopy = copyToTempFile(docUri, outputFile);
+                                                                                    RequestBody requestBody = RequestBody.create(MediaType.parse(mimeType), fileCopy);
+                                                                                    MultipartBody.Part part = MultipartBody.Part.createFormData("file", fileName, requestBody);
+                                                                                    Call<ResponseBody> uploadFile = RetrofitClient.getInstance().getApi().uploadFile("Bearer " + access, idJanji, part);
+                                                                                    uploadFile.enqueue(new Callback<ResponseBody>() {
                                                                                         @Override
                                                                                         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                                                                            if (response.body() != null){
-                                                                                                try {
-                                                                                                    Log.e(TAG, "onResponse: "+response.body().string());
-                                                                                                    JSONObject responseObj = new JSONObject(response.body().string());
-                                                                                                    snapToken = responseObj.getString("token");
-                                                                                                    ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Konsultasi dengan "+tv_dr_name.getText().toString());
-                                                                                                    ArrayList<ItemDetails> details = new ArrayList<>();
-                                                                                                    details.add(itemDetails);
-                                                                                                    TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
-                                                                                                    request.setItemDetails(details);
-                                                                                                    progressDialog.dismiss();
-                                                                                                    MidtransSDK.getInstance().setTransactionRequest(request);
-                                                                                                    MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
-                                                                                                } catch (IOException | JSONException e) {
-                                                                                                    e.printStackTrace();
+                                                                                            try {
+                                                                                                if (response.isSuccessful()) {
+                                                                                                    if (response.body() != null) {
+                                                                                                        String respons = response.body().string();
+                                                                                                        JSONObject uploadObj = new JSONObject(respons);
+                                                                                                        Log.e("TAG", "onActivityResult: " + respons);
+                                                                                                        if (uploadObj.has("success")) {
+                                                                                                            Call<ResponseBody> payment = RetrofitClient.getInstance().getApi().payment("Bearer "+access,idJanji);
+                                                                                                            payment.enqueue(new Callback<ResponseBody>() {
+                                                                                                                @Override
+                                                                                                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                                                                                                    if (response.body() != null){
+                                                                                                                        try {
+                                                                                                                            Log.e(TAG, "onResponse: "+response.body().string());
+                                                                                                                            JSONObject responseObj = new JSONObject(response.body().string());
+                                                                                                                            snapToken = responseObj.getString("token");
+                                                                                                                            ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Konsultasi dengan "+tv_dr_name.getText().toString());
+                                                                                                                            ArrayList<ItemDetails> details = new ArrayList<>();
+                                                                                                                            details.add(itemDetails);
+                                                                                                                            TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
+                                                                                                                            request.setItemDetails(details);
+                                                                                                                            progressDialog.dismiss();
+                                                                                                                            MidtransSDK.getInstance().setTransactionRequest(request);
+                                                                                                                            MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
+                                                                                                                        } catch (IOException | JSONException e) {
+                                                                                                                            e.printStackTrace();
+                                                                                                                        }
+                                                                                                                    }
+                                                                                                                }
+
+                                                                                                                @Override
+                                                                                                                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                                                                                                    payment.clone().enqueue(this);
+                                                                                                                }
+                                                                                                            });
+                                                                                                        }
+                                                                                                    } else {
+                                                                                                        String respons = response.errorBody().string();
+                                                                                                        Log.e("TAG", "onActivityResult: " + respons);
+                                                                                                    }
+                                                                                                } else {
+                                                                                                    String respons = response.errorBody().string();
+                                                                                                    Log.e("TAG", "onActivityResult: " + respons);
                                                                                                 }
+                                                                                            } catch (IOException | JSONException e) {
+                                                                                                e.printStackTrace();
+                                                                                                Log.e("TAG", "onActivityResult: " + e.getMessage());
+                                                                                                uploadFile.clone().enqueue(this);
                                                                                             }
                                                                                         }
 
                                                                                         @Override
                                                                                         public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                                                                            payment.clone().enqueue(this);
+                                                                                            Log.e("TAG", "Failure: " + t.getMessage());
                                                                                         }
                                                                                     });
+                                                                                } catch (Exception e) {
+                                                                                    e.printStackTrace();
                                                                                 }
-                                                                            } else {
-                                                                                String respons = response.errorBody().string();
-                                                                                Log.e("TAG", "onActivityResult: " + respons);
+                                                                            }else{
+                                                                                Call<ResponseBody> payment = RetrofitClient.getInstance().getApi().payment("Bearer "+access,idJanji);
+                                                                                payment.enqueue(new Callback<ResponseBody>() {
+                                                                                    @Override
+                                                                                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                                                                        if (response.body() != null){
+                                                                                            try {
+                                                                                                JSONObject responseObj = new JSONObject(response.body().string());
+                                                                                                Log.e(TAG, "onResponse: "+response.body().string());
+                                                                                                snapToken = responseObj.getString("token");
+                                                                                                ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Konsultasi dengan "+tv_dr_name.getText().toString());
+                                                                                                ArrayList<ItemDetails> details = new ArrayList<>();
+                                                                                                details.add(itemDetails);
+                                                                                                TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
+                                                                                                request.setItemDetails(details);
+                                                                                                progressDialog.dismiss();
+                                                                                                MidtransSDK.getInstance().setTransactionRequest(request);
+                                                                                                MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
+                                                                                            } catch (IOException | JSONException e) {
+                                                                                                e.printStackTrace();
+                                                                                            }
+                                                                                        }
+                                                                                    }
+
+                                                                                    @Override
+                                                                                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                                                                        payment.clone().enqueue(this);
+                                                                                    }
+                                                                                });
                                                                             }
-                                                                        } else {
-                                                                            String respons = response.errorBody().string();
-                                                                            Log.e("TAG", "onActivityResult: " + respons);
                                                                         }
-                                                                    } catch (IOException | JSONException e) {
-                                                                        e.printStackTrace();
-                                                                        Log.e("TAG", "onActivityResult: " + e.getMessage());
-                                                                        uploadFile.clone().enqueue(this);
                                                                     }
                                                                 }
-
-                                                                @Override
-                                                                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                                                    Log.e("TAG", "Failure: " + t.getMessage());
-                                                                }
-                                                            });
-                                                        } catch (Exception e) {
-                                                            e.printStackTrace();
+                                                            }catch (IOException | JSONException e) {
+                                                                e.printStackTrace();
+                                                            }
                                                         }
-                                                    }else{
-                                                        Call<ResponseBody> payment = RetrofitClient.getInstance().getApi().payment("Bearer "+access,idJanji);
-                                                        payment.enqueue(new Callback<ResponseBody>() {
-                                                            @Override
-                                                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                                                if (response.body() != null){
-                                                                    try {
-                                                                        JSONObject responseObj = new JSONObject(response.body().string());
-                                                                        Log.e(TAG, "onResponse: "+response.body().string());
-                                                                        snapToken = responseObj.getString("token");
-                                                                        ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Konsultasi dengan "+tv_dr_name.getText().toString());
-                                                                        ArrayList<ItemDetails> details = new ArrayList<>();
-                                                                        details.add(itemDetails);
-                                                                        TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
-                                                                        request.setItemDetails(details);
-                                                                        progressDialog.dismiss();
-                                                                        MidtransSDK.getInstance().setTransactionRequest(request);
-                                                                        MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
-                                                                    } catch (IOException | JSONException e) {
-                                                                        e.printStackTrace();
-                                                                    }
-                                                                }
-                                                            }
 
-                                                            @Override
-                                                            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                                                payment.clone().enqueue(this);
-                                                            }
-                                                        });
-                                                    }
+                                                        @Override
+                                                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                                                        }
+                                                    });
+                                                }else{
+                                                    setIdJanji(bundle.getInt("id_janji"));
+                                                    ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Konsultasi dengan "+tv_dr_name.getText().toString());
+                                                    ArrayList<ItemDetails> details = new ArrayList<>();
+                                                    details.add(itemDetails);
+                                                    TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
+                                                    request.setItemDetails(details);
+                                                    progressDialog.dismiss();
+                                                    MidtransSDK.getInstance().setTransactionRequest(request);
+                                                    MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
                                                 }
+                                            }else{
+                                                getUserJanji.clone().enqueue(this);
                                             }
+                                        }else{
+                                            getUserJanji.clone().enqueue(this);
                                         }
-                                    }catch (IOException | JSONException e) {
+                                    } catch (IOException|JSONException e) {
                                         e.printStackTrace();
                                     }
                                 }
 
                                 @Override
                                 public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                                    getUserJanji.clone().enqueue(this);
                                 }
                             });
                         }
                     }
                 });
+            }
+        });
+
+        Call<ResponseBody> callDokter = RetrofitClient.getInstance().getApi().getDokterId(bundle.getInt("id_dokter"));
+        callDokter.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    String s = response.body().string();
+                    JSONObject object = new JSONObject(s);
+                    JSONObject obj = new JSONObject(object.getString("data"));
+                    tv_dr_name.setText(obj.getString("name"));
+                    JSONObject specObj = new JSONObject(obj.getString("specialization"));
+                    String spec = specObj.getString("specialization");
+                    tv_dr_specialist.setText(spec);
+                    JSONObject rsObject = new JSONObject(obj.getString("hospital"));
+                    String rs_name = rsObject.getString("name");
+                    JSONObject alamatObject = new JSONObject(obj.getString("alamat"));
+                    String kelurahan = alamatObject.getString("kelurahan");
+                    String kecamatan = alamatObject.getString("kecamatan");
+                    String kota = alamatObject.getString("kota");
+                    String rs_loc = kecamatan+", "+kota;
+                    tv_dr_rs.setText(rs_name);
+                    tv_dr_rs_loc.setText(rs_loc);
+                    String path="";
+                    JSONArray jsonArrayImage = new JSONArray(obj.getString("image"));
+                    if (new JSONArray(obj.getString("image")).length() !=0){
+                        for (int j = 0; j < jsonArrayImage.length(); j++) {
+                            JSONObject imageObj = jsonArrayImage.getJSONObject(j);
+                            if (imageObj.getInt("type_id") == 1) {
+                                path = BASE_URL + imageObj.getString("path");
+                                break;
+                            }
+                        }
+                    }else{
+                        path = BASE_URL+"/storage/Dokter.png";
+                    }
+                    Picasso.get().load(path).into(circleImageView);
+                    Call<ResponseBody> callUser = RetrofitClient.getInstance().getApi().getUser("Bearer "+access);
+                    callUser.enqueue(new Callback<ResponseBody>() {
+                        @Override
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            try {
+                                String s = response.body().string();
+                                JSONObject object = new JSONObject(s);
+                                String userName = obj.getString("name");
+                                String[] userNameArr = userName.split(" ");
+                                fName = userNameArr[0];
+                                lName = "";
+                                if (userNameArr.length > 1) {
+                                    lName = userName.split(" ")[1];
+                                }
+                                phone = object.getString("notelp");
+                                email = object.getString("email");
+                                JSONObject alamatObj = object.getJSONObject("alamat");
+                                alamat = alamatObj.getString("jalan")+", No. "+alamatObj.getString("nomor_bangunan")
+                                        +", RT/RW. "+alamatObj.getString("rtrw")+", "+alamatObj.getString("kelurahan")
+                                        +", "+alamatObj.getString("kecamatan")+", "+alamatObj.getString("kota");
+                                JSONObject walletObj = object.getJSONObject("wallet");
+                                saldo = walletObj.getInt("balance");
+                                String balance = NumberFormat.getInstance(Locale.ITALIAN).format(saldo);
+                                tv_saldo.setText("Rp"+balance);
+
+                                tv_nama_dokter.setText(bundle.getString("nama_dokter"));
+
+                                Locale locale = new Locale("in", "ID");
+                                DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("EEEE, dd MMMM YYYY",locale);
+                                LocalDate localDate = LocalDate.parse(bundle.getString("date"));
+
+                                tv_tgl_konsultasi.setText(localDate.format(dateFormat));
+                                tv_jam_konsultasi.setText(bundle.getString("time"));
+                                String harga = NumberFormat.getInstance(Locale.ITALIAN).format(bundle.getInt("harga"));
+                                String uniqueCode = NumberFormat.getInstance(Locale.ITALIAN).format(object.getInt("id"));
+
+                                DateTimeFormatter dayFormat = DateTimeFormatter.ofPattern("EEEE",locale);
+
+                                Call<ResponseBody> getServiceFee = RetrofitClient.getInstance().getApi().getServiceFee();
+                                getServiceFee.enqueue(new Callback<ResponseBody>() {
+                                    @Override
+                                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                        try {
+                                            if (response.isSuccessful()){
+                                                if (response.body() != null){
+                                                    String s = response.body().string();
+                                                    JSONObject jsonObject = new JSONObject(s);
+                                                    layananInt = jsonObject.getJSONObject("data").getInt("servicefee");
+                                                    totalBayar = object.getInt("id")+layananInt+bundle.getInt("harga");
+                                                    String layanan = NumberFormat.getInstance(Locale.ITALIAN).format(jsonObject.getJSONObject("data").getInt("servicefee"));
+                                                    tv_layanan.setText("Rp"+layanan);
+                                                    String total = NumberFormat.getInstance(Locale.ITALIAN).format(totalBayar);
+                                                    tv_total_harga.setText("Rp"+total);
+                                                    tv_total_bayar.setText("Rp"+total);
+                                                    tv_harga.setText("Rp"+harga);
+                                                    tv_kode_unik.setText("Rp"+uniqueCode);
+                                                    setDay(localDate.format(dayFormat).toLowerCase());
+                                                    setDetailJanji(localDate.format(dateFormat)+" Pukul "+bundle.getString("time")+"\n\nKeluhan:\n"+bundle.getString("detailJanji"));
+
+                                                    if (bundle.containsKey("method")){
+                                                        metode = bundle.getString("method");
+                                                        Log.e(TAG, "onStart: "+metode );
+                                                        if (metode.equalsIgnoreCase("hybrid")){
+                                                            ll_choose_wallet.performClick();
+                                                            ll_payment_method.setClickable(false);
+                                                        }else if(metode.equalsIgnoreCase("snap")){
+                                                            ll_choose_others.performClick();
+                                                            ll_payment_method.setClickable(false);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        } catch (IOException | JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                                    }
+                                });
+
+                                ll_loader.setVisibility(View.GONE);
+                                shimmerFrameLayout.stopShimmer();
+                                rl_content.setVisibility(View.VISIBLE);
+                            } catch (IOException | JSONException e) {
+                                e.printStackTrace();
+                                callUser.clone().enqueue(this);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                        }
+                    });
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
             }
         });
     }
@@ -1266,205 +1081,6 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
         }
     }
 
-    /*private void initializeDialogSuccess(String detailJanji, LocalDate localDate){
-        Dialog dialog = new Dialog(getActivity(),R.style.CustomAlertDialog);
-        LayoutInflater inflater = getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.dialog_payment_success,null);
-        dialog.setContentView(dialogView);
-        dialog.setCancelable(false);
-        dialog.setTitle(null);
-
-        RelativeLayout relativeContent = dialogView.findViewById(R.id.layout_visible);
-        ShimmerFrameLayout SFL = dialogView.findViewById(R.id.shimmerLayout);
-        SFL.startShimmer();
-        LinearLayout linearLoader = dialogView.findViewById(R.id.layout_loader);
-
-        Locale locale = new Locale("in", "ID");
-        DateTimeFormatter dayFormat = DateTimeFormatter.ofPattern("EEEE",locale);
-
-        JanjiRequest request = new JanjiRequest(bundle.getInt("id_dokter"), bundle.getString("date"), detailJanji, localDate.format(dayFormat).toLowerCase());
-
-        Call<ResponseBody> buatJanji = RetrofitClient.getInstance().getApi().buatJanji("Bearer "+access, request);
-        buatJanji.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                try {
-                    if (response.isSuccessful()){
-                        if (response.body() != null){
-                            String s = response.body().string();
-                            JSONObject object = new JSONObject(s);
-                            if (object.has("success")){
-                                JSONObject janjiSuccess = object.getJSONObject("data");
-                                Call<ResponseBody> getJanji = RetrofitClient.getInstance().getApi().getUserJanji("Bearer "+access);
-                                getJanji.enqueue(new Callback<ResponseBody>() {
-                                    @Override
-                                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                        try {
-                                            if (response.isSuccessful()){
-                                                if (response.body()!=null){
-                                                    String s = response.body().string();
-                                                    JSONObject jsonObject = new JSONObject(s);
-                                                    JSONArray jsonArray = jsonObject.optJSONArray("data");
-                                                    for (int i = 0; i < jsonArray.length(); i++) {
-                                                        JSONObject object = jsonArray.getJSONObject(i);
-                                                        idJanji = object.getInt("id");
-                                                        JSONArray transaksiArr = object.getJSONArray("transaksi");
-                                                        for (int j = 0; j < transaksiArr.length(); j++) {
-                                                            JSONObject transaksi = transaksiArr.getJSONObject(j);
-                                                            if (!transaksi.getBoolean("is_paid")){
-                                                                idTransaksi = transaksi.getInt("id");
-                                                                Call<ResponseBody> bayar = RetrofitClient.getInstance().getApi().bayar("Bearer "+access,idTransaksi,idJanji);
-                                                                bayar.enqueue(new Callback<ResponseBody>() {
-                                                                    @Override
-                                                                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                                                        try {
-                                                                            if (response.isSuccessful()) {
-                                                                                if (response.body() != null) {
-                                                                                    String s = response.body().string();
-                                                                                    Log.e("BUATJANJI","idTransaksi:"+idTransaksi+", "+s);
-                                                                                    JSONObject object = new JSONObject(s);
-                                                                                    if (object.has("success")) {
-                                                                                        Call<ResponseBody> getJanjiAgain = RetrofitClient.getInstance().getApi().getUserJanji("Bearer "+access);
-                                                                                        getJanjiAgain.enqueue(new Callback<ResponseBody>() {
-                                                                                            @Override
-                                                                                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                                                                                try {
-                                                                                                    if (response.isSuccessful()){
-                                                                                                        if (response.body() != null){
-                                                                                                            String s = response.body().string();
-                                                                                                            JSONObject janjiObject = new JSONObject(s);
-                                                                                                            JSONArray janjiArr = janjiObject.getJSONArray("data");
-                                                                                                            for (int i = 0; i < janjiArr.length(); i++) {
-                                                                                                                JSONObject janjiObj = janjiArr.getJSONObject(i);
-                                                                                                                if (janjiObj.getInt("idStatus") == 1){
-                                                                                                                    docUri = Uri.parse(bundle.getString("uri"));
-                                                                                                                    String mimeType = getActivity().getContentResolver().getType(docUri);
-
-                                                                                                                    try {
-                                                                                                                        String fileName = getFileName(docUri);
-
-                                                                                                                        // The temp file could be whatever you want
-                                                                                                                        File outputDir = getActivity().getCacheDir(); // context being the Activity pointer
-                                                                                                                        File outputFile = File.createTempFile(fileName.split("\\.")[0], "."+fileName.split("\\.")[1], outputDir);
-
-                                                                                                                        File fileCopy = copyToTempFile(docUri, outputFile);
-                                                                                                                        RequestBody requestBody = RequestBody.create(MediaType.parse(mimeType),fileCopy);
-                                                                                                                        MultipartBody.Part part = MultipartBody.Part.createFormData("file",fileName,requestBody);
-                                                                                                                        Call<ResponseBody> uploadFile = RetrofitClient.getInstance().getApi().uploadFile("Bearer "+access, janjiSuccess.getInt("id"), part);
-                                                                                                                        uploadFile.enqueue(new Callback<ResponseBody>() {
-                                                                                                                            @Override
-                                                                                                                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                                                                                                                try {
-                                                                                                                                    if (response.isSuccessful()){
-                                                                                                                                        if (response.body() != null){
-                                                                                                                                            String respons = response.body().string();
-                                                                                                                                            JSONObject uploadObj = new JSONObject(respons);
-                                                                                                                                            Log.e("TAG", "onActivityResult: "+respons);
-                                                                                                                                            if (uploadObj.has("success")){
-                                                                                                                                                SFL.stopShimmer();
-                                                                                                                                                relativeContent.setVisibility(View.VISIBLE);
-                                                                                                                                                linearLoader.setVisibility(View.GONE);
-                                                                                                                                            }
-                                                                                                                                        }else{
-                                                                                                                                            String respons = response.errorBody().string();
-                                                                                                                                            Log.e("TAG", "onActivityResult: "+respons);
-                                                                                                                                        }
-                                                                                                                                    }else{
-                                                                                                                                        String respons = response.errorBody().string();
-                                                                                                                                        Log.e("TAG", "onActivityResult: "+respons);
-                                                                                                                                    }
-                                                                                                                                } catch (IOException | JSONException e) {
-                                                                                                                                    e.printStackTrace();
-                                                                                                                                    Log.e("TAG", "onActivityResult: "+e.getMessage());
-                                                                                                                                    uploadFile.clone().enqueue(this);
-                                                                                                                                }
-                                                                                                                            }
-
-                                                                                                                            @Override
-                                                                                                                            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                                                                                                                Log.e("TAG", "Failure: "+t.getMessage());
-                                                                                                                            }
-                                                                                                                        });
-                                                                                                                        break;
-                                                                                                                    } catch (Exception e) {
-                                                                                                                        e.printStackTrace();
-                                                                                                                    }
-                                                                                                                }
-                                                                                                            }
-                                                                                                        }
-                                                                                                    }
-                                                                                                } catch (IOException | JSONException e) {
-                                                                                                    e.printStackTrace();
-                                                                                                    getJanjiAgain.clone().enqueue(this);
-                                                                                                }
-                                                                                            }
-
-                                                                                            @Override
-                                                                                            public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-                                                                                            }
-                                                                                        });
-                                                                                    }
-                                                                                }
-                                                                            }else{
-                                                                                Log.e("BUATJANJI",response.errorBody().string());
-                                                                            }
-                                                                        } catch (IOException | JSONException e) {
-                                                                            e.printStackTrace();
-                                                                            bayar.clone().enqueue(this);
-                                                                        }
-                                                                    }
-
-                                                                    @Override
-                                                                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-                                                                    }
-                                                                });
-                                                                break;
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        } catch (IOException | JSONException e) {
-                                            getJanji.clone().enqueue(this);
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-                                    }
-                                });
-                            }
-                        }
-                    }
-                } catch (IOException | JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-            }
-        });
-
-        dialogView.findViewById(R.id.btnNext).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.cancel();
-//                socket.emit("App.User.Notification.Janji."+bundle.getInt("id_dokter"),bundle.getString("name"));
-                FragmentManager fm = getActivity().getSupportFragmentManager();
-                for(int i = 0; i < fm.getBackStackEntryCount()-1; ++i) {
-                    fm.popBackStack();
-                }
-            }
-        });
-
-        dialog.show();
-    }*/
-
     private void initializeDialogSuccess(){
         progressDialog.dismiss();
         Dialog dialog = new Dialog(getActivity(),R.style.CustomAlertDialog);
@@ -1479,86 +1095,6 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
         SFL.startShimmer();
         LinearLayout linearLoader = dialogView.findViewById(R.id.layout_loader);
 
-        /*Call<ResponseBody> getJanjiAgain = RetrofitClient.getInstance().getApi().getUserJanji("Bearer "+access);
-        getJanjiAgain.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                try {
-                    if (response.isSuccessful()){
-                        if (response.body() != null){
-                            String s = response.body().string();
-                            JSONObject janjiObject = new JSONObject(s);
-                            JSONArray janjiArr = janjiObject.getJSONArray("data");
-                            for (int i = 0; i < janjiArr.length(); i++) {
-                                JSONObject janjiObj = janjiArr.getJSONObject(i);
-                                if (janjiObj.getInt("idStatus") == 1){
-                                    docUri = Uri.parse(bundle.getString("uri"));
-                                    String mimeType = getActivity().getContentResolver().getType(docUri);
-
-                                    try {
-                                        String fileName = getFileName(docUri);
-
-                                        // The temp file could be whatever you want
-                                        File outputDir = getActivity().getCacheDir(); // context being the Activity pointer
-                                        File outputFile = File.createTempFile(fileName.split("\\.")[0], "."+fileName.split("\\.")[1], outputDir);
-
-                                        File fileCopy = copyToTempFile(docUri, outputFile);
-                                        RequestBody requestBody = RequestBody.create(MediaType.parse(mimeType),fileCopy);
-                                        MultipartBody.Part part = MultipartBody.Part.createFormData("file",fileName,requestBody);
-                                        Call<ResponseBody> uploadFile = RetrofitClient.getInstance().getApi().uploadFile("Bearer "+access, idJanji, part);
-                                        uploadFile.enqueue(new Callback<ResponseBody>() {
-                                            @Override
-                                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                                try {
-                                                    if (response.isSuccessful()){
-                                                        if (response.body() != null){
-                                                            String respons = response.body().string();
-                                                            JSONObject uploadObj = new JSONObject(respons);
-                                                            Log.e("TAG", "onActivityResult: "+respons);
-                                                            if (uploadObj.has("success")){
-                                                                SFL.stopShimmer();
-                                                                relativeContent.setVisibility(View.VISIBLE);
-                                                                linearLoader.setVisibility(View.GONE);
-                                                            }
-                                                        }else{
-                                                            String respons = response.errorBody().string();
-                                                            Log.e("TAG", "onActivityResult: "+respons);
-                                                        }
-                                                    }else{
-                                                        String respons = response.errorBody().string();
-                                                        Log.e("TAG", "onActivityResult: "+respons);
-                                                    }
-                                                } catch (IOException | JSONException e) {
-                                                    e.printStackTrace();
-                                                    Log.e("TAG", "onActivityResult: "+e.getMessage());
-                                                    uploadFile.clone().enqueue(this);
-                                                }
-                                            }
-
-                                            @Override
-                                            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                                Log.e("TAG", "Failure: "+t.getMessage());
-                                            }
-                                        });
-                                        break;
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                } catch (IOException | JSONException e) {
-                    e.printStackTrace();
-                    getJanjiAgain.clone().enqueue(this);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-            }
-        });*/
         SFL.stopShimmer();
         relativeContent.setVisibility(View.VISIBLE);
         linearLoader.setVisibility(View.GONE);
@@ -1779,6 +1315,10 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
         transactionRequestNew.setShopeepay(new Shopeepay("demo:://midtrans"));
 
         return transactionRequestNew;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
     }
 
     private CustomerDetails initCustomerDetails(String phone, String fName, String lName, String email, String alamat) {

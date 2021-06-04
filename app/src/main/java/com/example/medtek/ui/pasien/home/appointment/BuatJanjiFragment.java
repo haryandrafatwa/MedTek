@@ -625,7 +625,7 @@ public class BuatJanjiFragment extends Fragment {
                                 noonTime.add(j);
                             }else if (j>=15 && j <= 17){
                                 afternoonTime.add(j);
-                            }else if(j>=18 && j <= 20){
+                            }else if(j>=18 && j <= 24){
                                 eveningTime.add(j);
                             }
                         }
@@ -878,7 +878,7 @@ public class BuatJanjiFragment extends Fragment {
                                 noonTime.add(j);
                             }else if (j>=15 && j <= 17){
                                 afternoonTime.add(j);
-                            }else if(j>=18 && j <= 20){
+                            }else if(j>=18 && j <= 24){
                                 eveningTime.add(j);
                             }
                         }

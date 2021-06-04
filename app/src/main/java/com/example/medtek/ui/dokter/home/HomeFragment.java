@@ -400,13 +400,13 @@ public class HomeFragment extends Fragment {
     }
 
     private void startService() throws JSONException {
-        Intent serviceIntent = new Intent(getActivity(), NotificationService.class);
+        Intent serviceIntent = new Intent(getContext(), NotificationService.class);
         serviceIntent.putExtra("data",CHANNEL_MESSAGES);
         getActivity().startService(serviceIntent);
     }
 
     public void stopService() {
-        Intent serviceIntent = new Intent(getActivity(), NotificationService.class);
+        Intent serviceIntent = new Intent(getContext(), NotificationService.class);
         ContextCompat.startForegroundService(getActivity(),serviceIntent);
     }
 

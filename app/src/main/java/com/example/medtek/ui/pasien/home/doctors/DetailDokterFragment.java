@@ -90,7 +90,7 @@ public class DetailDokterFragment extends Fragment {
 
     private RelativeLayout rl_content,rl_loader;
     private ShimmerFrameLayout shimmerFrameLayout;
-    private String access = "", refresh = "", nama, nama_dokter, detail_janji, date, time, snapToken;
+    private String access = "", refresh = "", nama, nama_dokter, detail_janji, date, time, snapToken, metode;
     private int harga, balance, id_doc, idJanji;
 
     private boolean isOnAttach = false;
@@ -254,11 +254,6 @@ public class DetailDokterFragment extends Fragment {
                                                                 JSONObject walletObj = user.getJSONObject("wallet");
                                                                 balance = walletObj.getInt("balance");
                                                                 if (!user.isNull("email_verified_at")){
-                                                        /*BuatJanjiFragment buatJanjiFragment = new BuatJanjiFragment();
-                                                        Bundle bundle = new Bundle();
-                                                        bundle.putInt("id_dokter",id_dokter);
-                                                        buatJanjiFragment.setArguments(bundle);
-                                                        setFragment(buatJanjiFragment,"FragmentBuatJanji");*/
                                                                     Call<ResponseBody> getUserJanji = RetrofitClient.getInstance().getApi().getUserJanji("Bearer "+access);
                                                                     getUserJanji.enqueue(new Callback<ResponseBody>() {
                                                                         @Override
@@ -306,6 +301,7 @@ public class DetailDokterFragment extends Fragment {
                                                                                                     detail_janji = janjiObj.getString("detailJanji");
                                                                                                     date = janjiObj.getString("tglJanji");
                                                                                                     snapToken = transObj.getString("snapToken");
+                                                                                                    metode = transObj.getString("method");
                                                                                                 }else{
                                                                                                     setStatus(true);
                                                                                                 }
@@ -323,6 +319,7 @@ public class DetailDokterFragment extends Fragment {
                                                                                             bundle.putString("date",date);
                                                                                             bundle.putString("snapToken",snapToken);
                                                                                             bundle.putString("lastFragment","DetailDokter");
+                                                                                            bundle.putString("method",metode);
                                                                                             if(detail_janji.contains("Pukul")){
                                                                                                 bundle.putString("time",detail_janji.split("Pukul")[1].split("\n")[0]);
                                                                                             }else{
