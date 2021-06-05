@@ -175,10 +175,16 @@ public class OthersFragment extends Fragment {
                                 JSONObject imageObj = jsonArrayImage.getJSONObject(j);
                                 if (imageObj.getInt("type_id") == 1) {
                                     path = BASE_URL + imageObj.getString("path");
+                                    Picasso.get().load(path).into(civ_user);
                                     break;
+                                }else{
+                                    if (obj.getInt("role_id") == 1){
+                                        civ_user.setImageDrawable(getActivity().getDrawable(R.drawable.ic_pasien));
+                                    }else{
+                                        civ_user.setImageDrawable(getActivity().getDrawable(R.drawable.ic_dokter));
+                                    }
                                 }
                             }
-                            Picasso.get().load(path).into(civ_user);
                         }else{
                             if (obj.getInt("role_id") == 1){
                                 civ_user.setImageDrawable(getActivity().getDrawable(R.drawable.ic_pasien));
