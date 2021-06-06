@@ -81,6 +81,7 @@
     <string name="isiulang">Isi ulang</string>
     <string name="pilihjadwal">Pilih jadwal</string>
     <string name="riwayat">Riwayat</string>
+    <string name="riwayat_konsultasi">Riwayat Konsultasi</string>
     <string name="wallet">Wallet</string>
     <string name="wallet_saldo">Saldo Dompetku</string>
     <string name="bank_transfer_and_other">Transfer antar bank atau lainnya</string>
@@ -284,6 +285,7 @@
     <string name="tidakadajanji">Anda sedang tidak memiliki janji</string>
     <string name="tidakadakonfirmasi">Anda sedang tidak memiliki antrian konfirmasi</string>
     <string name="tidakadariwayattransaksi">Anda tidak memiliki riwayat transaksi</string>
+    <string name="tidakadariwayatkonsultasi">Anda tidak memiliki riwayat konsultasi</string>
     <string name="tidakadajadwalkonsultasi">Anda belum menambahkan jadwal konsultasi anda</string>
     <string name="lp">Lingkar perut</string>
     <string name="tinggibadan">Tinggi badan (cm)</string>

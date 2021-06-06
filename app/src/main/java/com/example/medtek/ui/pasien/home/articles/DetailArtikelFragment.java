@@ -4,7 +4,9 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,7 +54,8 @@ public class DetailArtikelFragment extends Fragment {
     private Toolbar toolbar;
     private ImageView iv_artikel;
     private CircleImageView civ_author;
-    private TextView tv_author_name, tv_judul_artikel, tv_date_artikel, tv_content_artikel;
+    private TextView tv_author_name, tv_judul_artikel, tv_date_artikel;
+    private TextView tv_content_artikel;
     private ImageButton ib_share;
 
     @Override
@@ -96,7 +99,11 @@ public class DetailArtikelFragment extends Fragment {
                     String name = jsonObject.getJSONObject("author").getString("name");
                     tv_author_name.setText(name);
                     tv_judul_artikel.setText(jsonObject.getString("judul"));
-                    tv_content_artikel.setText(jsonObject.getString("isi"));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        tv_content_artikel.setText(Html.fromHtml(jsonObject.getString("isi"), Html.FROM_HTML_MODE_LEGACY));
+                    } else {
+                        tv_content_artikel.setText(Html.fromHtml(jsonObject.getString("isi")));
+                    }
                     JSONArray jsonArray = new JSONArray(jsonObject.getJSONObject("author").getString("image"));
                     String userImagePath;
                     if (jsonArray.length() == 0){
@@ -113,7 +120,8 @@ public class DetailArtikelFragment extends Fragment {
                         Calendar calendar = Calendar.getInstance();
                         calendar.setTime(date);
                         String month_name = new SimpleDateFormat("MMMM", locale).format(calendar.getTime());
-                        tv_date_artikel.setText(calendar.get(Calendar.DATE)+" "+month_name+" "+calendar.get(Calendar.YEAR)+" • "+calendar.get(Calendar.HOUR_OF_DAY)+":"+calendar.get(Calendar.MINUTE));
+                        tv_date_artikel.setText(calendar.get(Calendar.DATE)+" "+month_name+" "+calendar.get(Calendar.YEAR)+" • "+
+                                String.format("%02d",calendar.get(Calendar.HOUR_OF_DAY))+":"+String.format("%02d",calendar.get(Calendar.MINUTE)));
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }

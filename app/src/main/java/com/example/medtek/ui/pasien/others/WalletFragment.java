@@ -165,7 +165,7 @@ public class WalletFragment extends Fragment {
                                         if(calendar.get(Calendar.MONTH) == calendarNow.get(Calendar.MONTH)){
                                             if(calendar.get(Calendar.YEAR) == calendarNow.get(Calendar.YEAR)){
                                                 if (mListToday.size() <= 5){
-                                                    mListToday.add(new TransactionModel(jsonObject.getInt("id"), jsonObject.getInt("type_id"),jsonObject.getInt("totalHarga"),calendar.get(Calendar.DATE)+" "+month_name+" "+calendar.get(Calendar.YEAR)));
+                                                    mListToday.add(new TransactionModel(jsonObject.getInt("id"), jsonObject.getInt("type_id"),jsonObject.getInt("totalHarga"), jsonObject.getInt("harga"), calendar.get(Calendar.DATE)+" "+month_name+" "+calendar.get(Calendar.YEAR)));
                                                 }
                                             }
                                         }
@@ -173,7 +173,7 @@ public class WalletFragment extends Fragment {
                                         if(calendar.get(Calendar.MONTH) == calendarNow.get(Calendar.MONTH)){
                                             if(calendar.get(Calendar.YEAR) == calendarNow.get(Calendar.YEAR)){
                                                 if (mListYesterday.size() <= 5){
-                                                    mListYesterday.add(new TransactionModel(jsonObject.getInt("id"), jsonObject.getInt("type_id"),jsonObject.getInt("totalHarga"),calendar.get(Calendar.DATE)+" "+month_name+" "+calendar.get(Calendar.YEAR)));
+                                                    mListYesterday.add(new TransactionModel(jsonObject.getInt("id"), jsonObject.getInt("type_id"),jsonObject.getInt("totalHarga"), jsonObject.getInt("harga"), calendar.get(Calendar.DATE)+" "+month_name+" "+calendar.get(Calendar.YEAR)));
                                                 }
                                             }
                                         }

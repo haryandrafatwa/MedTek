@@ -14,6 +14,13 @@
     <color name="textColorDarkRed">#B2151B</color>
     <color name="colorFormInfo">#FFD77B</color>
 
+    <color name="colorCoffee">#B38867</color>
+    <color name="colorLatte">#DDBC95</color>
+    <color name="colorCarrot">#EE693F</color>
+    <color name="colorTangerine">#F69454</color>
+    <color name="colorOcean">#07575B</color>
+    <color name="colorWave">#66A5AD</color>
+
     <color name="whitePrimary">#F6F8FA</color>
     <color name="whiteSecondary">#F7F8F3</color>
     <color name="whiteSecondary2">#fff2f2f2</color>

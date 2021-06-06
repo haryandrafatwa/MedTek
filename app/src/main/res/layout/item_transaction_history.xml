@@ -19,11 +19,9 @@
         android:orientation="vertical"
         android:layout_gravity="center_vertical">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="12">
+            android:layout_height="wrap_content">
 
             <me.abhinay.input.CurrencyEditText
                 android:id="@+id/tv_totalharga"
@@ -38,33 +36,44 @@
                 android:maxLines="1"
                 android:ellipsize="end"/>
 
-            <TextView
-                android:id="@+id/tv_judul_history"
+            <me.abhinay.input.CurrencyEditText
+                android:id="@+id/tv_harga"
                 android:layout_width="0dp"
                 android:layout_weight="7"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
                 android:textColor="@color/textColorDark"
+                android:visibility="gone"
                 android:gravity="center_vertical"
                 android:fontFamily="@font/roboto_medium"
                 android:maxLines="1"
                 android:ellipsize="end"/>
 
             <TextView
+                android:id="@+id/tv_judul_history"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="@color/textColorDark"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/tv_date"
+                android:fontFamily="@font/roboto_medium"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+
+            <TextView
                 android:id="@+id/tv_date"
-                android:layout_width="0dp"
-                android:layout_weight="5"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
                 android:textColor="@color/textColorGray"
-                android:layout_marginStart="@dimen/margin_8"
-                android:gravity="center_vertical|end"
-                android:layout_gravity="center_vertical"
                 android:fontFamily="@font/roboto_regular"
                 android:maxLines="1"
                 android:ellipsize="end"/>
 
-        </LinearLayout>
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/tv_desc"

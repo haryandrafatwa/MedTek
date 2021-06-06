@@ -6,13 +6,14 @@ import android.os.Parcelable;
 public class TransactionModel implements Parcelable {
 
     private int id, idType;
-    private long totalHarga;
+    private long totalHarga, harga;
     private String date;
 
-    public TransactionModel(int id, int idType, long totalHarga, String date) {
+    public TransactionModel(int id, int idType, long totalHarga, long harga, String date) {
         this.id = id;
         this.idType = idType;
         this.totalHarga = totalHarga;
+        this.harga = harga;
         this.date = date;
     }
 
@@ -20,6 +21,7 @@ public class TransactionModel implements Parcelable {
         id = in.readInt();
         idType = in.readInt();
         totalHarga = in.readLong();
+        harga = in.readLong();
         date = in.readString();
     }
 
@@ -45,6 +47,7 @@ public class TransactionModel implements Parcelable {
         dest.writeInt(id);
         dest.writeInt(idType);
         dest.writeLong(totalHarga);
+        dest.writeLong(harga);
         dest.writeString(date);
     }
 
@@ -78,5 +81,13 @@ public class TransactionModel implements Parcelable {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public long getHarga() {
+        return harga;
+    }
+
+    public void setHarga(long harga) {
+        this.harga = harga;
     }
 }

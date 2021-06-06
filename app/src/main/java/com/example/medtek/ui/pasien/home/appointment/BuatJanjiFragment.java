@@ -798,7 +798,11 @@ public class BuatJanjiFragment extends Fragment {
                 String[] strDays = new String[] { "", "Senin", "Selasa","Rabu", "Kamis","Jumat", "Sabtu", "Minggu" };
 
                 if (day.equalsIgnoreCase("Hari Ini")){
-                    day = strDays[calendar.get(Calendar.DAY_OF_WEEK)-1];
+                    if (calendar.get(Calendar.DAY_OF_WEEK) == 1){
+                        day = strDays[7];
+                    }else{
+                        day = strDays[calendar.get(Calendar.DAY_OF_WEEK)-1];
+                    }
                 }else if(day.equalsIgnoreCase("Besok")){
                     day = strDays[calendar.get(Calendar.DAY_OF_WEEK)];
                 }

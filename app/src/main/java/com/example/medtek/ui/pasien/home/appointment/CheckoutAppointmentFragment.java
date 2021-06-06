@@ -205,14 +205,46 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
                             progressDialog.show();
                             if (bundle.getString("lastFragment").equalsIgnoreCase("DetailDokter")){
                                 setIdJanji(bundle.getInt("id_janji"));
-                                ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Konsultasi dengan "+tv_dr_name.getText().toString());
-                                ArrayList<ItemDetails> details = new ArrayList<>();
-                                details.add(itemDetails);
-                                TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
-                                request.setItemDetails(details);
-                                progressDialog.dismiss();
-                                MidtransSDK.getInstance().setTransactionRequest(request);
-                                MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
+                                Log.e(TAG, "onClick: DetailDokter ->"+snapToken );
+                                if (!snapToken.equalsIgnoreCase("null")){
+                                    ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Konsultasi dengan "+tv_dr_name.getText().toString());
+                                    ArrayList<ItemDetails> details = new ArrayList<>();
+                                    details.add(itemDetails);
+                                    TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
+                                    request.setItemDetails(details);
+                                    progressDialog.dismiss();
+                                    MidtransSDK.getInstance().setTransactionRequest(request);
+                                    MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
+                                }else{
+                                    Call<ResponseBody> payment = RetrofitClient.getInstance().getApi().payment("Bearer "+access,idJanji);
+                                    payment.enqueue(new Callback<ResponseBody>() {
+                                        @Override
+                                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                            if (response.body() != null){
+                                                try {
+                                                    JSONObject responseObj = new JSONObject(response.body().string());
+                                                    Log.e(TAG, "onResponse: "+response.body().string());
+                                                    snapToken = responseObj.getString("token");
+                                                    ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Konsultasi dengan "+tv_dr_name.getText().toString());
+                                                    ArrayList<ItemDetails> details = new ArrayList<>();
+                                                    details.add(itemDetails);
+                                                    TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
+                                                    request.setItemDetails(details);
+                                                    progressDialog.dismiss();
+                                                    MidtransSDK.getInstance().setTransactionRequest(request);
+                                                    MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
+                                                } catch (IOException | JSONException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                            payment.clone().enqueue(this);
+                                        }
+                                    });
+                                }
                             }else{
                                 Call<ResponseBody> getUserJanji = RetrofitClient.getInstance().getApi().getUserJanji("Bearer "+access);
                                 getUserJanji.enqueue(new Callback<ResponseBody>() {
@@ -664,14 +696,45 @@ public class CheckoutAppointmentFragment extends Fragment implements Transaction
                         progressDialog.show();
                         if (bundle.getString("lastFragment").equalsIgnoreCase("DetailDokter")){
                             setIdJanji(bundle.getInt("id_janji"));
-                            ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Konsultasi dengan "+tv_dr_name.getText().toString());
-                            ArrayList<ItemDetails> details = new ArrayList<>();
-                            details.add(itemDetails);
-                            TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
-                            request.setItemDetails(details);
-                            progressDialog.dismiss();
-                            MidtransSDK.getInstance().setTransactionRequest(request);
-                            MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
+                            if (!snapToken.equalsIgnoreCase("null")){
+                                ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Konsultasi dengan "+tv_dr_name.getText().toString());
+                                ArrayList<ItemDetails> details = new ArrayList<>();
+                                details.add(itemDetails);
+                                TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
+                                request.setItemDetails(details);
+                                progressDialog.dismiss();
+                                MidtransSDK.getInstance().setTransactionRequest(request);
+                                MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
+                            }else{
+                                Call<ResponseBody> payment = RetrofitClient.getInstance().getApi().payment("Bearer "+access,idJanji);
+                                payment.enqueue(new Callback<ResponseBody>() {
+                                    @Override
+                                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                        if (response.body() != null){
+                                            try {
+                                                JSONObject responseObj = new JSONObject(response.body().string());
+                                                Log.e(TAG, "onResponse: "+response.body().string());
+                                                snapToken = responseObj.getString("token");
+                                                ItemDetails itemDetails = new ItemDetails("1",totalBayar,1,"Konsultasi dengan "+tv_dr_name.getText().toString());
+                                                ArrayList<ItemDetails> details = new ArrayList<>();
+                                                details.add(itemDetails);
+                                                TransactionRequest request = initTransactionRequest(totalBayar,phone,fName,lName,email,alamat);
+                                                request.setItemDetails(details);
+                                                progressDialog.dismiss();
+                                                MidtransSDK.getInstance().setTransactionRequest(request);
+                                                MidtransSDK.getInstance().startPaymentUiFlow(getActivity(),snapToken);
+                                            } catch (IOException | JSONException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                        payment.clone().enqueue(this);
+                                    }
+                                });
+                            }
                         }else{
                             Call<ResponseBody> getUserJanji = RetrofitClient.getInstance().getApi().getUserJanji("Bearer "+access);
                             getUserJanji.enqueue(new Callback<ResponseBody>() {

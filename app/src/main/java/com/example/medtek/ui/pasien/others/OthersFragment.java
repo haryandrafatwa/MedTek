@@ -60,8 +60,8 @@ public class OthersFragment extends Fragment {
 
     private TextView tv_nama, tv_email,tv_app_version;
     private Button btn_logout;
-    private ImageButton ib_edit,ib_cek_verified, ib_wallet, ib_jadwal;
-    private LinearLayout layout_nilai_kami,layout_invite_friends, ll_wallet, ll_jadwal;
+    private ImageButton ib_edit,ib_cek_verified, ib_wallet, ib_jadwal, ib_riwayat;
+    private LinearLayout layout_nilai_kami,layout_invite_friends, ll_wallet, ll_jadwal, ll_riwayat;
     private ChipNavigationBar bottomNavigationView;
     private CircleImageView civ_user;
 
@@ -150,13 +150,13 @@ public class OthersFragment extends Fragment {
                         ll_wallet.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                /*if (isVerified){
+                                if (isVerified){
                                     WalletFragment walletFragment = new WalletFragment();
                                     setFragment(walletFragment,"FragmentWallet");
                                 }else{
                                     Toasty.info(getActivity(),getString(R.string.silahkanlakukanverifikasi),Toasty.LENGTH_LONG).show();
-                                }*/
-                                Toasty.info(getActivity(),"Under Maintenance!",Toasty.LENGTH_LONG).show();
+                                }
+//                                Toasty.info(getActivity(),"Under Maintenance!",Toasty.LENGTH_LONG).show();
                             }
                         });
 
@@ -165,6 +165,14 @@ public class OthersFragment extends Fragment {
                             public void onClick(View v) {
                                 JadwalSayaFragment jadwalSayaFragment = new JadwalSayaFragment();
                                 setFragment(jadwalSayaFragment,"JadwalSayaFragment");
+                            }
+                        });
+
+                        ll_riwayat.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                RiwayatFragment riwayatFragment = new RiwayatFragment();
+                                setFragment(riwayatFragment,"RiwayatFragment");
                             }
                         });
 
@@ -290,6 +298,13 @@ public class OthersFragment extends Fragment {
             }
         });
 
+        ib_riwayat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ll_riwayat.performClick();
+            }
+        });
+
     }
 
     private void initialize(){
@@ -303,6 +318,7 @@ public class OthersFragment extends Fragment {
         ib_cek_verified = getActivity().findViewById(R.id.btn_cek_verified);
         ib_wallet = getActivity().findViewById(R.id.ib_wallet);
         ib_jadwal = getActivity().findViewById(R.id.ib_jadwal);
+        ib_riwayat = getActivity().findViewById(R.id.ib_riwayat);
 
         bottomNavigationView = getActivity().findViewById(R.id.bottomBar);
         bottomNavigationView.setVisibility(View.VISIBLE);
@@ -315,6 +331,7 @@ public class OthersFragment extends Fragment {
         pb_profile = getActivity().findViewById(R.id.pb_profile);
         ll_wallet = getActivity().findViewById(R.id.layout_wallet);
         ll_jadwal = getActivity().findViewById(R.id.layout_jadwal);
+        ll_riwayat = getActivity().findViewById(R.id.layout_riwayat);
 
         startEcho();
 

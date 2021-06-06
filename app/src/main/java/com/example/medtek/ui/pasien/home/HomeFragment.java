@@ -772,7 +772,7 @@ public class HomeFragment extends Fragment {
                                                         .show();
                                             }else if (jsonObject.getString("message").equalsIgnoreCase("Janji Queued")){
                                                 CHANNEL_MESSAGES = drName+" telah mengkonfirmasi janji anda, mohon tunggu.";
-                                                SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(App.getContext(), SweetAlertDialog.SUCCESS_TYPE);
+                                                SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(getActivity(), SweetAlertDialog.SUCCESS_TYPE);
                                                 sweetAlertDialog.setTitleText("Janji Diterima!")
                                                         .setContentText("Janji anda telah diterima, silahkan menunggu antrian pada halaman chat")
                                                         .setConfirmButtonBackgroundColor(Color.parseColor("#2196F3"))

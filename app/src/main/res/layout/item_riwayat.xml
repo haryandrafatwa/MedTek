@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content" android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_16"
+        android:padding="@dimen/margin_16"
+        android:background="@drawable/bg_recycler_item"
+        android:elevation="4dp"
+        android:id="@+id/rl_recycler">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/header">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/ic_consultation"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="@drawable/ic_consultation"
+                android:layout_centerVertical="true"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/ic_consultation"
+                android:layout_toStartOf="@id/tv_status"
+                android:layout_marginHorizontal="@dimen/margin_16"
+                android:layout_centerVertical="true"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_content_artikel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Konsultasi"
+                    android:textColor="@color/textColorDark"
+                    android:fontFamily="@font/roboto_medium"/>
+
+                <TextView
+                    android:id="@+id/tv_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textColorGray"
+                    android:textSize="@dimen/text_xs"
+                    android:fontFamily="@font/roboto_regular"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_dialog"
+                android:backgroundTint="@color/textColorLightRed"
+                android:paddingHorizontal="@dimen/margin_8"
+                android:paddingVertical="@dimen/margin_4"
+                android:textColor="@color/colorPrimary"
+                android:textSize="14sp"
+                android:fontFamily="@font/roboto_medium"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"/>
+
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/separator"
+            android:layout_width="match_parent"
+            android:layout_height="0.3dp"
+            android:background="@drawable/bg_dialog"
+            android:backgroundTint="@color/textColorLightGray"
+            android:layout_below="@+id/header"
+            android:layout_marginTop="@dimen/margin_8"/>
+
+        <RelativeLayout
+            android:id="@+id/layout_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_8"
+            android:layout_below="@id/separator">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/civ_dokter"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_centerVertical="true"/>
+
+            <LinearLayout
+                android:id="@+id/layout_profile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/civ_dokter"
+                android:layout_toStartOf="@id/tv_harga"
+                android:orientation="vertical"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp">
+
+                <TextView
+                    android:id="@+id/tv_dr_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textColorDark"
+                    android:fontFamily="@font/roboto_medium"
+                    android:ellipsize="end"
+                    android:maxLines="1"/>
+
+                <TextView
+                    android:id="@+id/tv_dr_special"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/darker_gray"
+                    android:fontFamily="@font/roboto_regular"
+                    android:textSize="12sp"
+                    android:ellipsize="end"
+                    android:maxLines="1"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_harga"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:textColor="@color/textColorDark"
+                android:fontFamily="@font/roboto_medium"/>
+
+            <me.abhinay.input.CurrencyEditText
+                android:id="@+id/tv_totalharga"
+                android:layout_width="0dp"
+                android:layout_weight="7"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="@color/textColorDark"
+                android:visibility="gone"
+                android:gravity="center_vertical"
+                android:fontFamily="@font/roboto_medium"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/detailjanji"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/layout_content"
+            android:text="Detail Janji"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_xs"
+            android:layout_marginTop="@dimen/margin_8"
+            android:fontFamily="@font/roboto_light"/>
+
+        <TextView
+            android:id="@+id/tv_detail_janji"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/detailjanji"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textColor="@color/textColorDark"
+            android:fontFamily="@font/roboto_regular"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>

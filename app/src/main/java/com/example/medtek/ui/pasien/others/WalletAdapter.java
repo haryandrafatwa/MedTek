@@ -69,6 +69,12 @@ public class WalletAdapter extends RecyclerView.Adapter<WalletAdapter.ViewHolder
         holder.currencyEditText.setDecimals(false);
         holder.currencyEditText.setSeparator(".");
         holder.currencyEditText.setText(model.getTotalHarga()+"");
+        holder.currencyEditTextHarga.setCurrency(CurrencySymbols.INDONESIA);
+        holder.currencyEditTextHarga.setDelimiter(false);
+        holder.currencyEditTextHarga.setSpacing(false);
+        holder.currencyEditTextHarga.setDecimals(false);
+        holder.currencyEditTextHarga.setSeparator(".");
+        holder.currencyEditTextHarga.setText(model.getHarga()+"");
 
         if (model.getIdType() == 1){
             holder.riv_artikel.setImageDrawable(mActivity.getDrawable(R.drawable.ic_payment));
@@ -85,7 +91,7 @@ public class WalletAdapter extends RecyclerView.Adapter<WalletAdapter.ViewHolder
         }else if (model.getIdType() == 4){
             holder.riv_artikel.setImageDrawable(mActivity.getDrawable(R.drawable.ic_refund));
             holder.tv_judul.setText("Refund");
-            holder.tv_desc.setText("Anda telah melakukan refund sebesar "+holder.currencyEditText.getText()+".");
+            holder.tv_desc.setText("Anda telah melakukan refund sebesar "+holder.currencyEditTextHarga.getText()+".");
         }
 
         holder.tv_date.setText(model.getDate());
@@ -106,6 +112,7 @@ public class WalletAdapter extends RecyclerView.Adapter<WalletAdapter.ViewHolder
         private final ImageView riv_artikel;
         private final LinearLayout linearLayout;
         private final CurrencyEditText currencyEditText;
+        private final CurrencyEditText currencyEditTextHarga;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -115,6 +122,7 @@ public class WalletAdapter extends RecyclerView.Adapter<WalletAdapter.ViewHolder
             tv_desc = itemView.findViewById(R.id.tv_desc);
             linearLayout = itemView.findViewById(R.id.rl_history);
             currencyEditText = itemView.findViewById(R.id.tv_totalharga);
+            currencyEditTextHarga = itemView.findViewById(R.id.tv_harga);
         }
     }
 }
