@@ -99,7 +99,6 @@ public class RiwayatFragment extends Fragment {
                             JSONObject obj = new JSONObject(s);
                             JSONArray jsonArray = obj.getJSONArray("data");
 
-                            Toasty.info(getActivity(),"Data Length: "+jsonArray.length(),Toasty.LENGTH_LONG).show();
                             if (jsonArray.length() > 0){
                                 mList.clear();
                                 for (int i = 0; i < jsonArray.length(); i++) {
